@@ -293,7 +293,10 @@ input[type=range]:focus{ box-shadow:none; }
 .dw-stats{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
 
 /* ---------- To-Do ---------- */
-.todo-add{ display:flex; gap:8px; margin-bottom:12px; }
+.todo-add{ display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
+.todo-add #todo-input{ flex:1 1 180px; }
+.todo-add #todo-date{ width:150px; flex:none; }
+.todo-scheduled{ display:block; font-family:var(--mono); font-size:10px; color:var(--accent); margin-top:3px; }
 .todo-progress{ height:6px; background:#10151d; border-radius:999px; overflow:hidden; margin-bottom:12px; }
 .todo-progress .bar-fill{ height:100%; }
 .todo-list{ list-style:none; max-height:400px; overflow-y:auto; padding-right:4px; }
@@ -363,6 +366,8 @@ input[type=range]:focus{ box-shadow:none; }
 .goal-metrics{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:2px 0 6px; }
 .m-label{ display:block; font-size:9px; letter-spacing:.18em; color:var(--muted); margin-bottom:5px; font-weight:800; }
 .m-input{ font-family:var(--mono); font-size:13px; padding:7px 9px; }
+.goal-unit-input{ font-family:var(--mono); }
+.goal-metric-row.unit-row{ grid-column:1 / -1; }
 .goal-bar-row{ display:flex; align-items:center; gap:12px; margin:8px 0 4px; }
 .bar-pct{ font-family:var(--mono); font-size:12px; color:var(--bright); min-width:38px; text-align:right; flex:none; }
 .goal-readout{ font-family:var(--mono); font-size:11.5px; color:var(--muted); }
@@ -625,6 +630,9 @@ input[type=range]:focus{ box-shadow:none; }
   padding:10px; margin-bottom:12px;
 }
 .ws-set-head{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:8px; }
+.ws-set-order{ display:inline-flex; gap:3px; margin-left:auto; }
+.ws-set-order .icon-btn{ padding:3px 6px; border:1px solid var(--line); background:var(--bg2); }
+.ws-set-order .icon-btn:disabled{ opacity:.3; cursor:default; }
 .ws-set-num{
   font-size:9px; letter-spacing:.16em; color:var(--bright); font-weight:800;
   text-transform:uppercase; background:rgba(102,252,241,.08); border:1px solid rgba(102,252,241,.3);
@@ -825,6 +833,10 @@ input[type=range]:focus{ box-shadow:none; }
 #film-games .game-row .g-opp{ font-size:12.5px; }
 #film-games .game-row .g-score{ font-size:12px; }
 #film-games .game-row .btn.sm{ padding:3px 10px; font-size:10.5px; }
+.game-video-link{ display:inline-flex; align-items:center; gap:4px; color:var(--bright); font-size:10.5px; text-decoration:none; margin-top:3px; }
+.game-video-link:hover{ text-decoration:underline; }
+.branch-frame-actions{ display:flex; gap:6px; flex-wrap:wrap; margin:8px 0; }
+.branch-frame-actions .btn{ min-width:80px; }
 
 /* Play builder */
 .play-layout{ display:grid; grid-template-columns:minmax(260px,340px) 1fr; gap:16px; align-items:start; }
@@ -1040,6 +1052,7 @@ input[type=range]:focus{ box-shadow:none; }
             <div class="todo-progress"><div class="bar-fill" id="todo-bar" style="width:0%"></div></div>
             <form id="todo-form" class="todo-add" autocomplete="off">
               <input id="todo-input" placeholder="Add a task for today...">
+              <input type="date" id="todo-date" title="Scheduled date">
               <button class="btn sm" type="submit">+ Add</button>
             </form>
             <ul class="todo-list" id="todo-list"></ul>
@@ -1078,6 +1091,7 @@ input[type=range]:focus{ box-shadow:none; }
             <div class="card-head">
               <h3>Workout Session</h3>
               <span class="kicker" id="ws-date-label"></span>
+              <label class="kicker" style="display:flex;align-items:center;gap:6px;text-transform:none;letter-spacing:.04em">Log date <input type="date" id="ws-date-override" class="mini-input" onchange="setWorkoutDate(this.value)"></label>
             </div>
             <div id="workout-session"></div>
           </div>
@@ -1234,6 +1248,9 @@ input[type=range]:focus{ box-shadow:none; }
                 <option value="p3">Period 3</option>
                 <option value="p4">Period 4</option>
                 <option value="off">Off-Time</option>
+              </select>
+              <select id="cc-sem" title="Semester">
+                <option value="s1">S1</option><option value="s2">S2</option>
               </select>
               <button class="btn sm" onclick="addClassCat()">+ Add Class</button>
             </div>
@@ -1432,6 +1449,14 @@ const LIFT_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const STRENGTH_CATS = ['Sprints', 'Plyometrics', 'Isometrics', 'Calisthenics'];
 const SET_TYPES = ['Shooting', 'Ball Handling', 'Finishing', 'Free Throws', 'Lifts'];
 const BH_STYLES = ['Stationary', 'Moving'];
+const DEFAULT_CLASS_SLOTS = [
+  { label: 'Pre-Calculus 11', period: 'p1' },
+  { label: 'EPP & New Media 10', period: 'p2' },
+  { label: 'Computer Science 11', period: 'p3' },
+  { label: 'Metalwork 11', period: 'p4' },
+  { label: 'Career Life Ed 10', period: 'off' }
+];
+const safeUrl = value => /^https?:\/\//i.test(String(value || '').trim()) ? String(value).trim() : '';
 
 const LS_KEY = 'phoenix-os-v2';
 const DAY_ABBR = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
@@ -1486,7 +1511,7 @@ function defaultState(){
     version: 2,
     habits: DEFAULT_HABITS.map(h => ({ ...h })),
     school: [],         // academic assignment database
-    classCats: [],      // registered classes (e.g. Pre-Calculus 11)
+    classCats: DEFAULT_CLASS_SLOTS.map(c => ({ id: 'class-' + uid(), label: c.label, room: '', teacher: '', period: c.period, semester: 's1' })),      // registered classes (e.g. Pre-Calculus 11)
     presets: { basketball: [], lift: [], strength: [] },
     workouts: {},       // dateKey -> workout session (basketball | lift | strength)
     logs: {},           // dateKey -> journal entry
@@ -1494,7 +1519,7 @@ function defaultState(){
     goals: [],          // blank until user creates goals
     records: { lifts: [], shooting: [], rankTiers: [] },  // Gym PRs + shooting record highs + custom rank tiers
     film: {
-      games: [],        // { id, season, club, date, opponent, scoreUs, scoreThem, oppNotes, notes }
+      games: [],        // { id, season, club, date, opponent, scoreUs, scoreThem, videoUrl, oppNotes, notes }
       plays: [],        // { id, name, team, type, primPos, secPos, steps: [{ desc, tokens }] }
       study: { player: [], team: [] }  // { id, title, url, notes }
     },
@@ -1522,7 +1547,7 @@ function mergeState(p){
     version: 2,
     habits:   Array.isArray(p.habits)   && p.habits.length   ? p.habits.map(h => ({ ...h, type: h.type || 'good' })) : d.habits,
     school:   Array.isArray(p.school)   ? p.school.map(a => ({ ...a, semester: a.semester || 's1', status: a.status || 'Not Started' })) : d.school,
-    classCats: Array.isArray(p.classCats) ? p.classCats.map(c => ({ ...c, room: c.room || '', teacher: c.teacher || '', period: c.period || 'p1' })) : d.classCats,
+    classCats: Array.isArray(p.classCats) ? p.classCats.map(c => ({ ...c, room: c.room || '', teacher: c.teacher || '', period: c.period || 'p1', semester: c.semester || 's1' })) : d.classCats,
     presets: {
       basketball: Array.isArray(p.presets && p.presets.basketball) ? p.presets.basketball.map(x => migrateSessionPreset({ ...x, notes: x.notes || '' })) : [],
       lift:       Array.isArray(p.presets && p.presets.lift)       ? p.presets.lift.map(x => ({ ...x, notes: x.notes || '' }))       : [],
@@ -1671,7 +1696,7 @@ async function cloudPull(initial){
       if (remoteAt > cloudBootAt) {
         applyingRemote = true;
         state = mergeState(data.payload);
-        flushSave();
+        localStorage.setItem(LS_KEY, JSON.stringify(state));
         renderAll();
         applyingRemote = false;
         cloudPulls++;
@@ -1683,7 +1708,7 @@ async function cloudPull(initial){
       // Realtime/background update from another device — remote wins.
       applyingRemote = true;
       state = mergeState(data.payload);
-      flushSave();
+      localStorage.setItem(LS_KEY, JSON.stringify(state));
       renderAll();
       applyingRemote = false;
       cloudPulls++;
@@ -1705,7 +1730,8 @@ function cloudQueuePush(){
   if (applyingRemote) return;
   pendingPush = true;
   clearTimeout(pushT);
-  pushT = setTimeout(cloudFlush, 900);
+  // Keep local input handling synchronous and defer network work to the background.
+  pushT = setTimeout(() => { Promise.resolve().then(cloudFlush); }, 700);
 }
 
 async function cloudFlush(){
@@ -2018,12 +2044,12 @@ function blankRow(type){
   return { name:'', sets:'', reps:'', sec:false, secs:'' };
 }
 function blankSession(type){
-  if (type === 'basketball') return { type, presetId:null, presetName:'', location:'Home', sets:[blankSet('Shooting')], time:'', notes:'' };
+  if (type === 'basketball') return { type, presetId:null, presetName:'', location:'Home', sets:[blankSet('Shooting')], time:'', notes:'', logDate:'' };
   if (type === 'lift')       return { type, presetId:null, presetName:'', day:'Mon', exercises:[blankRow(type)], time:'', notes:'' };
   return { type, presetId:null, presetName:'', category:'Sprints', items:[blankRow(type)], time:'', notes:'' };
 }
 function sessionFromPreset(p){
-  if (p.type === 'basketball') return { type:'basketball', presetId:p.id, presetName:p.name, location:p.location, sets: JSON.parse(JSON.stringify(p.sets || toSets(p.drills))), time:(p.time ? String(p.time) : ''), notes:p.notes || '' };
+  if (p.type === 'basketball') return { type:'basketball', presetId:p.id, presetName:p.name, location:p.location, sets: JSON.parse(JSON.stringify(p.sets || toSets(p.drills))), time:(p.time ? String(p.time) : ''), notes:p.notes || '', logDate:'' };
   if (p.type === 'lift')       return { type:'lift', presetId:p.id, presetName:p.name, day:p.day, exercises:p.exercises.map(r => ({ ...r })), time:'', notes:p.notes || '' };
   return { type:'strength', presetId:p.id, presetName:p.name, category:p.category, items:p.items.map(r => ({ ...r })), time:'', notes:p.notes || '' };
 }
@@ -2112,6 +2138,10 @@ function renderWsSets(s){
         '<span class="ws-set-num">Skill ' + (si + 1) + '</span>' +
         setTypeSel(set.setType, si) +
         '<button class="btn sm ghost" onclick="addWsDrill(' + si + ')">+ Add Drill</button>' +
+        '<span class="ws-set-order">' +
+          '<button class="icon-btn" onclick="moveWsSet(' + si + ',-1)" title="Move set up" ' + (si === 0 ? 'disabled' : '') + '>↑</button>' +
+          '<button class="icon-btn" onclick="moveWsSet(' + si + ',1)" title="Move set down" ' + (si === basketSets(s).length - 1 ? 'disabled' : '') + '>↓</button>' +
+        '</span>' +
         '<button class="icon-btn danger" onclick="removeWsSet(' + si + ')" title="Remove set">✕</button>' +
       '</div>' +
       '<div class="ws-set-drills">' + (set.drills || []).map((dr, di) => bbDrillHtml(set.setType, dr, si, di)).join('') + '</div>' +
@@ -2122,6 +2152,8 @@ function renderWorkoutSession(key){
   const s = state.workouts[key];
   const el = document.getElementById('workout-session');
   document.getElementById('ws-date-label').textContent = fmtDate(key);
+  const dateOverride = document.getElementById('ws-date-override');
+  if (dateOverride) dateOverride.value = key;
 
   if (!s){
     el.innerHTML =
@@ -2261,6 +2293,36 @@ function addWsDrill(si){
   syncSessionToLog(key);
   save();
   renderWorkoutSession(key);
+}
+function moveWsSet(si, delta){
+  snapshot();
+  const key = state.settings.logDate;
+  const s = state.workouts[key];
+  if (!s || s.type !== 'basketball') return;
+  const sets = basketSets(s), target = si + delta;
+  if (target < 0 || target >= sets.length) return;
+  const tmp = sets[si]; sets[si] = sets[target]; sets[target] = tmp;
+  syncSessionToLog(key); save(); renderWorkoutSession(key);
+}
+function setWorkoutDate(value){
+  const next = value || todayKey();
+  if (next === state.settings.logDate) return;
+  const current = state.settings.logDate;
+  const s = state.workouts[current];
+  if (s){
+    snapshot();
+    delete state.workouts[current];
+    state.workouts[next] = s;
+    s.logDate = next;
+    delete state.logs[current].workoutLabel;
+    syncSessionToLog(next);
+    state.settings.logDate = next;
+    save();
+    renderWorkoutSession(next); renderLogFields(); renderLogHistory(); renderDashboard();
+    toast('✓ Workout moved to ' + fmtDate(next));
+  } else {
+    state.settings.logDate = next; save(); renderWorkoutSession(next); renderLogFields();
+  }
 }
 function removeWsSet(si){
   snapshot();
@@ -2449,6 +2511,10 @@ function renderPmSets(d){
         '<span class="ws-set-num">Skill ' + (si + 1) + '</span>' +
         pmSetTypeSel(set.setType, si) +
         '<button class="btn sm ghost" onclick="addPmDrill(' + si + ')">+ Add Drill</button>' +
+        '<span class="ws-set-order">' +
+          '<button class="icon-btn" onclick="movePmSet(' + si + ',-1)" title="Move set up" ' + (si === 0 ? 'disabled' : '') + '>↑</button>' +
+          '<button class="icon-btn" onclick="movePmSet(' + si + ',1)" title="Move set down" ' + (si === (d.sets || []).length - 1 ? 'disabled' : '') + '>↓</button>' +
+        '</span>' +
         '<button class="icon-btn danger" onclick="removePmSet(' + si + ')">✕</button>' +
       '</div>' +
       '<div class="ws-set-drills">' + (set.drills || []).map((dr, di) => pmBbDrillHtml(set.setType, dr, si, di)).join('') + '</div>' +
@@ -2593,6 +2659,13 @@ function removePmSet(si){
   (pmDraft.sets || []).splice(si, 1);
   renderPresetManager();
 }
+function movePmSet(si, delta){
+  if (!pmDraft || pmType !== 'basketball') return;
+  const sets = pmDraft.sets || [], target = si + delta;
+  if (target < 0 || target >= sets.length) return;
+  const tmp = sets[si]; sets[si] = sets[target]; sets[target] = tmp;
+  renderPresetManager();
+}
 function removePmDrill(si, di){
   if (!pmDraft) return;
   const set = (pmDraft.sets || [])[si];
@@ -2695,7 +2768,7 @@ function renderDashboard(){
           '</div>' +
           '<div class="bar"><div class="bar-fill" style="width:' + p.pct + '%"></div></div>' +
           '<div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:5px">' +
-            fmtNum(g.current) + ' / ' + fmtNum(g.target) + ' ' + esc(g.unit || '') +
+            esc(String(g.current ?? '')) + ' / ' + esc(String(g.target ?? '')) + ' ' + esc(g.unit || '') +
             ' &middot; due ' + fmtDate(g.targetDate) +
           '</div>' +
         '</div>';
@@ -2752,9 +2825,24 @@ function renderDashboardWorkout(){
   el.innerHTML = body;
 }
 
+function todoEntriesForDate(key){
+  const seen = new Set(), out = [];
+  Object.entries(state.todos || {}).forEach(([bucket, rows]) => (rows || []).forEach(t => {
+    const scheduled = t.scheduledDate || bucket;
+    if (scheduled === key && !seen.has(t.id)){ seen.add(t.id); out.push({ ...t, _bucket: bucket }); }
+  }));
+  return out;
+}
+function todoLocation(id){
+  for (const [bucket, rows] of Object.entries(state.todos || {})){
+    const index = (rows || []).findIndex(t => t.id === id);
+    if (index >= 0) return { bucket, index, task: rows[index] };
+  }
+  return null;
+}
 function renderTodos(){
   const key = todayKey();
-  const list = state.todos[key] || [];
+  const list = todoEntriesForDate(key);
   const done = list.filter(t => t.done).length;
   document.getElementById('todo-counter').textContent = done + ' / ' + list.length + ' done';
   document.getElementById('todo-bar').style.width = list.length ? (done / list.length * 100) + '%' : '0%';
@@ -2764,7 +2852,7 @@ function renderTodos(){
     ? ordered.map(t =>
         '<li class="todo-item' + (t.done ? ' done' : '') + '">' +
           '<input type="checkbox" class="t-check" ' + (t.done ? 'checked' : '') + ' onchange="toggleTodo(\'' + t.id + '\')">' +
-          '<span class="t-text">' + esc(t.text) + '</span>' +
+          '<span class="t-text">' + esc(t.text) + (t.scheduledDate ? '<small class="todo-scheduled">Scheduled · ' + esc(fmtDate(t.scheduledDate)) + '</small>' : '') + '</span>' +
           '<button class="icon-btn" onclick="deleteTodo(\'' + t.id + '\')" title="Delete">✕</button>' +
         '</li>').join('')
     : '<li class="empty">No tasks yet — add one above.</li>';
@@ -2774,25 +2862,27 @@ function addTodo(){
   const val = document.getElementById('todo-input').value.trim();
   if (!val) return;
   const key = todayKey();
+  const scheduledDate = document.getElementById('todo-date').value || key;
   state.todos[key] = state.todos[key] || [];
-  state.todos[key].push({ id: uid(), text: val, done: false });
+  state.todos[key].push({ id: uid(), text: val, done: false, scheduledDate });
   document.getElementById('todo-input').value = '';
+  document.getElementById('todo-date').value = '';
   save();
   renderTodos();
 }
 function toggleTodo(id){
   snapshot();
-  const key = todayKey();
-  const t = (state.todos[key] || []).find(x => x.id === id);
-  if (!t) return;
-  t.done = !t.done;
+  const loc = todoLocation(id);
+  if (!loc) return;
+  loc.task.done = !loc.task.done;
   save();
   renderTodos();
 }
 function deleteTodo(id){
   snapshot();
-  const key = todayKey();
-  state.todos[key] = (state.todos[key] || []).filter(x => x.id !== id);
+  const loc = todoLocation(id);
+  if (!loc) return;
+  state.todos[loc.bucket].splice(loc.index, 1);
   save();
   renderTodos();
 }
@@ -3332,9 +3422,9 @@ function deleteRankTier(id){
    LIFETIME BADGE VAULT — accumulation from saved workouts
    ============================================================ */
 const LIFETIME_BADGES = [
-  { key: 'threes', icon: '🎯', cat: '3-Pointers Made', list: [[1000, 'Shooter'], [2500, 'Sniper'], [5000, 'Flamethrower'], [10000, 'Sharpshooter']] },
-  { key: 'finishes', icon: '🏀', cat: 'Finishes Made', list: [[2000, 'Marksman'], [5000, 'Slasher'], [20000, 'Jelly Fam'], [125000, 'Paint Beast']] },
-  { key: 'fts', icon: '⛹️', cat: 'Free Throws Made', list: [[500, 'Automatic'], [750, 'Clutch Gene I'], [1000, 'Clutch Gene II'], [1500, 'Clutch Gene III']] }
+  { key: 'threes', icon: '🎯', cat: '3-Pointers Made', list: [[1000, 'Shooter'], [2500, 'Sniper'], [5000, 'Flamethrower'], [10000, 'Sharpshooter'], [25000, 'Ice Vein'], [40000, 'Automatic']] },
+  { key: 'finishes', icon: '🏀', cat: 'Finishes Made', list: [[2000, 'Marksman'], [5000, 'Smooth Touch'], [20000, 'Slasher'], [125000, 'Jelly Fam'], [150000, 'Paint Beast'], [250000, 'Paint Beast II']] },
+  { key: 'fts', icon: '⛹️', cat: 'Free Throws Made', list: [[500, 'Automatic'], [750, 'Clutch Gene I'], [1000, 'Clutch Gene II'], [1500, 'Clutch Gene III'], [3500, 'Clutch Gene IV'], [8000, 'Clutch Gene V']] }
 ];
 function lifetimeShotCounts(){
   /* Background accumulation: every saved basketball session in localStorage contributes.
@@ -3663,6 +3753,9 @@ function setSchoolSem(sem){
   if (s2) s2.classList.toggle('active', sem === 's2');
   const name = document.getElementById('school-sem-name');
   if (name) name.textContent = sem.toUpperCase();
+  const semInput = document.getElementById('cc-sem');
+  if (semInput) semInput.value = sem;
+  renderClassCats();
   renderSchool();
 }
 function schoolPrioClass(p){
@@ -3682,7 +3775,7 @@ function classMetaHtml(c, compact){
 function renderClassCats(){
   const list = document.getElementById('class-cat-list');
   if (!list) return;
-  const cats = state.classCats || [];
+  const cats = (state.classCats || []).filter(c => (c.semester || 's1') === schoolSem());
   list.innerHTML = cats.length
     ? cats.map(c => {
         if (ccEditId === c.id){
@@ -3691,19 +3784,20 @@ function renderClassCats(){
             '<input id="cc-e-room" value="' + esc(c.room || '') + '" placeholder="Room #" style="flex:0 1 80px">' +
             '<input id="cc-e-teacher" value="' + esc(c.teacher || '') + '" placeholder="Teacher" style="flex:1 1 120px">' +
             '<select id="cc-e-period">' + SCHOOL_PERIODS.map(p => '<option value="' + p + '"' + ((c.period || 'p1') === p ? ' selected' : '') + '>' + periodLabel(p) + '</option>').join('') + '</select>' +
+            '<select id="cc-e-sem"><option value="s1"' + ((c.semester || 's1') === 's1' ? ' selected' : '') + '>S1</option><option value="s2"' + (c.semester === 's2' ? ' selected' : '') + '>S2</option></select>' +
             '<span style="display:flex;gap:6px">' +
               '<button class="btn sm" onclick="saveClassEdit(\'' + c.id + '\')">Save</button>' +
               '<button class="icon-btn" onclick="cancelClassEdit()" title="Cancel">✕</button>' +
             '</span>' +
           '</div>';
         }
-        return '<div class="cc-item"><span class="cc-swatch" style="background:var(--accent)"></span><b>' + esc(c.label) + '</b>' + classMetaHtml(c) +
+        return      '<div class="cc-item"><span class="cc-swatch" style="background:var(--accent)"></span><b>' + esc(c.label) + '</b>' + chip('#45a29e', (c.semester || 's1').toUpperCase()) + classMetaHtml(c) +
           '<button class="icon-btn" onclick="toggleEditClass(\'' + c.id + '\')" title="Edit class">✎</button>' +
           '<button class="icon-btn danger" onclick="deleteClassCat(\'' + c.id + '\')" title="Remove class">✕</button></div>';
       }).join('')
     : '<div class="empty sm">No registered classes yet — add them above.</div>';
   const dl = document.getElementById('school-cats');
-  if (dl) dl.innerHTML = cats.map(c => '<option value="' + esc(c.label) + '"></option>').join('');
+  if (dl) dl.innerHTML = (state.classCats || []).map(c => '<option value="' + esc(c.label) + '"></option>').join('');
   const fc = document.getElementById('filter-cat');
   if (fc){ const cur = fc.value; fc.innerHTML = '<option value="">All Courses</option>' + cats.map(c => '<option value="' + esc(c.label) + '">' + esc(c.label) + '</option>').join(''); fc.value = cur; }
   renderSchoolDeadlines();
@@ -3721,7 +3815,8 @@ function addClassCat(){
     id: 'class-' + uid(), label,
     room: document.getElementById('cc-room').value.trim(),
     teacher: document.getElementById('cc-teacher').value.trim(),
-    period: document.getElementById('cc-period').value
+    period: document.getElementById('cc-period').value,
+    semester: document.getElementById('cc-sem') ? document.getElementById('cc-sem').value : schoolSem()
   });
   inp.value = '';
   document.getElementById('cc-room').value = '';
@@ -3743,6 +3838,7 @@ function saveClassEdit(id){
   c.room = document.getElementById('cc-e-room').value.trim();
   c.teacher = document.getElementById('cc-e-teacher').value.trim();
   c.period = document.getElementById('cc-e-period').value;
+  c.semester = document.getElementById('cc-e-sem').value;
   ccEditId = null;
   save();
   renderClassCats();
@@ -3780,7 +3876,7 @@ function applySchoolView(){
 function renderSchoolTT(){
   const el = document.getElementById('school-timetable');
   if (!el) return;
-  const cats = state.classCats || [];
+  const cats = (state.classCats || []).filter(c => (c.semester || 's1') === schoolSem());
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
   const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
   const cell = p =>
@@ -4006,6 +4102,7 @@ function renderFilmGames(){
             '<span class="g-opp"><b>' + esc(g.opponent || '—') + '</b>' +
               (meta ? '<i>' + esc(meta) + '</i>' : '') +
               (sl ? '<i style="color:var(--bright)">' + esc(sl) + '</i>' : '') +
+              (g.videoUrl ? '<a class="game-video-link" href="' + esc(g.videoUrl) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">▶ Video</a>' : '') +
             '</span>' +
             '<span class="g-score">' + (g.scoreUs !== undefined && g.scoreUs !== '' ? esc(g.scoreUs) + ' – ' + esc(g.scoreThem || 0) : '—') + '</span>' +
             '<button class="btn sm" onclick="openGameModal(\'' + g.id + '\')">More</button>' +
@@ -4017,7 +4114,7 @@ function openGameModal(id){
   const g = id ? state.film.games.find(x => x.id === id) : null;
   gameModalId = id || null;
   openModal(g ? 'Edit Game — ' + g.opponent : 'Add Game');
-  const d = g || { season: '', club: '', date: todayKey(), opponent: '', scoreUs: '', scoreThem: '', pts: '', ast: '', reb: '', stl: '', blk: '', to: '', min: '', oppNotes: '', notes: '' };
+  const d = g || { season: '', club: '', date: todayKey(), opponent: '', scoreUs: '', scoreThem: '', pts: '', ast: '', reb: '', stl: '', blk: '', to: '', min: '', videoUrl: '', oppNotes: '', notes: '' };
   const statIn = (label, f) =>
     '<div class="field stat-field"><label>' + label + '</label><input type="number" min="0" step="any" id="gm-' + f + '" class="game-score-input" value="' + esc(d[f] ?? '') + '"></div>';
   modalBody.innerHTML =
@@ -4031,6 +4128,7 @@ function openGameModal(id){
       '<div class="field inline-block stat-field"><label>Our</label><input type="number" id="gm-us" class="game-score-input" value="' + esc(d.scoreUs ?? '') + '"></div>' +
       '<div class="field inline-block stat-field"><label>Their</label><input type="number" id="gm-them" class="game-score-input" value="' + esc(d.scoreThem ?? '') + '"></div>' +
     '</div>' +
+    '<div class="field"><label>Video Link / URL</label><input type="url" id="gm-video" value="' + esc(d.videoUrl || '') + '" placeholder="https://..."></div>' +
     '<div class="stats-row">' +
       statIn('PTS', 'pts') + statIn('AST', 'ast') + statIn('REB', 'reb') +
       statIn('STL', 'stl') + statIn('BLK', 'blk') + statIn('TO', 'to') + statIn('MIN', 'min') +
@@ -4052,7 +4150,7 @@ function saveGame(){
     opponent: val('gm-opp'), scoreUs: val('gm-us'), scoreThem: val('gm-them'),
     pts: val('gm-pts'), ast: val('gm-ast'), reb: val('gm-reb'),
     stl: val('gm-stl'), blk: val('gm-blk'), to: val('gm-to'), min: val('gm-min'),
-    oppNotes: val('gm-oppnotes'), notes: val('gm-notes')
+    videoUrl: safeUrl(val('gm-video')), oppNotes: val('gm-oppnotes'), notes: val('gm-notes')
   };
   if (!data.date || !data.opponent){ toast('Game date and opponent are required', 'error'); return; }
   if (gameModalId){
@@ -4370,8 +4468,8 @@ function tokenColor(tokId){
   const isB = tokId === 'B';
   if (isB) return { fill: '#f0a500', stroke: '#ffe08a', label: 'B' };
   const isMine = myCol === 'o' ? isO : !isO;
-  if (isO) return isMine ? { fill: '#2563ff', stroke: '#cfe0ff', label: tokId } : { fill: '#3b82f6', stroke: '#bfdbfe', label: tokId };
-  return isMine ? { fill: '#e11d48', stroke: '#ffc9d2', label: tokId } : { fill: '#e63946', stroke: '#ffb3b8', label: tokId };
+  if (isO) return isMine ? { fill: '#2563ff', stroke: '#cfe0ff', label: tokId.slice(1) } : { fill: '#3b82f6', stroke: '#bfdbfe', label: tokId.slice(1) };
+  return isMine ? { fill: '#e11d48', stroke: '#ffc9d2', label: tokId.slice(1) } : { fill: '#e63946', stroke: '#ffb3b8', label: tokId.slice(1) };
 }
 function ballGlyph(){
   // Realistic 2D basketball: orange sphere with seam arcs + dimples.
@@ -4478,9 +4576,11 @@ function renderFilmPlays(){
             '<button class="btn sm" onclick="nextStep()">Next ▶</button>' +
           '</div>' +
           '<textarea class="step-desc" id="pl-desc" placeholder="Describe this frame / execution note...">' + esc(step.desc || '') + '</textarea>' +
-          '<div class="step-ctrl" style="margin-top:8px">' +
-            '<button class="btn sm ghost" onclick="branchFromCurrent()">' + (playCursor.lane === 'main' ? '⿻ + Branch from Here' : '＋ + Frame (branch)') + '</button>' +
-            '<button class="btn sm ghost danger" onclick="deleteStep()" title="Remove this frame">Remove Frame</button>' +
+          '<div class="branch-frame-actions" style="margin-top:8px">' +
+            '<button class="btn sm ghost" onclick="addBranchFromHere()">+ Branch</button>' +
+            '<button class="btn sm ghost" onclick="deleteBranch(playCursor.lane)" ' + (playCursor.lane === 'main' ? 'disabled' : '') + '>- Branch</button>' +
+            '<button class="btn sm ghost" onclick="nextStep()">+ Frame</button>' +
+            '<button class="btn sm ghost danger" onclick="deleteStep()">- Frame</button>' +
           '</div>' +
           '<div class="step-tree">' + stepTree + '</div>' +
         '</div>' +
@@ -4990,13 +5090,14 @@ function goalCardHtml(g){
     '<div class="goal-bar-wrap">' + goalBarHtml(g, p.pct, cat.color) + '</div>' +
     '<div class="goals-ring-grid">' +
       '<div class="goal-metrics">' +
-        '<div class="goal-metric-row"><span class="m-label">Current</span><input class="m-input" type="number" step="any" value="' + g.current + '" oninput="setGoalLive(\'' + g.id + '\',\'current\',this.value)" aria-label="Current value"></div>' +
-        '<div class="goal-metric-row"><span class="m-label">Target</span><input class="m-input" type="number" step="any" value="' + g.target + '" onchange="setGoal(\'' + g.id + '\',\'target\',this.value)" aria-label="Target value"></div>' +
+        '<div class="goal-metric-row"><span class="m-label">Current Value</span><input class="m-input" type="text" value="' + esc(g.current ?? '') + '" oninput="setGoalLive(\'' + g.id + '\',\'current\',this.value)" aria-label="Current value"></div>' +
+        '<div class="goal-metric-row"><span class="m-label">Target Value</span><input class="m-input" type="text" value="' + esc(g.target ?? '') + '" onchange="setGoal(\'' + g.id + '\',\'target\',this.value)" aria-label="Target value"></div>' +
         '<div class="goal-metric-row"><span class="m-label">Due Date</span><input class="m-input" type="date" value="' + (g.targetDate || '') + '" onchange="setGoal(\'' + g.id + '\',\'targetDate\',this.value)"></div>' +
+        '<div class="goal-metric-row unit-row"><span class="m-label">Unit Label</span><input class="m-input goal-unit-input" type="text" value="' + esc(g.unit || '') + '" placeholder="lbs, $, PPG, reps..." onchange="setGoal(\'' + g.id + '\',\'unit\',this.value)"></div>' +
         '<div class="goal-metric-row"><span class="m-label">Category</span><select class="goal-cat" style="margin:0" onchange="setGoal(\'' + g.id + '\',\'category\',this.value)">' + catOptions + '</select></div>' +
       '</div>' +
     '</div>' +
-    '<div class="goal-readout">' + fmtNum(g.current) + ' / ' + fmtNum(g.target) + ' ' + esc(g.unit || '') + (p.sub ? ' · ' + p.sub : '') + '</div>' +
+    '<div class="goal-readout">' + esc(String(g.current ?? '')) + ' / ' + esc(String(g.target ?? '')) + ' ' + esc(g.unit || '') + (p.sub ? ' · ' + p.sub : '') + '</div>' +
     '<div class="gc-desc-wrap' + (descOpen ? ' open' : '') + '">' +
       '<button type="button" class="gc-desc-head" onclick="this.parentElement.classList.toggle(&apos;open&apos;)">▸ Description / Strategy</button>' +
       '<div class="gc-desc-body"><textarea class="goal-desc" style="margin:0" placeholder="Add a description or game-plan strategy..." onchange="setGoal(\'' + g.id + '\',\'desc\',this.value)">' + esc(g.desc || '') + '</textarea></div>' +
@@ -5023,7 +5124,7 @@ function setGoal(id, field, value){
   snapshot();
   const g = state.goals.find(x => x.id === id);
   if (!g) return;
-  if (field === 'current' || field === 'target') g[field] = parseFloat(value) || 0;
+  if (field === 'current' || field === 'target') g[field] = String(value ?? '');
   else if (field === 'targetDate') g[field] = value || '';
   else g[field] = value;
   save();
@@ -5033,13 +5134,13 @@ function setGoalLive(id, field, value){
   const g = state.goals.find(x => x.id === id);
   if (!g) return;
   snapshotDebounced();
-  g[field] = parseFloat(value) || 0;
+  g[field] = String(value ?? '');
   save();
   const card = document.querySelector('[data-goal="' + id + '"]');
   if (!card) return;
   const p = goalProgress(g);
   card.querySelector('.goal-readout').textContent =
-    fmtNum(g.current) + ' / ' + fmtNum(g.target) + ' ' + (g.unit || '') + (p.sub ? ' · ' + p.sub : '');
+    String(g.current ?? '') + ' / ' + String(g.target ?? '') + ' ' + (g.unit || '') + (p.sub ? ' · ' + p.sub : '');
   const bar = card.querySelector('.goal-bar-fill');
   if (bar) bar.style.width = Math.max(0, Math.min(100, p.pct)) + '%';
   const pct = card.querySelector('.goal-bar-pct');
@@ -5150,7 +5251,7 @@ function addGoal(){
   const d = new Date(); d.setMonth(d.getMonth() + 6);
   state.goals.push({
     id: uid(), title: 'New Goal', category: 'athletic', unit: '', desc: '',
-    target: 100, current: 0, targetDate: dateKey(d), milestones: []
+    target: '100', current: '0', targetDate: dateKey(d), milestones: []
   });
   save();
   renderGoals();
