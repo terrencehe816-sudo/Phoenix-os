@@ -10,7 +10,6 @@
 <meta name="theme-color" content="#0b0c10">
 <title>PHOENIX OPERATING SYSTEM</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%3E%3Cdefs%3E%3ClinearGradient%20id%3D%27g%27%20x1%3D%2712%27%20y1%3D%272%27%20x2%3D%2712%27%20y2%3D%2722%27%20gradientUnits%3D%27userSpaceOnUse%27%3E%3Cstop%20stop-color%3D%27%2366fcf1%27%2F%3E%3Cstop%20offset%3D%271%27%20stop-color%3D%27%231ea89e%27%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Cpath%20fill%3D%27url%28%23g%29%27%20d%3D%27M12%207c-2.2%201.5-3.4%203.4-3.4%205.8a3.4%203.4%200%200%200%206.8%200c0-2.4-1.2-4.3-3.4-5.8z%27%2F%3E%3Cpath%20fill%3D%27url%28%23g%29%27%20d%3D%27M9.2%206.6%206.7%204.9c-.9%201.1-.7%202.1.7%203.1-.7%201-.4%202%20.6%203-1.6%200-2.5.8-2.8%202.3l1.9.4c.2-1.2%201-1.8%202.4-1.9-.5-1.7-.2-3.1%201.5-4.4z%27%2F%3E%3Cpath%20fill%3D%27url%28%23g%29%27%20d%3D%27M14.8%206.6l2.5-1.7c.9%201.1.7%202.1-.7%203.1.7%201%20.4%202-.6%203%201.6%200%202.5.8%202.8%202.3l-1.9.4c-.2-1.2-1-1.8-2.4-1.9.5-1.7.2-3.1-1.5-4.4z%27%2F%3E%3Ccircle%20cx%3D%2712%27%20cy%3D%274.9%27%20r%3D%271.3%27%20fill%3D%27url%28%23g%29%27%2F%3E%3C%2Fsvg%3E">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 /* ============================================================
    PHOENIX OPERATING SYSTEM — Sleek Stealth Dark Theme
@@ -104,31 +103,6 @@ body{
 .util-btn:disabled, .util-btn.disabled{ opacity:.35; cursor:default; pointer-events:none; }
 .save-status{ display:flex; align-items:center; gap:8px; font-size:11px; color:var(--muted); margin-top:2px; }
 .dot{ width:7px; height:7px; border-radius:50%; background:var(--green); flex:none; transition:all .25s; }  .dot.saved{ background:var(--bright); box-shadow:0 0 9px var(--bright); }
-
-  /* ---------- Cloud sync status ---------- */
-  .cloud-status{
-    display:flex; align-items:center; gap:8px; font-size:11px; color:var(--muted);
-    cursor:pointer; padding:6px 8px; border:1px solid var(--line); border-radius:var(--r);
-    transition:all .15s; user-select:none;
-  }
-  .cloud-status:hover{ border-color:var(--accent); color:var(--text); }
-  .cloud-dot{ width:7px; height:7px; border-radius:50%; background:var(--muted); flex:none; transition:all .25s; }
-  .cloud-status[data-state="on"] .cloud-dot{ background:var(--green); box-shadow:0 0 8px var(--green); }
-  .cloud-status[data-state="sync"] .cloud-dot{ background:var(--amber); animation:cloudPulse 1s infinite; }
-  .cloud-status[data-state="connecting"] .cloud-dot{ background:var(--amber); }
-  .cloud-status[data-state="err"] .cloud-dot{ background:var(--danger); box-shadow:0 0 8px var(--danger); }
-  .cloud-status[data-state="setup"] .cloud-dot{ background:var(--amber); box-shadow:0 0 8px var(--amber); }
-  .cloud-status[data-state="setup"] .cloud-txt{ color:var(--amber); }
-  .cloud-status[data-state="err"] .cloud-txt{ color:var(--danger); }
-  @keyframes cloudPulse{ 0%,100%{ opacity:1; } 50%{ opacity:.3; } }
-  .sql-box{
-    background:#0e1117; border:1px solid var(--line); border-radius:var(--r);
-    padding:10px; font-family:var(--mono); font-size:11px; line-height:1.55;
-    color:var(--bright); white-space:pre; overflow-x:auto; max-height:220px; overflow-y:auto;
-  }
-  .setup-steps{ font-size:12.5px; color:var(--text); margin:0 0 10px; padding-left:18px; }
-  .setup-steps li{ margin-bottom:6px; }
-  .setup-steps a{ color:var(--bright); }
 
 /* ---------- Main / Topbar ---------- */
 #main{ margin-left:238px; flex:1; min-width:0; display:flex; flex-direction:column; }
@@ -299,6 +273,8 @@ input[type=range]:focus{ box-shadow:none; }
 .todo-add{ display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
 .todo-add #todo-input{ flex:1 1 180px; }
 .todo-add #todo-date{ width:150px; flex:none; }
+.todo-sel{ display:flex; flex-direction:column; gap:3px; font-size:9.5px; letter-spacing:.05em; text-transform:uppercase; color:var(--muted); }
+.todo-sel select{ width:auto; padding:6px 7px; font-size:11.5px; }
 .todo-scheduled{ display:block; font-family:var(--mono); font-size:10px; color:var(--accent); margin-top:3px; }
 .todo-progress{ height:6px; background:#10151d; border-radius:999px; overflow:hidden; margin-bottom:12px; }
 .todo-progress .bar-fill{ height:100%; }
@@ -606,6 +582,18 @@ input[type=range]:focus{ box-shadow:none; }
 .cc-edit-row{ display:flex; gap:6px; flex-wrap:wrap; align-items:center; padding:8px 10px; background:var(--bg2); border:1px solid var(--line); border-radius:var(--r); margin-bottom:8px; }
 .cc-edit-row input{ flex:1 1 110px; padding:6px 8px; font-size:12px; }
 .cc-edit-row select{ width:auto; flex:none; padding:6px 8px; font-size:12px; }
+.cc-sem-field{ display:flex; flex-direction:column; gap:3px; font-size:9.5px; letter-spacing:.05em; text-transform:uppercase; color:var(--muted); }
+.cc-sem-field select{ width:auto; padding:6px 7px; font-size:11.5px; }
+.gpa-grid{ display:grid; grid-template-columns:auto 1fr; gap:18px; align-items:center; }
+.gpa-ring{ position:relative; width:132px; height:132px; }
+.gpa-ring svg{ transform:rotate(-90deg); }
+.gpa-val{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.gpa-val b{ font-size:27px; font-weight:800; color:var(--hi); line-height:1; }
+.gpa-val span{ font-size:10px; color:var(--muted); letter-spacing:.06em; text-transform:uppercase; margin-top:3px; }
+.gpa-rows{ font-size:12px; }
+.gpa-row{ display:flex; justify-content:space-between; gap:10px; padding:6px 0; border-bottom:1px solid var(--line); }
+.gpa-row span:last-child{ font-family:var(--mono); color:var(--hi); }
+@media (max-width:640px){ .gpa-grid{ grid-template-columns:1fr; justify-items:center; } }
 .cc-add{ display:grid; grid-template-columns:1fr 90px 1fr auto auto; gap:8px; margin-bottom:12px; align-items:center; }
 .cc-add input, .cc-add select{ padding:7px 9px; font-size:12px; min-width:0; }
 /* ---------- School class categories & detail view ---------- */
@@ -1026,6 +1014,171 @@ input[type=range]:focus{ box-shadow:none; }
 .curr-note{ min-height:160px; font-family:var(--mono); font-size:12px; line-height:1.6; }
 .curr-head{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px; }
 .curr-toggle{ display:inline-flex; align-items:center; gap:8px; font-size:12.5px; font-weight:700; color:var(--text); cursor:pointer; margin-top:4px; }
+
+  /* ---------- Local storage chip ---------- */
+  .local-chip{
+    display:flex; align-items:center; gap:8px; font-size:11px; color:var(--muted);
+    padding:6px 8px; border:1px solid var(--line); border-radius:var(--r); user-select:none;
+  }
+  .local-dot{ width:7px; height:7px; border-radius:50%; background:var(--accent); box-shadow:0 0 8px var(--accent); flex:none; }
+
+  /* ---------- Eisenhower To-Do Matrix ---------- */
+  .quad-grid{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+  @media (max-width:820px){ .quad-grid{ grid-template-columns:1fr; } }
+  .quad{ border:1px solid var(--line); border-left-width:3px; border-radius:var(--r); background:var(--bg2); padding:12px; min-height:170px; }
+  .quad-do{    border-left-color:#2ecc71; }
+  .quad-sched{ border-left-color:#3b82f6; }
+  .quad-del{   border-left-color:#f0a500; }
+  .quad-dont{  border-left-color:#e63946; }
+  .quad-head{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:4px; }
+  .quad-head h4{ font-size:13px; font-weight:700; letter-spacing:.02em; }
+  .quad-rule{ font-size:10.5px; color:var(--muted); margin-bottom:9px; }
+  .quad-count{ font-size:11px; font-weight:700; padding:2px 7px; border-radius:999px; background:var(--bg3); color:var(--text); }
+  .quad-list{ display:flex; flex-direction:column; gap:7px; }
+  .quad-task{ border:1px solid var(--line); border-radius:var(--r); background:var(--bg); padding:8px 9px; }
+  .quad-task.done .qt-text{ opacity:.5; text-decoration:line-through; }
+  .qt-top{ display:flex; align-items:flex-start; gap:8px; }
+  .qt-text{ flex:1; font-size:12.5px; line-height:1.35; word-break:break-word; }
+  .qt-date{ display:block; font-size:10.5px; color:var(--muted); margin-top:2px; }
+  .qt-selects{ display:flex; gap:6px; margin-top:7px; flex-wrap:wrap; }
+  .mini-sel{ font-size:11px; padding:3px 6px; width:auto; flex:1 1 90px; }
+  .qt-pill{ font-size:10px; font-weight:700; padding:2px 6px; border-radius:999px; border:1px solid; white-space:nowrap; }
+
+  /* ---------- Extracurricular ---------- */
+  .xc-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; }
+  .xc-kpi-row{ display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:16px; }
+  .xc-kpi{ border:1px solid var(--line); border-radius:var(--r); background:var(--bg2); padding:12px; }
+  .xc-kpi span.ck-label{ display:block; font-size:10.5px; letter-spacing:.06em; color:var(--muted); text-transform:uppercase; }
+  .xc-kpi span.ck-value{ display:block; font-size:22px; font-weight:800; color:var(--hi); margin-top:4px; }
+  .xc-bar{ height:8px; border-radius:999px; background:var(--bg3); overflow:hidden; margin-top:10px; }
+  .xc-bar > div{ height:100%; background:linear-gradient(90deg,var(--accent),var(--bright)); }
+
+  /* ---------- Recruiting: contact badges, tiers, interactions ---------- */
+  .rec-tags{ display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin:6px 0 4px; }
+  .rec-days{ font-size:10px; font-weight:700; padding:2px 7px; border-radius:999px; border:1px solid; white-space:nowrap; }
+  .rec-days.fresh{ color:#2ecc71; border-color:rgba(46,204,113,.5); background:rgba(46,204,113,.12); }
+  .rec-days.stale{ color:#e63946; border-color:rgba(230,57,70,.55); background:rgba(230,57,70,.15); }
+  .rec-div{ font-size:10px; padding:2px 7px; border-radius:999px; border:1px solid var(--line); color:var(--text); background:var(--bg3); }
+  .rec-tier{ font-size:10px; font-weight:700; padding:2px 7px; border-radius:999px; border:1px solid; white-space:nowrap; }
+  .rec-tier.t1{ color:#66fcf1; border-color:rgba(102,252,241,.5); background:rgba(102,252,241,.12); }
+  .rec-tier.t2{ color:#f0a500; border-color:rgba(240,165,0,.5); background:rgba(240,165,0,.12); }
+  .rec-tier.safety{ color:#9aa5b1; border-color:var(--line); background:var(--bg3); }
+  .rec-int-head{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin:12px 0 4px; font-size:10.5px; letter-spacing:.05em; text-transform:uppercase; color:var(--muted); }
+  .rec-int-row{ display:flex; align-items:center; gap:8px; font-size:11.5px; padding:5px 0; border-bottom:1px solid var(--line); }
+  .rec-int-row i{ flex:1; color:var(--text); font-style:normal; }
+  .rec-int-type{ font-weight:700; color:var(--bright); white-space:nowrap; }
+  .rec-divlist{ display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:12px; }
+
+  /* ---------- LIVE WORKOUT MODE ---------- */
+  #live-overlay{ position:fixed; inset:0; z-index:90; background:rgba(8,10,14,.97); overflow-y:auto; padding:18px; }
+  #live-overlay.hidden{ display:none; }
+  body.live-mode{ overflow:hidden; }
+  .live-wrap{ max-width:900px; margin:0 auto; }
+  .live-head{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:14px; }
+  .live-rec{ display:flex; align-items:center; gap:7px; font-size:11px; font-weight:800; letter-spacing:.09em; color:#ff4d5e; }
+  .live-rec .dot{ width:9px; height:9px; border-radius:50%; background:#ff4d5e; animation:livePulse 1.4s infinite; }
+  @keyframes livePulse{ 0%,100%{ opacity:1; box-shadow:0 0 0 0 rgba(255,77,94,.6); } 50%{ opacity:.55; box-shadow:0 0 0 7px rgba(255,77,94,0); } }
+  .live-clock{ font-family:var(--mono); font-size:22px; font-weight:800; color:var(--hi); letter-spacing:.04em; }
+  .live-clock small{ font-size:10px; color:var(--muted); letter-spacing:.08em; display:block; font-weight:600; }
+  .live-spacer{ flex:1; }
+  .live-stats{ border:1px solid var(--line); border-left:3px solid var(--bright); border-radius:var(--r); background:var(--bg2); padding:14px; margin-bottom:12px; }
+  .live-stats.bump{ animation:liveBump .2s ease; }
+  @keyframes liveBump{ 0%{ transform:scale(1); } 45%{ transform:scale(1.012); border-left-color:var(--accent); } 100%{ transform:scale(1); } }
+  .live-stat-row{ display:flex; gap:14px; flex-wrap:wrap; align-items:flex-end; }
+  .live-stat{ min-width:104px; }
+  .live-stat .ls-label{ font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
+  .live-stat .ls-val{ font-size:27px; font-weight:800; color:var(--hi); line-height:1.15; }
+  .live-stat .ls-val.small{ font-size:18px; }
+  .live-mental{ display:flex; align-items:center; gap:12px; border:1px solid rgba(102,252,241,.5); background:rgba(102,252,241,.09); border-left:3px solid var(--bright); border-radius:var(--r); padding:12px 14px; margin-bottom:12px; }
+  .live-mental p{ flex:1; font-size:13px; color:var(--hi); line-height:1.45; }
+  .live-btns{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-bottom:12px; }
+  .live-btn{ border:1px solid var(--line); border-radius:var(--r); background:var(--bg2); color:var(--hi); font-size:16px; font-weight:800; padding:26px 10px; cursor:pointer; transition:transform .08s, background .15s, border-color .15s; }
+  .live-btn:hover{ background:var(--bg3); }
+  .live-btn:active{ transform:scale(.97); }
+  .live-btn.make{ border-color:rgba(46,204,113,.55); color:#2ecc71; }
+  .live-btn.make:hover{ background:rgba(46,204,113,.12); }
+  .live-btn.miss{ border-color:rgba(230,57,70,.55); color:#e63946; }
+  .live-btn.miss:hover{ background:rgba(230,57,70,.12); }
+  .live-btn.rep{ border-color:rgba(102,163,255,.55); color:#66a3ff; }
+  .live-btn.rep:hover{ background:rgba(102,163,255,.12); }
+  .live-fixrow{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin:-4px 0 12px; }
+  .live-fix{ display:flex; align-items:center; justify-content:center; gap:6px; font-size:12px; font-weight:700; padding:10px 8px; border:1px dashed var(--line); border-radius:var(--r); background:transparent; color:var(--muted); cursor:pointer; transition:all .15s; }
+  .live-fix:hover{ color:var(--text); border-color:var(--accent); background:rgba(69,162,158,.08); }
+  .live-fix:disabled{ opacity:.35; cursor:default; }
+  .live-timer-off{ font-size:11px; font-weight:700; letter-spacing:.06em; color:var(--muted); border:1px dashed var(--line); border-radius:var(--r); padding:8px 10px; }
+  @media (max-width:640px){ .live-fixrow{ grid-template-columns:1fr; } }
+  .live-rest{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; border:1px solid var(--line); border-radius:var(--r); background:var(--bg2); padding:12px; margin-bottom:12px; }
+  .live-rest.on{ border-color:var(--amber); box-shadow:0 0 0 1px rgba(240,165,0,.35) inset; }
+  .live-start{ border-color:rgba(255,77,94,.65) !important; color:#ff4d5e !important; }
+  .live-start:hover{ background:rgba(255,77,94,.12) !important; }
+  .live-rest.done{ animation:restDone .9s ease; }
+  @keyframes restDone{ 0%,100%{ background:var(--bg2); } 40%{ background:rgba(102,252,241,.16); } }
+  .live-rest-clock{ font-family:var(--mono); font-size:24px; font-weight:800; color:var(--amber); min-width:78px; }
+  .live-sec{ border:1px solid var(--line); border-radius:var(--r); background:var(--bg2); padding:12px; margin-bottom:12px; }
+  .live-chunk{ display:flex; align-items:center; gap:10px; font-size:12px; padding:6px 0; border-bottom:1px solid var(--line); }
+  .live-chunk .lc-name{ flex:1; color:var(--text); }
+  .live-chunk .lc-cat{ font-size:10px; padding:2px 7px; border-radius:999px; border:1px solid var(--line); }
+  @media (max-width:640px){ .live-btns{ grid-template-columns:1fr; } .live-btn{ padding:20px 10px; } }
+
+  /* ---------- Notion weekly summary ---------- */
+  .notion-md{ width:100%; min-height:340px; font-family:var(--mono); font-size:11.5px; line-height:1.5; background:#0e1117; color:var(--text); border:1px solid var(--line); border-radius:var(--r); padding:12px; white-space:pre; resize:vertical; }
+
+  /* ---------- Play builder player roles ---------- */
+  .role-list{ display:flex; flex-direction:column; gap:6px; }
+  .role-row{ display:flex; align-items:center; gap:10px; padding:7px 9px; border:1px solid var(--line); border-radius:var(--r); background:var(--bg2); }
+  .role-tok{ font-family:var(--mono); font-size:11px; font-weight:800; border:1px solid; border-radius:6px; padding:2px 6px; flex:none; }
+  .role-desc{ flex:1; font-size:11.5px; color:var(--text); min-width:0; word-break:break-word; }
+
+  /* ---------- Finance: 3-part athlete layout ---------- */
+  .fin-sections{ display:flex; flex-direction:column; gap:16px; margin-top:16px; }
+  .fin-sec-head{ align-items:flex-start; flex-wrap:wrap; gap:10px; }
+  .fin-sec-head h3{ display:flex; align-items:center; gap:8px; }
+  .fin-sec-tag{ font-size:9.5px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; padding:3px 8px; border-radius:999px; }
+  .fin-sec-a{ color:#2ecc71; background:rgba(46,204,113,.13); border:1px solid rgba(46,204,113,.45); }
+  .fin-sec-b{ color:#f0a500; background:rgba(240,165,0,.13); border:1px solid rgba(240,165,0,.45); }
+  .fin-sec-c{ color:#66a3ff; background:rgba(102,163,255,.13); border:1px solid rgba(102,163,255,.45); }
+  .fin-sec-d{ color:#9d4edd; background:rgba(157,78,221,.14); border:1px solid rgba(157,78,221,.45); }
+  .asset-row{ display:flex; align-items:center; gap:10px; padding:7px 0; border-bottom:1px solid var(--line); font-size:12px; }
+  .asset-name{ flex:1; color:var(--text); }
+  .asset-track{ flex:2; height:8px; background:var(--bg3); border-radius:999px; overflow:hidden; min-width:80px; }
+  .asset-fill{ height:100%; }
+  .asset-val{ font-family:var(--mono); color:var(--hi); min-width:96px; text-align:right; }
+  .compound-out{ display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:12px; margin-top:12px; }
+  .compound-cell{ border:1px solid var(--line); border-radius:var(--r); background:var(--bg2); padding:11px; }
+  .compound-cell .cc-label{ font-size:10px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); }
+  .compound-cell .cc-val{ font-size:18px; font-weight:800; margin-top:3px; color:var(--hi); }
+  .compound-bars{ display:flex; align-items:flex-end; gap:4px; height:96px; margin-top:14px; border-bottom:1px solid var(--line); padding-bottom:2px; }
+  .compound-bar{ flex:1; background:linear-gradient(180deg,var(--bright),var(--accent)); border-radius:3px 3px 0 0; min-height:3px; }
+  .invest-table{ width:100%; border-collapse:collapse; font-size:12px; }
+  .invest-table th{ text-align:left; font-size:10px; letter-spacing:.05em; text-transform:uppercase; color:var(--muted); padding:8px; border-bottom:1px solid var(--line); white-space:nowrap; }
+  .invest-table td{ padding:8px; border-bottom:1px solid var(--line); }
+  .invest-table tr:hover td{ background:var(--bg3); }
+  .rec-slider{ width:100%; accent-color:var(--bright); }
+  .game-avg-strip{ display:flex; align-items:center; gap:16px; flex-wrap:wrap; border:1px solid var(--line); border-left:3px solid var(--bright); border-radius:var(--r); background:var(--bg2); padding:10px 14px; margin-bottom:14px; }
+  .ga-kicker{ font-size:9.5px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); }
+  .ga-kicker i{ font-style:normal; font-weight:600; letter-spacing:0; text-transform:none; }
+  .ga-item{ display:flex; align-items:baseline; gap:6px; }
+  .ga-l{ font-size:10px; letter-spacing:.05em; text-transform:uppercase; color:var(--muted); }
+  .ga-v{ font-family:var(--mono); font-size:17px; font-weight:800; color:var(--hi); }
+  .rec-recent{ display:flex; gap:6px; flex-wrap:wrap; margin-top:10px; }
+  .fin-budget{ display:flex; gap:12px; flex-wrap:wrap; }
+  .fin-budget-stat{ flex:1 1 130px; border:1px solid var(--line); border-radius:var(--r); background:var(--bg2); padding:10px; }
+  .fin-budget-stat .fb-label{ font-size:10px; letter-spacing:.05em; text-transform:uppercase; color:var(--muted); }
+  .fin-budget-stat .fb-val{ font-size:17px; font-weight:800; margin-top:3px; }
+
+  /* ---------- Mental section ---------- */
+  .mental-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:14px; }
+  .prompt-block{ border:1px solid var(--line); border-radius:var(--r); background:var(--bg2); padding:11px; margin-bottom:10px; }
+  .prompt-block label{ display:block; font-size:12px; font-weight:600; color:var(--hi); margin-bottom:6px; }
+  .prompt-block textarea{ width:100%; }
+  .decision-table{ width:100%; border-collapse:collapse; font-size:12px; }
+  .decision-table th{ text-align:left; font-size:10.5px; letter-spacing:.05em; text-transform:uppercase; color:var(--muted); padding:8px; border-bottom:1px solid var(--line); white-space:nowrap; }
+  .decision-table td{ padding:8px; border-bottom:1px solid var(--line); vertical-align:top; }
+  .decision-table tr:hover td{ background:var(--bg3); }
+  .stars{ font-size:13px; letter-spacing:2px; color:#f0a500; white-space:nowrap; }
+  .journal-entry{ border-left:2px solid var(--accent); padding:6px 0 6px 10px; margin-bottom:9px; }
+  .journal-entry b{ font-size:12px; }
+  .journal-entry p{ font-size:12px; color:var(--text); margin-top:3px; line-height:1.45; }
 </style>
 </head>
 <body>
@@ -1067,6 +1220,7 @@ input[type=range]:focus{ box-shadow:none; }
       <button class="nav-btn" data-tab="film" onclick="switchTab('film')"><span class="nav-num">05</span><span>Film Study</span></button>
       <button class="nav-btn" data-tab="finance" onclick="switchTab('finance')"><span class="nav-num">06</span><span>Finance Tracker</span></button>
       <button class="nav-btn" data-tab="recruiting" onclick="switchTab('recruiting')"><span class="nav-num">07</span><span>Recruiting CRM</span></button>
+      <button class="nav-btn" data-tab="mental" onclick="switchTab('mental')"><span class="nav-num">08</span><span>Mental Game</span></button>
     </nav>
 
     <div class="side-util">
@@ -1076,9 +1230,7 @@ input[type=range]:focus{ box-shadow:none; }
       </div>
       <button class="util-btn" onclick="exportJSON()">⬇&nbsp; Export JSON</button>
       <button class="util-btn ghost" onclick="document.getElementById('importFile').click()">⬆&nbsp; Import JSON</button>
-      <div class="cloud-status" id="cloud-status" data-state="off" onclick="cloudStatusClick()" title="Supabase cloud sync — click for status / setup">
-        <span class="cloud-dot"></span><span class="cloud-txt">Cloud: offline</span>
-      </div>
+      <div class="local-chip" title="All data is stored in this browser's localStorage"><span class="local-dot"></span>Local storage only</div>
       <div class="save-status"><span class="dot" id="save-dot"></span> Auto-saved locally</div>
     </div>
   </aside>
@@ -1091,7 +1243,7 @@ input[type=range]:focus{ box-shadow:none; }
         <p id="topbar-date"></p>
       </div>
       <div class="clock-shell">
-        <span class="beta-label">BETA V1.0</span>
+        <span class="beta-label">BETA V1.2</span>
         <div class="clock" id="clock" aria-label="Live digital clock">--:--:--</div>
       </div>
     </header>
@@ -1100,6 +1252,13 @@ input[type=range]:focus{ box-shadow:none; }
 
       <!-- ============ TAB 1: DASHBOARD ============ -->
       <section id="tab-dashboard" class="tab active">
+        <div class="card-head-row">
+          <div>
+            <h2 class="page-title">Weekly Overview</h2>
+            <p class="page-sub">Academics, athletics, habits and recruiting for the current week.</p>
+          </div>
+          <button class="btn" onclick="openNotionExport()">⇪ Export to Notion</button>
+        </div>
         <div class="dash-grid">
 
           <div class="card">
@@ -1120,6 +1279,14 @@ input[type=range]:focus{ box-shadow:none; }
 
           <div class="card">
             <div class="card-head">
+              <h3>Recovery Score</h3>
+              <span class="kicker" id="recovery-kicker"></span>
+            </div>
+            <div id="dash-recovery"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
               <h3>Upcoming Deadlines</h3>
               <span class="kicker" id="dash-dl-count"></span>
             </div>
@@ -1135,6 +1302,8 @@ input[type=range]:focus{ box-shadow:none; }
             <form id="todo-form" class="todo-add" autocomplete="off">
               <input id="todo-input" placeholder="Add a task for today...">
               <input type="date" id="todo-date" title="Scheduled date">
+              <label class="todo-sel"><span>Priority (Impact)</span><select id="todo-priority"><option>Low</option><option selected>Medium</option><option>High</option></select></label>
+              <label class="todo-sel"><span>Urgency (Time)</span><select id="todo-urgency"><option>Low</option><option selected>Medium</option><option>High</option></select></label>
               <button class="btn sm" type="submit">+ Add</button>
             </form>
             <ul class="todo-list" id="todo-list"></ul>
@@ -1175,6 +1344,7 @@ input[type=range]:focus{ box-shadow:none; }
               <span class="kicker" id="ws-date-label"></span>
               <label class="kicker" style="display:flex;align-items:center;gap:6px;text-transform:none;letter-spacing:.04em">Log date <input type="date" id="ws-date-override" class="mini-input" onchange="setWorkoutDate(this.value)"></label>
             </div>
+            <div style="margin-bottom:12px"><button class="btn live-start" onclick="startLiveWorkout()">🔴 Start Live Workout</button></div>
             <div id="workout-session"></div>
           </div>
         </div>
@@ -1279,6 +1449,7 @@ input[type=range]:focus{ box-shadow:none; }
           <button class="chip-btn active" id="sview-btn-assign" onclick="setSchoolView('assign')">Assignments</button>
           <button class="chip-btn" id="sview-btn-tt" onclick="setSchoolView('tt')">🗓 Timetable</button>
           <button class="chip-btn" id="sview-btn-classes" onclick="setSchoolView('classes')">▦ Classes</button>
+          <button class="chip-btn" id="sview-btn-xc" onclick="setSchoolView('xc')">🎖 Extracurricular</button>
         </div>
         <div class="school-toolbar" style="margin-bottom:14px">
           <span class="kicker">SEMESTER VIEW</span>
@@ -1325,6 +1496,7 @@ input[type=range]:focus{ box-shadow:none; }
               <input id="cc-class-input" placeholder="Class name" onkeydown="if(event.key==='Enter'){event.preventDefault();addClassCat()}">
               <input id="cc-room" placeholder="Room #">
               <input id="cc-teacher" placeholder="Teacher">
+              <input id="cc-credits" type="number" min="0" max="10" step="0.5" value="4" title="Credits (default 4)" placeholder="Credits">
               <select id="cc-period">
                 <option value="p1">Period 1</option>
                 <option value="p2">Period 2</option>
@@ -1332,9 +1504,11 @@ input[type=range]:focus{ box-shadow:none; }
                 <option value="p4">Period 4</option>
                 <option value="off">Off-Time</option>
               </select>
-              <select id="cc-sem" title="Semester">
-                <option value="s1">S1</option><option value="s2">S2</option>
-              </select>
+              <label class="cc-sem-field" title="Classes only appear in the semester they are assigned to"><span>Semester</span>
+                <select id="cc-sem">
+                  <option value="s1">Semester 1</option><option value="s2">Semester 2</option>
+                </select>
+              </label>
               <button class="btn sm" onclick="addClassCat()">+ Add Class</button>
             </div>
             <div id="class-cat-list"></div>
@@ -1383,6 +1557,35 @@ input[type=range]:focus{ box-shadow:none; }
         <div id="sview-class-detail" style="display:none">
           <div class="card" id="school-class-detail"></div>
         </div>
+
+        <div id="sview-xc" style="display:none">
+          <div class="card-head-row">
+            <div>
+              <h2 class="page-title">Extracurricular</h2>
+              <p class="page-sub">Volunteer hours tracker and total graduation credits earned.</p>
+            </div>
+            <button class="btn" onclick="openVolunteerModal()">+ Log Volunteer Hours</button>
+          </div>
+          <div id="xc-kpis" class="xc-kpi-row"></div>
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-head"><h3>GPA Tracker</h3><span class="kicker" id="gpa-kicker"></span></div>
+            <div id="xc-gpa"></div>
+          </div>
+          <div class="xc-grid">
+            <div class="card">
+              <div class="card-head"><h3>Volunteer Hours</h3><span class="kicker" id="xc-hours-kicker"></span></div>
+              <div class="school-form-row" style="max-width:420px">
+                <div class="field"><label>Goal Hours <span class="hint">target to reach</span></label><input type="number" min="0" step="1" id="xc-goal" oninput="saveXcSettings()" placeholder="40"></div>
+                <div class="field"><label>Extracurricular Credits</label><input type="number" min="0" step="0.5" id="xc-credits" oninput="saveXcSettings()" placeholder="0"></div>
+              </div>
+              <div id="xc-volunteer-table"></div>
+            </div>
+            <div class="card">
+              <div class="card-head"><h3>Graduation Credits</h3><span class="kicker">Courses + extracurricular</span></div>
+              <div id="xc-credits-summary"></div>
+            </div>
+          </div>
+        </div>
       </section>
 
       <!-- ============ TAB 4: GOAL MATRIX ============ -->
@@ -1390,6 +1593,7 @@ input[type=range]:focus{ box-shadow:none; }
         <div id="goal-subtabs" class="sub-tabs">
           <button class="sub-tab" data-gview="goals" onclick="setGoalView('goals')">Goal Cards</button>
           <button class="sub-tab" data-gview="habits" onclick="setGoalView('habits')">Habits</button>
+          <button class="sub-tab" data-gview="matrix" onclick="setGoalView('matrix')">To-Do Matrix</button>
         </div>
 
         <!-- VIEW: GOAL CARDS -->
@@ -1407,6 +1611,18 @@ input[type=range]:focus{ box-shadow:none; }
         <!-- VIEW: HABITS -->
         <div class="log-sub" id="gview-habits">
           <div id="habits-view"></div>
+        </div>
+
+        <!-- VIEW: EISENHOWER TO-DO MATRIX -->
+        <div class="log-sub" id="gview-matrix">
+          <div class="card-head-row">
+            <div>
+              <h2 class="page-title">To-Do Matrix</h2>
+              <p class="page-sub">Eisenhower quadrant — sort every task by Priority (importance) and Urgency.</p>
+            </div>
+            <button class="chip-btn" id="matrix-hide-done" onclick="toggleMatrixDone()">Hide Completed</button>
+          </div>
+          <div class="quad-grid" id="todo-matrix"></div>
         </div>
       </section>
 
@@ -1479,19 +1695,65 @@ input[type=range]:focus{ box-shadow:none; }
           <div class="card-head"><h3>Cash Flow &amp; Net Worth Trend</h3><span class="kicker" id="fin-trend-kicker"></span></div>
           <div id="finance-trend"></div>
         </div>
-        <div class="fin-grid">
+        <div class="fin-sections">
+
+          <!-- SECTION A — INCOME -->
           <div class="card">
-            <div class="card-head"><h3>Income &amp; Expenses</h3><span class="kicker">Current month</span></div>
-            <div id="finance-tx"></div>
+            <div class="card-head fin-sec-head">
+              <div>
+                <h3><span class="fin-sec-tag fin-sec-a">Section A</span> Income &amp; Allowance Tracker</h3>
+                <p class="page-sub">Jobs · Allowance · NIL / Sponsorships · Prize Money</p>
+              </div>
+              <button class="btn sm" onclick="openTxModal(null,'income')">+ Log Income</button>
+            </div>
+            <div id="fin-income-block"></div>
           </div>
+
+          <!-- SECTION B — EXPENSES -->
           <div class="card">
-            <div class="card-head"><h3>Savings Goals</h3><span class="kicker">Progress</span></div>
-            <div id="finance-savings"></div>
+            <div class="card-head fin-sec-head">
+              <div>
+                <h3><span class="fin-sec-tag fin-sec-b">Section B</span> Athlete Expense Categories</h3>
+                <p class="page-sub">Gear / Shoes · Training &amp; Coaching Fees · Travel / Fuel · Nutrition · Tournament Fees</p>
+              </div>
+              <button class="btn sm" onclick="openTxModal(null,'expense')">+ Log Expense</button>
+            </div>
+            <div id="fin-expense-block"></div>
+            <div class="log-label" style="margin-top:18px">SPENDING BY CATEGORY <span class="hint">Current month</span></div>
+            <div id="finance-cats"></div>
           </div>
-        </div>
-        <div class="card" style="margin-top:16px">
-          <div class="card-head"><h3>Spending by Category</h3><span class="kicker">Current month</span></div>
-          <div id="finance-cats"></div>
+
+          <!-- SECTION C — SAVINGS & BUDGET -->
+          <div class="card">
+            <div class="card-head fin-sec-head">
+              <div>
+                <h3><span class="fin-sec-tag fin-sec-c">Section C</span> Savings Goals &amp; Budget</h3>
+                <p class="page-sub">Big-ticket targets: summer travel ball, personal trainer, new shoes.</p>
+              </div>
+              <button class="btn sm" onclick="openSavingsModal()">+ New Goal</button>
+            </div>
+            <div id="fin-budget"></div>
+            <div id="finance-savings" style="margin-top:14px"></div>
+          </div>
+
+          <!-- SECTION D — INVESTING & WEALTH -->
+          <div class="card">
+            <div class="card-head fin-sec-head">
+              <div>
+                <h3><span class="fin-sec-tag fin-sec-d">Section D</span> Investing &amp; Wealth</h3>
+                <p class="page-sub">Beginner-friendly portfolio tracking — index funds, savings, stocks and compound growth.</p>
+              </div>
+              <button class="btn sm" onclick="openInvestmentModal()">+ Log Investment</button>
+            </div>
+            <div id="fin-portfolio"></div>
+            <div class="log-label" style="margin-top:18px">ASSET BREAKDOWN <span class="hint">by category</span></div>
+            <div id="fin-assets"></div>
+            <div class="log-label" style="margin-top:18px">COMPOUND INTEREST CALCULATOR <span class="hint">5 to 10 years</span></div>
+            <div id="fin-compound"></div>
+            <div class="log-label" style="margin-top:18px">SIMPLE INVESTMENT LOG</div>
+            <div id="fin-invest-table"></div>
+          </div>
+
         </div>
       </section>
 
@@ -1506,6 +1768,47 @@ input[type=range]:focus{ box-shadow:none; }
         </div>
         <div class="rec-filter" id="rec-filter"></div>
         <div class="rec-board" id="recruiting-board"></div>
+      </section>
+
+      <!-- ============ TAB 8: MENTAL ============ -->
+      <section id="tab-mental" class="tab">
+        <div class="sub-tabs" id="mental-subtabs">
+          <button class="sub-tab" data-mview="journal" onclick="setMentalView('journal')">Journaling</button>
+          <button class="sub-tab" data-mview="decisions" onclick="setMentalView('decisions')">Decision Archive</button>
+        </div>
+
+        <!-- VIEW 8A: JOURNALING -->
+        <div class="log-sub" id="mview-journal">
+          <div class="card-head-row">
+            <div>
+              <h2 class="page-title">Journaling</h2>
+              <p class="page-sub">Daily entries link straight to your Daily Log history, plus a structured weekly review.</p>
+            </div>
+            <button class="btn sm" onclick="switchTab('log');setLogView('entry')">✎ Open Daily Log</button>
+          </div>
+          <div class="mental-grid">
+            <div class="card">
+              <div class="card-head"><h3>Daily Entries</h3><span class="kicker" id="journal-kicker"></span></div>
+              <div id="journal-daily"></div>
+            </div>
+            <div class="card">
+              <div class="card-head"><h3>Weekly Journaling</h3><span class="kicker" id="journal-week"></span></div>
+              <div id="journal-weekly"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEW 8B: DECISION ARCHIVE -->
+        <div class="log-sub" id="mview-decisions">
+          <div class="card-head-row">
+            <div>
+              <h2 class="page-title">Decision Archive</h2>
+              <p class="page-sub">Log the calls you make, the framework behind them, and how confident you felt.</p>
+            </div>
+            <button class="btn" onclick="openDecisionModal()">+ Log Decision</button>
+          </div>
+          <div class="card"><div id="decision-table"></div></div>
+        </div>
       </section>
 
     </div>
@@ -1534,6 +1837,10 @@ input[type=range]:focus{ box-shadow:none; }
 </datalist>
 
 <input type="file" id="importFile" accept=".json,application/json" hidden>
+
+<!-- ============ LIVE WORKOUT MODE OVERLAY ============ -->
+<div id="live-overlay" class="hidden" role="dialog" aria-modal="true" aria-label="Live workout mode"></div>
+
 <div id="toast"></div>
 
 <script>
@@ -1551,9 +1858,21 @@ const CATEGORIES = {
   skiing:     { label: 'Skiing / Coaching',  color: '#9d4edd' },
   life:       { label: 'Life / Recovery',    color: '#e63946' }
 };
-const TITLES = { dashboard: 'Dashboard', log: 'Daily Log & Workouts', school: 'School', goals: 'Goal Matrix', film: 'Film Study', finance: 'Finance Tracker', recruiting: 'Recruiting CRM' };
+const TITLES = { dashboard: 'Dashboard', log: 'Daily Log & Workouts', school: 'School', goals: 'Goal Matrix', film: 'Film Study', finance: 'Finance Tracker', recruiting: 'Recruiting CRM', mental: 'Mental Game' };
+const DECISION_TYPES = ['Small', 'Medium', 'Big'];
+const DECISION_FRAMEWORKS = ['10-10-10', 'Values Compass', 'Gut Check', 'Pros & Cons', 'Regret Minimization', 'Other'];
+const WEEKLY_PROMPTS = [
+  'What did I do this week that moved my goals forward?',
+  'Where did I lose focus, and what will I change next week?',
+  'What is the hardest thing I am avoiding right now?',
+  'What am I grateful for, and who deserves a thank-you?'
+];
 const RECRUIT_STATUSES = ['Uncontacted', 'Contacted', 'Active Dialogue', 'Offer Extended', 'Committed / Archived'];
 const RECRUIT_ROLES = ['Head Coach', 'Assistant Coach', 'Lead Recruiter', 'Recruiting Coordinator', 'Other'];
+const RECRUIT_DIVISIONS = ['NCAA D1', 'NCAA D2', 'NCAA D3', 'NAIA', 'U Sports', 'JUCO', 'Other'];
+const RECRUIT_TIERS = ['Tier 1 Target', 'Tier 2 Backup', 'Safety'];
+const INTERACTION_TYPES = ['Call', 'Email', 'Campus Visit', 'Camp', 'Official Visit', 'Unofficial Visit', 'Offer'];
+const CONTACT_STALE_DAYS = 14;   // days without contact before the badge goes red
 const TYPE_META = {
   basketball: { label: 'Basketball', color: '#45a29e' },
   lift:       { label: 'Lift',       color: '#f0a500' },
@@ -1652,7 +1971,7 @@ function seedDefaults(s){
   SEED_CLASSES.forEach(seed => {
     let c = s.classCats.find(x => String(x.label || '').trim().toLowerCase() === seed.label.toLowerCase());
     if (!c){
-      c = { id: 'class-' + uid(), label: seed.label, category: classCategory(seed.label), room: '', teacher: '', period: seed.period, semester: 's1', currentGrade: '', targetGrade: '' };
+      c = { id: 'class-' + uid(), label: seed.label, category: classCategory(seed.label), room: '', teacher: '', credits: 4, period: seed.period, semester: 's1', currentGrade: '', targetGrade: '' };
       s.classCats.push(c);
     }
     if (c.currentGrade === '' || c.currentGrade === undefined || c.currentGrade === null) c.currentGrade = seed.currentGrade;
@@ -1752,7 +2071,18 @@ function defaultState(){
     seedVersion: 0,     // marks the automatic seed data as applied (see seedDefaults)
     habits: DEFAULT_HABITS.map(h => ({ ...h })),
     school: [],         // academic assignment database
-    classCats: DEFAULT_CLASS_SLOTS.map(c => ({ id: 'class-' + uid(), label: c.label, category: classCategory(c.label), room: '', teacher: '', period: c.period, semester: 's1', currentGrade: '', targetGrade: '' })),      // registered classes (e.g. Pre-Calculus 11)
+    classCats: DEFAULT_CLASS_SLOTS.map(c => ({ id: 'class-' + uid(), label: c.label, category: classCategory(c.label), room: '', teacher: '', credits: 4, period: c.period, semester: 's1', currentGrade: '', targetGrade: '' })),      // registered classes (e.g. Pre-Calculus 11)
+    extracurricular: { volunteerGoal: '', xcCredits: '', volunteerHours: [] },  // volunteer hours + graduation credits
+    mental: {
+      weekly: {},        // weekStartKey -> { prompts: {q: a}, notes }
+      decisions: []      // { id, name, type, framework, confidence, reviewed, notes, date }
+    },
+    live: {              // LIVE WORKOUT MODE (in-progress session buffer)
+      active: false, dateKey: '', location: 'DT', note: '', drill: '',
+      startedAt: 0, pausedAt: 0, drillStartAt: 0, restEndsAt: 0,
+      restPreset: 30, category: '3-PT', mentalDismissed: false, timerOn: true, chunks: []
+    },
+    recovery: {},        // dateKey -> 1-10 CNS / sleep recovery score
     presets: { basketball: [], lift: [], strength: [] },
     workouts: {},       // dateKey -> workout session (basketball | lift | strength)
     logs: {},           // dateKey -> journal entry
@@ -1768,7 +2098,9 @@ function defaultState(){
       grade: 'g10',           // current high-school grade (Grade 10/11/12)
       yearView: 'all',        // multi-year filter: g10 | g11 | g12 | all
       transactions: [],  // { id, date, desc, amount, cat, type }
-      savings: []        // { id, name, target, current, targetDate }
+      savings: [],       // { id, name, target, current, targetDate }
+      investments: [],   // { id, date, asset, category, amount, buyPrice, currentPrice }
+      investPlan: { start: '', monthly: '', rate: 7 }   // compound calculator inputs
     },
     recruiting: [],     // { id, school, lead, coach, role, email, phone, lastContact, notes, filmLink, status }
     settings: {
@@ -1781,7 +2113,9 @@ function defaultState(){
       studyView: 'player',    // Player Study | Team Study
       schoolView: 'assign',   // School sub-view: Assignments | Timetable | Classes
       schoolFilter: 'all',    // Assignments filter: all | active | archived
-      recruitFilter: 'all'    // Recruiting CRM filter: all | one of RECRUIT_STATUSES
+      recruitFilter: 'all',   // Recruiting CRM filter: all | one of RECRUIT_STATUSES
+      recruitDivFilter: 'all', // Recruiting CRM division filter: all | one of RECRUIT_DIVISIONS
+      mentalView: 'journal'   // Mental sub-view: Journaling | Decision Archive
     }
   };
 }
@@ -1793,7 +2127,58 @@ function mergeState(p){
     seedVersion: Number(p.seedVersion) || 0,
     habits:   Array.isArray(p.habits)   && p.habits.length   ? p.habits.map(h => ({ ...h, type: h.type || 'good', desc: h.desc || '', target: h.target ?? '' })) : d.habits,
     school:   Array.isArray(p.school)   ? p.school.map(a => ({ ...a, semester: a.semester || 's1', status: a.status || 'Not Started' })) : d.school,
-    classCats: Array.isArray(p.classCats) && p.classCats.length ? p.classCats.map(c => ({ ...c, category: c.category || classCategory(c.label), room: c.room || '', teacher: c.teacher || '', period: c.period || 'p1', semester: c.semester || 's1', targetGrade: c.targetGrade ?? '', currentGrade: c.currentGrade ?? '' })) : d.classCats,
+    classCats: Array.isArray(p.classCats) && p.classCats.length ? p.classCats.map(c => ({ ...c, category: c.category || classCategory(c.label), room: c.room || '', teacher: c.teacher || '', credits: (c.credits === undefined || c.credits === null || c.credits === '') ? 4 : c.credits, period: c.period || 'p1', semester: c.semester || 's1', targetGrade: c.targetGrade ?? '', currentGrade: c.currentGrade ?? '' })) : d.classCats,
+    extracurricular: p.extracurricular && typeof p.extracurricular === 'object'
+      ? {
+          volunteerGoal: p.extracurricular.volunteerGoal ?? '',
+          xcCredits: p.extracurricular.xcCredits ?? '',
+          volunteerHours: Array.isArray(p.extracurricular.volunteerHours)
+            ? p.extracurricular.volunteerHours.map(v => ({ id: v.id || uid(), date: v.date || '', org: v.org || '', hours: v.hours ?? '', notes: v.notes || '' }))
+            : []
+        }
+      : d.extracurricular,
+    recovery: p.recovery && typeof p.recovery === 'object'
+      ? Object.fromEntries(Object.entries(p.recovery)
+          .filter(([k, v]) => /^\d{4}-\d{2}-\d{2}$/.test(k) && Number.isFinite(parseFloat(v)))
+          .map(([k, v]) => [k, clamp(Math.round(parseFloat(v)), 1, 10)]))
+      : {},
+    live: p.live && typeof p.live === 'object'
+      ? {
+          active: !!p.live.active,
+          timerOn: p.live.timerOn === undefined ? true : !!p.live.timerOn,
+          dateKey: p.live.dateKey || '',
+          location: p.live.location || 'DT',
+          note: p.live.note || '',
+          drill: p.live.drill || '',
+          startedAt: Number(p.live.startedAt) || 0,
+          pausedAt: Number(p.live.pausedAt) || 0,
+          drillStartAt: Number(p.live.drillStartAt) || 0,
+          restEndsAt: Number(p.live.restEndsAt) || 0,
+          restPreset: REST_PRESETS.includes(p.live.restPreset) ? p.live.restPreset : 30,
+          category: LIVE_CATEGORIES.includes(p.live.category) ? p.live.category : '3-PT',
+          mentalDismissed: !!p.live.mentalDismissed,
+          chunks: Array.isArray(p.live.chunks)
+            ? p.live.chunks.map(c => ({
+                name: c.name || '',
+                category: LIVE_CATEGORIES.includes(c.category) ? c.category : 'Other',
+                setType: c.setType || 'Shooting',
+                attempts: num(c.attempts), makes: num(c.makes), reps: num(c.reps)
+              }))
+            : []
+        }
+      : d.live,
+    mental: p.mental && typeof p.mental === 'object'
+      ? {
+          weekly: (p.mental.weekly && typeof p.mental.weekly === 'object') ? p.mental.weekly : {},
+          decisions: Array.isArray(p.mental.decisions)
+            ? p.mental.decisions.map(x => ({
+                id: x.id || uid(), name: x.name || '', type: x.type || 'Small',
+                framework: x.framework || 'Gut Check', confidence: x.confidence ?? 3,
+                reviewed: !!x.reviewed, notes: x.notes || '', date: x.date || ''
+              }))
+            : []
+        }
+      : d.mental,
     presets: mergePresetCollections({
       basketball: Array.isArray(p.presets && p.presets.basketball) ? p.presets.basketball.map(x => migrateSessionPreset({ ...x, notes: x.notes || '' })) : [],
       lift:       Array.isArray(p.presets && p.presets.lift)       ? p.presets.lift.map(x => ({ ...x, notes: x.notes || '' }))       : [],
@@ -1803,7 +2188,14 @@ function mergeState(p){
       ? Object.fromEntries(Object.entries(p.workouts).map(([k, s]) => [k, migrateSessionPreset({ ...s, notes: (s && s.notes) || '' })]))
       : {},
     logs:         p.logs         && typeof p.logs === 'object'         ? p.logs         : {},
-    todos:        p.todos        && typeof p.todos === 'object'        ? p.todos        : {},
+    todos: p.todos && typeof p.todos === 'object'
+      ? Object.fromEntries(Object.entries(p.todos).map(([k, rows]) => [k, (Array.isArray(rows) ? rows : []).map(t => ({
+          id: t.id || uid(), text: t.text || '', done: !!t.done,
+          scheduledDate: t.scheduledDate || '',
+          priority: TODO_LEVELS.includes(t.priority) ? t.priority : 'Medium',
+          urgency: TODO_LEVELS.includes(t.urgency) ? t.urgency : 'Medium'
+        }))]))
+      : {},
     goals:        Array.isArray(p.goals)        ? p.goals.map(g => ({ ...g, desc: g.desc || '', milestones: (g.milestones || []).map(m => ({ ...m, curriculum: m.curriculum || '' })) })) : d.goals,
     records: p.records && typeof p.records === 'object'
       ? {
@@ -1827,7 +2219,19 @@ function mergeState(p){
           grade: (['g10','g11','g12'].includes(p.finance.grade) ? p.finance.grade : 'g10'),
           yearView: (['g10','g11','g12','all'].includes(p.finance.yearView) ? p.finance.yearView : 'all'),
           transactions: Array.isArray(p.finance.transactions) ? p.finance.transactions.map(t => ({ ...t })) : [],
-          savings:      Array.isArray(p.finance.savings)      ? p.finance.savings.map(s => ({ ...s, targetDate: s.targetDate || '' }))      : []
+          savings:      Array.isArray(p.finance.savings)      ? p.finance.savings.map(s => ({ ...s, targetDate: s.targetDate || '' }))      : [],
+          investments:  Array.isArray(p.finance.investments)
+            ? p.finance.investments.map(i => ({
+                id: i.id || uid(), date: i.date || '', asset: i.asset || '',
+                category: INVEST_CATS.includes(i.category) ? i.category : 'Index Funds / S&P 500',
+                amount: i.amount ?? '', buyPrice: i.buyPrice ?? '', currentPrice: i.currentPrice ?? ''
+              }))
+            : [],
+          investPlan: {
+            start: (p.finance.investPlan && p.finance.investPlan.start) ?? '',
+            monthly: (p.finance.investPlan && p.finance.investPlan.monthly) ?? '',
+            rate: (p.finance.investPlan && Number.isFinite(parseFloat(p.finance.investPlan.rate))) ? p.finance.investPlan.rate : 7
+          }
         }
       : d.finance,
     recruiting: Array.isArray(p.recruiting)
@@ -1835,10 +2239,15 @@ function mergeState(p){
           id: c.id || uid(), school: c.school || '', lead: c.lead || '', coach: c.coach || '',
           role: c.role || 'Head Coach', email: c.email || '', phone: c.phone || '',
           lastContact: c.lastContact || '', notes: c.notes || '', filmLink: c.filmLink || '',
-          status: RECRUIT_STATUSES.includes(c.status) ? c.status : 'Uncontacted'
+          division: RECRUIT_DIVISIONS.includes(c.division) ? c.division : 'Other',
+          priorityRank: RECRUIT_TIERS.includes(c.priorityRank) ? c.priorityRank : 'Tier 2 Backup',
+          status: RECRUIT_STATUSES.includes(c.status) ? c.status : 'Uncontacted',
+          interactions: Array.isArray(c.interactions)
+            ? c.interactions.map(i => ({ id: i.id || uid(), type: INTERACTION_TYPES.includes(i.type) ? i.type : 'Call', date: i.date || '', notes: i.notes || '' }))
+            : []
         }))
       : [],
-    settings: { ...d.settings, ...(p.settings || {}), schoolClassId: (p.settings && p.settings.schoolClassId) || '', schoolFilter: ['all', 'active', 'archived'].includes(p.settings && p.settings.schoolFilter) ? p.settings.schoolFilter : 'all', recruitFilter: ['all', ...RECRUIT_STATUSES].includes(p.settings && p.settings.recruitFilter) ? p.settings.recruitFilter : 'all' }
+    settings: { ...d.settings, ...(p.settings || {}), schoolClassId: (p.settings && p.settings.schoolClassId) || '', schoolFilter: ['all', 'active', 'archived'].includes(p.settings && p.settings.schoolFilter) ? p.settings.schoolFilter : 'all', recruitFilter: ['all', ...RECRUIT_STATUSES].includes(p.settings && p.settings.recruitFilter) ? p.settings.recruitFilter : 'all', recruitDivFilter: ['all', ...RECRUIT_DIVISIONS].includes(p.settings && p.settings.recruitDivFilter) ? p.settings.recruitDivFilter : 'all', mentalView: ['journal', 'decisions'].includes(p.settings && p.settings.mentalView) ? p.settings.mentalView : 'journal' }
   };
   // Baseline data is merged in exactly once, then respected as user-owned.
   return seedDefaults(merged);
@@ -1872,7 +2281,6 @@ function flushSave(){
   try {
     localStorage.setItem(LS_KEY, JSON.stringify(state));
     persistWorkoutPresets();
-    cloudQueuePush();
     flashSaved();
   } catch (e) {
     console.warn(e);
@@ -1892,251 +2300,6 @@ function flashSaved(){
   };
   flashT = setTimeout(pulse, 60);
 }
-
-/* ============================================================
-   SUPABASE CLOUD SYNC — workouts, habits, dashboard & everything else
-   ============================================================ */
-const SUPA_URL = 'https://ugvpreqqzymldygkkyoj.supabase.co';
-const SUPA_KEY = 'sb_publishable_ukQQ6DeEgB26YfeMohgGiw_Cdd82XfY';
-const CLOUD_ROW = 'phoenix_os';
-const TABLE = 'phoenix_state';
-
-let supa = null;
-let cloudState = 'off';          // off | connecting | on | sync | err | setup
-let cloudWatch = null;
-let cloudPulls = 0;
-let cloudLastErr = null;
-let applyingRemote = false;      // guard: don't re-push state that just arrived
-let pendingPush = false;
-let pushT = null;
-
-function supaInit(){
-  if (supa || typeof supabase === 'undefined') return;
-  try {
-    supa = supabase.createClient(SUPA_URL, SUPA_KEY);
-  } catch (e) {
-    console.warn('Supabase init failed', e);
-    setCloudState('err', 'Cloud: init failed');
-  }
-}
-
-function setCloudState(s, label){
-  cloudState = s;
-  const el = document.getElementById('cloud-status');
-  if (!el) return;
-  el.dataset.state = s;
-  const txt = el.querySelector('.cloud-txt');
-  if (txt) txt.textContent = label || {
-    off:        'Cloud: offline',
-    connecting: 'Cloud: connecting…',
-    on:         'Cloud: synced',
-    sync:       'Cloud: syncing…',
-    err:        'Cloud: offline',
-    setup:      'Cloud: setup needed'
-  }[s] || s;
-}
-
-function cloudStatusClick(){
-  if (cloudState === 'setup') openCloudSetup();
-  else openCloudModal();
-}
-
-/* ---------- Pull: fetch remote state (last-write-wins by updated_at) ---------- */
-async function cloudPull(initial){
-  if (!supa) return null;
-  setCloudState('sync');
-  try {
-    const { data, error } = await supa.from(TABLE).select('payload,updated_at').eq('id', CLOUD_ROW).maybeSingle();
-    if (error) throw error;
-    if (!data || !data.payload) {
-      // First ever sync: push local state up so other devices seed from it.
-      setCloudState('on');
-      if (initial) await cloudPush(true);
-      return null;
-    }
-    const remoteAt = data.updated_at ? Date.parse(data.updated_at) : 0;
-    if (initial) {
-      // On boot: remote wins if it's newer than the local snapshot; else push local up.
-      if (remoteAt > cloudBootAt) {
-        applyingRemote = true;
-        state = mergeState(data.payload);
-        localStorage.setItem(LS_KEY, JSON.stringify(state));
-        renderAll();
-        applyingRemote = false;
-        cloudPulls++;
-        toast('✓ Loaded cloud data');
-      } else {
-        await cloudPush(true);
-      }
-    } else {
-      // Realtime/background update from another device — remote wins.
-      applyingRemote = true;
-      state = mergeState(data.payload);
-      localStorage.setItem(LS_KEY, JSON.stringify(state));
-      renderAll();
-      applyingRemote = false;
-      cloudPulls++;
-      toast('↻ Synced from cloud');
-    }
-    cloudLastErr = null;
-    setCloudState('on');
-    return data;
-  } catch (e) {
-    cloudLastErr = e.message || String(e);
-    const missing = /PGRST205|Could not find the table|schema cache/i.test(cloudLastErr);
-    setCloudState(missing ? 'setup' : 'err');
-    return null;
-  }
-}
-
-/* ---------- Push: debounce writes to the cloud row ---------- */
-  function cloudQueuePush(){
-    if (applyingRemote) return;
-    pendingPush = true;
-    clearTimeout(pushT);
-    pushT = setTimeout(() => {
-      // Yield before cloning or touching the client so keystrokes stay responsive.
-      if (typeof queueMicrotask === 'function') queueMicrotask(cloudFlush);
-      else Promise.resolve().then(cloudFlush);
-    }, 700);
-  }
-
-async function cloudFlush(){
-  if (!pendingPush || !supa) return;
-  pendingPush = false;
-  setCloudState('sync');
-  const payload = JSON.parse(JSON.stringify(state));
-  try {
-    const { error } = await supa.from(TABLE).upsert({
-      id: CLOUD_ROW,
-      payload: payload,
-      updated_at: new Date().toISOString()
-    });
-    if (error) throw error;
-    cloudLastErr = null;
-    setCloudState('on');
-  } catch (e) {
-    cloudLastErr = e.message || String(e);
-    const missing = /PGRST205|Could not find the table|schema cache/i.test(cloudLastErr);
-    setCloudState(missing ? 'setup' : 'err');
-    pendingPush = true; // retry on next change / reconnect
-  }
-}
-
-/* ---------- Push (initial): immediate write, no debounce ---------- */
-async function cloudPush(){
-  if (!supa) return;
-  try {
-    const { error } = await supa.from(TABLE).upsert({
-      id: CLOUD_ROW,
-      payload: JSON.parse(JSON.stringify(state)),
-      updated_at: new Date().toISOString()
-    });
-    if (error) throw error;
-    cloudLastErr = null;
-    setCloudState('on');
-  } catch (e) {
-    cloudLastErr = e.message || String(e);
-    const missing = /PGRST205|Could not find the table|schema cache/i.test(cloudLastErr);
-    setCloudState(missing ? 'setup' : 'err');
-  }
-}
-
-/* ---------- Realtime: live updates from other devices ---------- */
-function cloudWatchStart(){
-  if (!supa || cloudWatch) return;
-  try {
-    cloudWatch = supa.channel('phoenix-sync')
-      .on('postgres_changes',
-        { event: '*', schema: 'public', table: TABLE, filter: 'id=eq.phoenix_os' },
-        () => { if (!applyingRemote) cloudPull(false); }
-      )
-      .subscribe(status => {
-        if (status === 'SUBSCRIBED') {
-          cloudLastErr = null;
-          setCloudState('on');
-        } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-          setCloudState('err');
-        }
-      });
-  } catch (e) {
-    console.warn('Realtime setup failed', e);
-  }
-}
-
-/* ---------- Boot: connect, pull, watch ---------- */
-let cloudBootAt = 0;
-function cloudStart(){
-  if (typeof supabase === 'undefined') {
-    setCloudState('err');
-    return;
-  }
-  supaInit();
-  if (!supa) return;
-  setCloudState('connecting');
-  cloudBootAt = Date.now();
-  cloudPull(true).then(() => cloudWatchStart());
-  document.addEventListener('visibilitychange', () => {
-    if (!document.hidden && supa) cloudPull(false);
-    if (!document.hidden && pendingPush) cloudFlush();
-  });
-}
-
-/* ---------- Status modal + one-click setup wizard ---------- */
-function openCloudModal(){
-  openModal('Cloud Sync Status');
-  document.getElementById('modal-body').innerHTML =
-    '<div class="card-head" style="padding:0 0 8px"><h3>Supabase</h3><span class="kicker">' + esc(SUPA_URL.replace('https://','')) + '</span></div>' +
-    '<div style="display:flex;gap:14px;margin-bottom:10px">' +
-      '<div><div style="font-size:11px;color:var(--muted)">STATUS</div><div style="font-size:14px;font-weight:700;color:var(--hi)">' +
-        ({ on:'✓ Synced', sync:'⏳ Syncing…', connecting:'⏳ Connecting…', err:'⚠ ' + (cloudLastErr || 'Offline'), setup:'⚠ Setup needed', off:'Offline' }[cloudState] || cloudState) +
-      '</div></div>' +
-      '<div><div style="font-size:11px;color:var(--muted)">LAST REMOTE LOAD</div><div style="font-size:14px;font-weight:700;color:var(--hi)">' +
-        (cloudPulls ? (cloudPulls === 1 ? '1 pull' : cloudPulls + ' pulls') : '—') + '</div></div>' +
-    '</div>' +
-    '<p style="font-size:12.5px;color:var(--text);margin-bottom:8px">All workouts, habits, logs and dashboard data auto-sync to this Supabase project. Your phone and PC share one row — last save wins, realtime pushes arrive within a second.</p>' +
-    '<button class="util-btn" style="width:100%" onclick="closeModal();cloudRetry()">↻ Reconnect now</button>' +
-    (cloudState === 'setup' ? '<button class="util-btn ghost" style="width:100%;margin-top:6px" onclick="openCloudSetup()">🛠 Run setup wizard</button>' : '') +
-    '<div style="font-size:11px;color:var(--muted);margin-top:10px">Local autosave stays enabled as a fallback — nothing is lost if the cloud is unreachable.</div>';
-}
-
-function cloudRetry(){
-  if (cloudWatch) { try { supa && supa.removeChannel(cloudWatch); } catch(e){} cloudWatch = null; }
-  cloudStart();
-}
-
-function openCloudSetup(){
-  openModal('Cloud Setup — One Time');
-  document.getElementById('modal-body').innerHTML =
-    '<p style="font-size:12.5px;margin-bottom:10px">Your Supabase project is reachable, but the sync table doesn\'t exist yet. Run this once:</p>' +
-    '<ol class="setup-steps">' +
-      '<li>Open <a href="https://supabase.com/dashboard/project/ugvpreqqzymldygkkyoj/sql/new" target="_blank" rel="noopener">SQL Editor</a> in your Supabase dashboard.</li>' +
-      '<li>Paste the SQL below and click <b>Run</b>.</li>' +
-      '<li>Close this and click the <b>Cloud</b> chip — it will turn green within a second.</li>' +
-    '</ol>' +
-    '<div class="sql-box">' + esc(CLOUD_SQL) + '</div>' +
-    '<div style="display:flex;gap:6px;margin-top:8px">' +
-      '<button class="util-btn" style="flex:1" onclick="copyCloudSql()">⧉ Copy SQL</button>' +
-      '<button class="util-btn ghost" style="flex:1" onclick="closeModal();cloudRetry()">↻ I ran it — reconnect</button>' +
-    '</div>';
-}
-
-function copyCloudSql(){
-  (navigator.clipboard ? navigator.clipboard.writeText(CLOUD_SQL) : Promise.reject())
-    .then(() => toast('✓ SQL copied'))
-    .catch(() => toast('Select the SQL text and copy manually', 'error'));
-}
-
-const CLOUD_SQL =
-"create table if not exists phoenix_state (\n" +
-"  id text primary key,\n" +
-"  payload jsonb not null,\n" +
-"  updated_at timestamptz not null default now()\n" +
-");\n" +
-"alter table phoenix_state enable row level security;\n" +
-"create policy \"anon full access\" on phoenix_state\n" +
-"  for all using (true) with check (true);\n" +
-"alter publication supabase_realtime add table phoenix_state;\n";
 
 /* ---------- Toast ---------- */
 let toastT = null;
@@ -2245,12 +2408,14 @@ function renderAll(){
   renderWorkoutSession(state.settings.logDate);
   renderLogHistory();
   renderGoals();
+  renderTodoMatrix();
   renderRecords();
   renderHabitsPanel();
   renderClassCats();
   renderSchool();
   renderSchoolClasses();
   if (state.settings.schoolView === 'class-detail') renderClassDetail();
+  if (state.settings.schoolView === 'xc') renderExtracurricular();
   const s1 = document.getElementById('sem-s1'), s2 = document.getElementById('sem-s2');
   if (s1) s1.classList.toggle('active', schoolSem() === 's1');
   if (s2) s2.classList.toggle('active', schoolSem() === 's2');
@@ -2262,6 +2427,10 @@ function renderAll(){
   if (state.settings.filmView === 'study') renderFilmStudy();
   renderFinance();
   renderRecruiting();
+  applyMentalView();
+  renderMental();
+  renderExtracurricular();
+  if (liveState().active) renderLive();
 }
 
 /* ============================================================
@@ -2437,8 +2606,9 @@ function renderWorkoutSession(key){
   if (!s){
     el.innerHTML =
       '<div class="ws-empty">' +
-        '<p style="margin-bottom:12px">Log a workout for this date — load a saved preset or start from a blank template. Logged workouts auto-attach to this date\'s journal draft.</p>' +
+        '<p style="margin-bottom:12px">Log a workout for this date — go live to tap makes and misses in real time, or load a saved preset / blank template. Logged workouts auto-attach to this date\'s journal draft.</p>' +
         '<div class="ws-actions">' +
+          '<button class="btn live-start" onclick="startLiveWorkout()">🔴 Start Live Workout</button>' +
           '<button class="btn" onclick="openPresetChooser(\'basketball\')">🏀 Basketball</button>' +
           '<button class="btn" style="background:var(--amber);border-color:var(--amber)" onclick="openPresetChooser(\'lift\')">🏋 Lift</button>' +
           '<button class="btn" style="background:var(--purple);border-color:var(--purple)" onclick="openPresetChooser(\'strength\')">💪 Strength</button>' +
@@ -2466,6 +2636,7 @@ function renderWorkoutSession(key){
       '<span class="ws-name">' + esc(s.presetName || 'Custom Session') + '</span>' +
       '<button class="btn sm ghost" onclick="changeWsPreset()">⚡ Change</button>' +
       '<button class="btn sm ghost" onclick="createPresetFromWorkout()">＋ Create Preset</button>' +
+      '<button class="btn sm" style="border-color:rgba(255,77,94,.6);color:#ff4d5e" onclick="startLiveWorkout()">🔴 Live Mode</button>' +
       '<button class="icon-btn danger" onclick="clearWorkoutSession()" title="Clear session">🗑</button>' +
     '</div>' +
     '<div class="ws-body">' + body + '</div>' +
@@ -3075,6 +3246,9 @@ function renderDashboard(){
   /* --- Shooting % summary (7 / 30 day) --- */
   renderShooting();
 
+  /* --- Daily recovery score + shooting correlation --- */
+  renderRecovery();
+
   /* --- Upcoming school deadlines --- */
   renderSchoolDeadlines();
 
@@ -3152,6 +3326,33 @@ function renderDashboardWorkout(){
   el.innerHTML = body;
 }
 
+const TODO_LEVELS = ['Low', 'Medium', 'High'];
+const todoPriority = t => TODO_LEVELS.includes(t && t.priority) ? t.priority : 'Medium';
+const todoUrgency  = t => TODO_LEVELS.includes(t && t.urgency)  ? t.urgency  : 'Medium';
+/* Eisenhower quadrants: importance = priority, urgency = urgency. */
+function eisenhowerQuadrant(t){
+  const important = todoPriority(t) !== 'Low';
+  const urgent = todoUrgency(t) === 'High';
+  if (important && urgent) return 'do';
+  if (important) return 'schedule';
+  if (urgent) return 'delegate';
+  return 'dont';
+}
+const EISENHOWER = {
+  do:       { label: 'Do First',  rule: 'Urgent & Important — High priority + High urgency', cls: 'quad-do',    color: '#2ecc71' },
+  schedule: { label: 'Schedule',  rule: 'Important, Not Urgent — High priority + Low/Medium urgency', cls: 'quad-sched', color: '#3b82f6' },
+  delegate: { label: 'Delegate',  rule: 'Urgent, Not Important — Low/Medium priority + High urgency', cls: 'quad-del',   color: '#f0a500' },
+  dont:     { label: "Don't Do",  rule: 'Not Urgent & Not Important — Low priority + Low urgency', cls: 'quad-dont',  color: '#e63946' }
+};
+function allTodos(){
+  const seen = new Set(), out = [];
+  Object.entries(state.todos || {}).forEach(([bucket, rows]) => (rows || []).forEach(t => {
+    if (seen.has(t.id)) return;
+    seen.add(t.id);
+    out.push({ ...t, _bucket: bucket, _scheduled: t.scheduledDate || bucket });
+  }));
+  return out;
+}
 function todoEntriesForDate(key){
   const seen = new Set(), out = [];
   Object.entries(state.todos || {}).forEach(([bucket, rows]) => (rows || []).forEach(t => {
@@ -3179,10 +3380,61 @@ function renderTodos(){
     ? ordered.map(t =>
         '<li class="todo-item' + (t.done ? ' done' : '') + '">' +
           '<input type="checkbox" class="t-check" ' + (t.done ? 'checked' : '') + ' onchange="toggleTodo(\'' + t.id + '\')">' +
-          '<span class="t-text">' + esc(t.text) + (t.scheduledDate ? '<small class="todo-scheduled">Scheduled · ' + esc(fmtDate(t.scheduledDate)) + '</small>' : '') + '</span>' +
+          '<span class="t-text">' + esc(t.text) +
+            todoPill(t) +
+            (t.scheduledDate ? '<small class="todo-scheduled">Scheduled · ' + esc(fmtDate(t.scheduledDate)) + '</small>' : '') + '</span>' +
           '<button class="icon-btn" onclick="deleteTodo(\'' + t.id + '\')" title="Delete">✕</button>' +
         '</li>').join('')
     : '<li class="empty">No tasks yet — add one above.</li>';
+}
+function todoPill(t){
+  const meta = EISENHOWER[eisenhowerQuadrant({ ...t, priority: todoPriority(t), urgency: todoUrgency(t) })];
+  return ' <span class="qt-pill" style="color:' + meta.color + ';background:' + rgba(meta.color, .13) + ';border-color:' + rgba(meta.color, .45) + '" title="' + esc(meta.rule) + '">' + esc(meta.label) + '</span>';
+}
+function setTodoField(id, field, value){
+  const loc = todoLocation(id);
+  if (!loc) return;
+  snapshot();
+  loc.task[field] = value;
+  save();
+  renderTodos();
+  renderTodoMatrix();
+}
+let matrixHideDone = false;
+function toggleMatrixDone(){
+  matrixHideDone = !matrixHideDone;
+  const b = document.getElementById('matrix-hide-done');
+  if (b){ b.classList.toggle('active', matrixHideDone); b.textContent = matrixHideDone ? 'Show Completed' : 'Hide Completed'; }
+  renderTodoMatrix();
+}
+function renderTodoMatrix(){
+  const el = document.getElementById('todo-matrix');
+  if (!el) return;
+  let list = allTodos();
+  if (matrixHideDone) list = list.filter(t => !t.done);
+  el.innerHTML = Object.entries(EISENHOWER).map(([key, meta]) => {
+    const rows = list.filter(t => eisenhowerQuadrant(t) === key)
+      .sort((a, b) => (a.done ? 1 : 0) - (b.done ? 1 : 0) || String(a._scheduled).localeCompare(String(b._scheduled)));
+    const opts = (cur, tag) => TODO_LEVELS.map(l => '<option value="' + l + '"' + (cur === l ? ' selected' : '') + '>' + tag + ': ' + l + '</option>').join('');
+    const cards = rows.length ? rows.map(t =>
+      '<div class="quad-task' + (t.done ? ' done' : '') + '">' +
+        '<div class="qt-top">' +
+          '<input type="checkbox" class="t-check" ' + (t.done ? 'checked' : '') + ' onchange="toggleTodo(\'' + t.id + '\')">' +
+          '<span class="qt-text">' + esc(t.text) + '<span class="qt-date">' + esc(fmtDate(t._scheduled)) + '</span></span>' +
+          '<button class="icon-btn danger" onclick="deleteTodo(\'' + t.id + '\')" title="Delete">✕</button>' +
+        '</div>' +
+        '<div class="qt-selects">' +
+          '<select class="mini-sel" onchange="setTodoField(\'' + t.id + '\',\'priority\',this.value)" title="Priority (Impact)">' + opts(todoPriority(t), 'Impact') + '</select>' +
+          '<select class="mini-sel" onchange="setTodoField(\'' + t.id + '\',\'urgency\',this.value)" title="Urgency (Time)">' + opts(todoUrgency(t), 'Time') + '</select>' +
+        '</div>' +
+      '</div>').join('')
+      : '<div class="empty sm">Nothing here.</div>';
+    return '<div class="quad ' + meta.cls + '">' +
+      '<div class="quad-head"><h4 style="color:' + meta.color + '">' + meta.label + '</h4><span class="quad-count">' + rows.length + '</span></div>' +
+      '<p class="quad-rule">' + esc(meta.rule) + '</p>' +
+      '<div class="quad-list">' + cards + '</div>' +
+    '</div>';
+  }).join('');
 }
 function addTodo(){
   snapshot();
@@ -3190,12 +3442,21 @@ function addTodo(){
   if (!val) return;
   const key = todayKey();
   const scheduledDate = document.getElementById('todo-date').value || key;
+  const pEl = document.getElementById('todo-priority');
+  const uEl = document.getElementById('todo-urgency');
   state.todos[key] = state.todos[key] || [];
-  state.todos[key].push({ id: uid(), text: val, done: false, scheduledDate });
+  state.todos[key].push({
+    id: uid(), text: val, done: false, scheduledDate,
+    priority: pEl ? pEl.value : 'Medium',
+    urgency: uEl ? uEl.value : 'Medium'
+  });
   document.getElementById('todo-input').value = '';
   document.getElementById('todo-date').value = '';
+  if (pEl) pEl.value = 'Medium';
+  if (uEl) uEl.value = 'Medium';
   save();
   renderTodos();
+  renderTodoMatrix();
 }
 function toggleTodo(id){
   snapshot();
@@ -3204,6 +3465,7 @@ function toggleTodo(id){
   loc.task.done = !loc.task.done;
   save();
   renderTodos();
+  renderTodoMatrix();
 }
 function deleteTodo(id){
   snapshot();
@@ -3212,6 +3474,7 @@ function deleteTodo(id){
   state.todos[loc.bucket].splice(loc.index, 1);
   save();
   renderTodos();
+  renderTodoMatrix();
 }
 
 /* ============================================================
@@ -3439,6 +3702,90 @@ function shootRing(pct, label, gid){
     '<span class="ring-label">' + label + '</span>' +
   '</div>';
 }
+/* ---------- Daily recovery score (slider) + shooting correlation ---------- */
+function recoveryScores(){
+  if (!state.recovery || typeof state.recovery !== 'object') state.recovery = {};
+  return state.recovery;
+}
+function dayShootingPct(k){
+  const s = state.workouts[k];
+  if (!s || s.type !== 'basketball') return null;
+  const m = drillTotals(basketAllDrills(s));
+  return m.shots > 0 ? m.pct : null;
+}
+function recoveryBuckets(days){
+  const out = { high: { days: 0, pct: 0 }, mid: { days: 0, pct: 0 }, low: { days: 0, pct: 0 } };
+  const r = recoveryScores();
+  for (let i = 0; i < days; i++){
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const k = dateKey(d);
+    const score = r[k];
+    if (!score) continue;
+    const pct = dayShootingPct(k);
+    if (pct === null) continue;
+    const b = score >= 7 ? 'high' : score >= 5 ? 'mid' : 'low';
+    out[b].days++;
+    out[b].pct += pct;
+  }
+  ['high', 'mid', 'low'].forEach(b => { if (out[b].days) out[b].avg = Math.round(out[b].pct / out[b].days * 10) / 10; });
+  return out;
+}
+function updateRecoveryLabel(v){
+  const el = document.getElementById('rec-value');
+  const n = clamp(Math.round(parseFloat(v)) || 0, 1, 10);
+  if (!el) return;
+  el.textContent = n + '/10';
+  el.style.color = n >= 7 ? '#2ecc71' : n >= 5 ? '#f0a500' : '#e63946';
+}
+function setRecoveryToday(v){
+  const n = clamp(Math.round(parseFloat(v)) || 0, 1, 10);
+  snapshotDebounced();
+  recoveryScores()[todayKey()] = n;
+  save();
+  renderRecovery();
+}
+function renderRecovery(){
+  const el = document.getElementById('dash-recovery');
+  if (!el) return;
+  const r = recoveryScores();
+  const today = r[todayKey()];
+  const b = recoveryBuckets(30);
+  const kick = document.getElementById('recovery-kicker');
+  const loggedDays = Object.keys(r).length;
+  if (kick) kick.textContent = loggedDays ? loggedDays + ' day' + (loggedDays === 1 ? '' : 's') + ' logged' : 'Not logged yet';
+  const recent = [];
+  for (let i = 0; i < 7; i++){
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const k = dateKey(d);
+    if (!r[k]) continue;
+    const pct = dayShootingPct(k);
+    recent.push('<div class="mini-goal" style="margin:0"><div style="display:flex;justify-content:space-between;gap:8px;font-size:11.5px">' +
+      '<span>' + esc(fmtDate(k)) + '</span><span style="color:' + (r[k] >= 7 ? '#2ecc71' : r[k] >= 5 ? '#f0a500' : '#e63946') + '">CNS ' + r[k] + '/10</span>' +
+      '<span class="hint">' + (pct === null ? 'no shooting logged' : pct + '% FG') + '</span></div></div>');
+  }
+  let insight = '<p class="paste-hint" style="margin-top:10px">Rate each day 1–10, then log a workout — after a few days this compares your sleep/CNS score with that day\'s shooting %.</p>';
+  if (b.high.avg !== undefined || b.low.avg !== undefined){
+    const bits = [];
+    if (b.high.avg !== undefined) bits.push('<b style="color:#2ecc71">High recovery (' + b.high.days + ' days): ' + b.high.avg + '%</b>');
+    if (b.mid.avg !== undefined) bits.push('Mid (' + b.mid.days + '): ' + b.mid.avg + '%');
+    if (b.low.avg !== undefined) bits.push('<b style="color:#e63946">Low (' + b.low.days + '): ' + b.low.avg + '%</b>');
+    insight = '<p class="paste-hint" style="margin-top:10px">' + bits.join(' · ') + '</p>';
+    if (b.high.avg !== undefined && b.low.avg !== undefined){
+      const diff = Math.round((b.high.avg - b.low.avg) * 10) / 10;
+      insight += '<p class="paste-hint" style="margin-top:4px">' + (diff >= 0
+        ? '📈 You shoot <b>' + diff + ' points better</b> on high-recovery days — protect your sleep before big sessions.'
+        : '📉 No sleep advantage showing up yet (' + diff + ' points) — keep logging to build the trend.') + '</p>';
+    }
+  }
+  el.innerHTML =
+    '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px">' +
+      '<span class="hint">Today\'s CNS / sleep recovery</span>' +
+      '<span id="rec-value" style="font-family:var(--mono);font-size:18px;font-weight:800;color:' + (today >= 7 ? '#2ecc71' : today >= 5 ? '#f0a500' : today ? '#e63946' : 'var(--muted)') + '">' + (today ? today + '/10' : '—') + '</span>' +
+    '</div>' +
+    '<input class="rec-slider" type="range" min="1" max="10" step="1" value="' + (today || 5) + '" oninput="updateRecoveryLabel(this.value)" onchange="setRecoveryToday(this.value)" aria-label="Daily recovery score">' +
+    insight +
+    (recent.length ? '<div class="rec-recent">' + recent.join('') + '</div>' : '');
+}
 function renderShooting(){
   const el = document.getElementById('dash-shooting');
   if (!el) return;
@@ -3471,11 +3818,12 @@ function setGoalView(v){
   save();
   applyGoalView();
   if (v === 'habits') renderHabitsPanel();
+  if (v === 'matrix') renderTodoMatrix();
 }
 function applyGoalView(){
   const v = state.settings.goalView || 'goals';
   $$('#goal-subtabs .sub-tab').forEach(b => b.classList.toggle('active', b.dataset.gview === v));
-  const map = { goals: 'gview-goals', habits: 'gview-habits' };
+  const map = { goals: 'gview-goals', habits: 'gview-habits', matrix: 'gview-matrix' };
   Object.entries(map).forEach(([k, id]) => {
     const el = document.getElementById(id);
     if (el) el.classList.toggle('active', k === v);
@@ -4260,7 +4608,30 @@ function classMetaHtml(c, compact){
   if (c.period) bits.push(periodLabel(c.period));
   if (c.room) bits.push('Rm ' + c.room);
   if (c.teacher) bits.push(c.teacher);
+  bits.push(classCredits(c) + ' cr');
   return (bits.length ? ' <span class="cc-meta">' + esc(bits.join(' · ')) + '</span>' : '');
+}
+/* Every class carries a credit weight (defaults to 4). */
+function classCredits(c){
+  const v = parseFloat(c && c.credits);
+  return Number.isFinite(v) && v >= 0 ? v : 4;
+}
+/* Graduation credits accumulate across BOTH semesters (a class registered in S2
+   counts toward the total even while the S1 view is on screen). */
+function graduationCredits(){
+  const all = state.classCats || [];
+  const perSem = { s1: { n: 0, credits: 0 }, s2: { n: 0, credits: 0 } };
+  all.forEach(c => {
+    const b = perSem[(c.semester || 's1') === 's2' ? 's2' : 's1'];
+    b.n++; b.credits += classCredits(c);
+  });
+  const xc = state.extracurricular || {};
+  const xcCredits = num(xc.xcCredits);
+  const courseCredits = perSem.s1.credits + perSem.s2.credits;
+  return {
+    courses: all.length, courseCredits, xcCredits, perSem,
+    total: courseCredits + xcCredits
+  };
 }
 function renderClassCats(){
   const list = document.getElementById('class-cat-list');
@@ -4273,8 +4644,9 @@ function renderClassCats(){
             '<input id="cc-e-name" value="' + esc(c.label) + '" placeholder="Class name">' +
             '<input id="cc-e-room" value="' + esc(c.room || '') + '" placeholder="Room #" style="flex:0 1 80px">' +
             '<input id="cc-e-teacher" value="' + esc(c.teacher || '') + '" placeholder="Teacher" style="flex:1 1 120px">' +
+            '<input id="cc-e-credits" type="number" min="0" max="10" step="0.5" value="' + classCredits(c) + '" title="Credits" style="flex:0 1 72px" placeholder="Credits">' +
             '<select id="cc-e-period">' + SCHOOL_PERIODS.map(p => '<option value="' + p + '"' + ((c.period || 'p1') === p ? ' selected' : '') + '>' + periodLabel(p) + '</option>').join('') + '</select>' +
-            '<select id="cc-e-sem"><option value="s1"' + ((c.semester || 's1') === 's1' ? ' selected' : '') + '>S1</option><option value="s2"' + (c.semester === 's2' ? ' selected' : '') + '>S2</option></select>' +
+            '<label class="cc-sem-field" title="Moving a class to the other semester moves it out of this view"><span>Semester</span><select id="cc-e-sem" style="width:auto"><option value="s1"' + ((c.semester || 's1') === 's1' ? ' selected' : '') + '>Semester 1</option><option value="s2"' + (c.semester === 's2' ? ' selected' : '') + '>Semester 2</option></select></label>' +
             '<span style="display:flex;gap:6px">' +
               '<button class="btn sm" onclick="saveClassEdit(\'' + c.id + '\')">Save</button>' +
               '<button class="icon-btn" onclick="cancelClassEdit()" title="Cancel">✕</button>' +
@@ -4287,7 +4659,7 @@ function renderClassCats(){
       }).join('')
     : '<div class="empty sm">No registered classes yet — add them above.</div>';
   const dl = document.getElementById('school-cats');
-  if (dl) dl.innerHTML = (state.classCats || []).map(c => '<option value="' + esc(c.label) + '"></option>').join('');
+  if (dl) dl.innerHTML = cats.map(c => '<option value="' + esc(c.label) + '"></option>').join('');
   const fc = document.getElementById('filter-cat');
   if (fc){ const cur = fc.value; fc.innerHTML = '<option value="">All Courses</option>' + cats.map(c => '<option value="' + esc(c.label) + '">' + esc(c.label) + '</option>').join(''); fc.value = cur; }
   renderSchoolDeadlines();
@@ -4300,42 +4672,75 @@ function addClassCat(){
   const label = inp.value.trim();
   if (!label){ toast('Enter a class name', 'error'); return; }
   state.classCats = state.classCats || [];
-  if (state.classCats.some(c => c.label.toLowerCase() === label.toLowerCase())){ toast('Class already registered', 'error'); return; }
+  const semInput = document.getElementById('cc-sem');
+  const semester = semInput && semInput.value ? semInput.value : schoolSem();
+  /* Duplicate names are only blocked INSIDE the same semester, so the same course
+     can be explicitly registered in both Semester 1 and Semester 2. */
+  if (state.classCats.some(c => c.label.toLowerCase() === label.toLowerCase() && (c.semester || 's1') === semester)){
+    toast('Class already registered in ' + (semester === 's2' ? 'Semester 2' : 'Semester 1'), 'error');
+    return;
+  }
+  const creditsInput = document.getElementById('cc-credits');
   state.classCats.push({
     id: 'class-' + uid(), label,
     category: classCategory(label),
     room: document.getElementById('cc-room').value.trim(),
     teacher: document.getElementById('cc-teacher').value.trim(),
+    credits: creditsInput && creditsInput.value.trim() !== '' ? optNum(creditsInput.value) : 4,
     period: document.getElementById('cc-period').value,
-    semester: document.getElementById('cc-sem') ? document.getElementById('cc-sem').value : schoolSem(),
+    semester,
     currentGrade: '', targetGrade: ''
   });
   inp.value = '';
   document.getElementById('cc-room').value = '';
   document.getElementById('cc-teacher').value = '';
+  if (creditsInput) creditsInput.value = '4';
   save();
   renderClassCats();
   renderSchool();
-  toast('✓ Class registered — ' + label);
+  renderExtracurricular();
+  toast('✓ Class registered — ' + label + ' (' + semester.toUpperCase() + ')');
 }
 function toggleEditClass(id){ ccEditId = (ccEditId === id) ? null : id; renderClassCats(); }
 function cancelClassEdit(){ ccEditId = null; renderClassCats(); }
+/* Edit an existing class: always update its array entry in place (by id) —
+   never push a duplicate course object. Renaming also relabels its assignments. */
 function saveClassEdit(id){
-  snapshot();
-  const c = (state.classCats || []).find(x => x.id === id);
-  if (!c) return;
-  const n = document.getElementById('cc-e-name').value.trim();
+  const c = (state.classCats || []).find(x => x.id === id) || classByLabel(id);
+  if (!c){ toast('Class not found — reopen the editor', 'error'); ccEditId = null; renderClassCats(); return; }
+  const nameEl   = document.getElementById('cc-e-name');
+  const roomEl   = document.getElementById('cc-e-room');
+  const teachEl  = document.getElementById('cc-e-teacher');
+  const creditEl = document.getElementById('cc-e-credits');
+  const perEl    = document.getElementById('cc-e-period');
+  const semEl    = document.getElementById('cc-e-sem');
+  const n = nameEl ? nameEl.value.trim() : c.label;
   if (!n){ toast('Class name is required', 'error'); return; }
-  c.label = n;
+  const editSem = semEl ? semEl.value : (c.semester || 's1');
+  const clash = (state.classCats || []).find(x => x.id !== c.id && (x.semester || 's1') === editSem
+    && String(x.label || '').trim().toLowerCase() === n.toLowerCase());
+  if (clash){ toast('That class already exists in ' + (editSem === 's2' ? 'Semester 2' : 'Semester 1'), 'error'); return; }
+  snapshot();
+  const oldLabel = c.label;
+  c.label    = n;
   c.category = classCategory(n);
-  c.room = document.getElementById('cc-e-room').value.trim();
-  c.teacher = document.getElementById('cc-e-teacher').value.trim();
-  c.period = document.getElementById('cc-e-period').value;
-  c.semester = document.getElementById('cc-e-sem').value;
+  c.room     = roomEl ? roomEl.value.trim() : (c.room || '');
+  c.teacher  = teachEl ? teachEl.value.trim() : (c.teacher || '');
+  c.credits  = creditEl && creditEl.value.trim() !== '' ? optNum(creditEl.value) : classCredits(c);
+  c.period   = perEl ? perEl.value : (c.period || 'p1');
+  c.semester = semEl ? semEl.value : (c.semester || 's1');
+  /* Keep assignments attached to the renamed class instead of orphaning them. */
+  if (oldLabel && oldLabel !== n){
+    (state.school || []).forEach(a => {
+      if (String(a.course || '').trim().toLowerCase() === String(oldLabel).trim().toLowerCase()) a.course = n;
+    });
+  }
   ccEditId = null;
   save();
   renderClassCats();
   renderSchool();
+  renderSchoolClasses();
+  renderExtracurricular();
   toast('✓ Class updated — ' + c.label);
 }
 function deleteClassCat(id){
@@ -4363,25 +4768,217 @@ function applySchoolView(){
   const showTT = v === 'tt';
   const showClasses = v === 'classes';
   const showDetail = v === 'class-detail';
+  const showXc = v === 'xc';
   const a = document.getElementById('sview-assign');
   const t = document.getElementById('sview-tt');
   const c = document.getElementById('sview-classes');
   const d = document.getElementById('sview-class-detail');
+  const x = document.getElementById('sview-xc');
   if (a) a.style.display = showAssign ? '' : 'none';
   if (t) t.style.display = showTT ? '' : 'none';
   if (c) c.style.display = showClasses ? '' : 'none';
   if (d) d.style.display = showDetail ? '' : 'none';
+  if (x) x.style.display = showXc ? '' : 'none';
   const ba = document.getElementById('sview-btn-assign');
   const bt = document.getElementById('sview-btn-tt');
   const bc = document.getElementById('sview-btn-classes');
+  const bx = document.getElementById('sview-btn-xc');
   if (ba) ba.classList.toggle('active', showAssign);
   if (bt) bt.classList.toggle('active', showTT);
   if (bc) bc.classList.toggle('active', showClasses || showDetail);
+  if (bx) bx.classList.toggle('active', showXc);
+  if (showXc) renderExtracurricular();
+}
+
+/* ---------- Automated GPA tracker (all semesters, credit-weighted) ---------- */
+const GPA_SCALE = [
+  { min: 93, pts: 4.0, letter: 'A' },  { min: 90, pts: 3.7, letter: 'A-' },
+  { min: 87, pts: 3.3, letter: 'B+' }, { min: 83, pts: 3.0, letter: 'B' },
+  { min: 80, pts: 2.7, letter: 'B-' }, { min: 77, pts: 2.3, letter: 'C+' },
+  { min: 73, pts: 2.0, letter: 'C' },  { min: 70, pts: 1.7, letter: 'C-' },
+  { min: 67, pts: 1.3, letter: 'D+' }, { min: 63, pts: 1.0, letter: 'D' },
+  { min: 60, pts: 0.7, letter: 'D-' }, { min: 0,  pts: 0.0, letter: 'F' }
+];
+function gpaFor(pct){ const v = parseFloat(pct); if (!Number.isFinite(v)) return null; return GPA_SCALE.find(s => v >= s.min) || GPA_SCALE[GPA_SCALE.length - 1]; }
+function gpaSummary(){
+  const buckets = { s1: { pts: 0, credits: 0, pct: 0, graded: 0 }, s2: { pts: 0, credits: 0, pct: 0, graded: 0 } };
+  let pts = 0, credits = 0, pctSum = 0, pctW = 0, graded = 0;
+  (state.classCats || []).forEach(c => {
+    const g = classGrade(c);
+    if (g === null || g === undefined || !Number.isFinite(g)) return;
+    const cr = classCredits(c);
+    const s = gpaFor(g);
+    pts += s.pts * cr; credits += cr; pctSum += g * cr; pctW += cr; graded++;
+    const b = buckets[(c.semester || 's1') === 's2' ? 's2' : 's1'];
+    b.pts += s.pts * cr; b.credits += cr; b.pct += g * cr; b.graded++;
+  });
+  return {
+    gpa: credits ? pts / credits : null,
+    pct: pctW ? pctSum / pctW : null,
+    letter: pctW ? gpaFor(pctSum / pctW).letter : '—',
+    graded, credits, buckets,
+    total: (state.classCats || []).length
+  };
+}
+function renderGpaWidget(){
+  const el = document.getElementById('xc-gpa');
+  if (!el) return;
+  const s = gpaSummary();
+  const kick = document.getElementById('gpa-kicker');
+  if (kick) kick.textContent = s.graded + ' of ' + s.total + ' classes graded · ' + fmtNum(s.credits) + ' credits';
+  if (!s.graded){
+    el.innerHTML = empty('No graded classes yet — add a Current Grade on a class or log a scored assignment, then your GPA appears here automatically.');
+    return;
+  }
+  const R = 52, CIRC = 2 * Math.PI * R, pctOf4 = clamp(s.gpa / 4 * 100, 0, 100);
+  const ring =
+    '<div class="gpa-ring"><svg width="132" height="132" viewBox="0 0 132 132">' +
+      '<circle cx="66" cy="66" r="' + R + '" fill="none" stroke="#1f2833" stroke-width="11"/>' +
+      '<circle cx="66" cy="66" r="' + R + '" fill="none" stroke="var(--bright)" stroke-width="11" stroke-linecap="round" ' +
+        'stroke-dasharray="' + CIRC.toFixed(1) + '" stroke-dashoffset="' + (CIRC * (1 - pctOf4 / 100)).toFixed(1) + '"/>' +
+    '</svg><div class="gpa-val"><b>' + s.gpa.toFixed(2) + '</b><span>GPA / 4.0</span></div></div>';
+  const row = (l, v) => '<div class="gpa-row"><span>' + l + '</span><span>' + v + '</span></div>';
+  const semRow = (b, label) => b.graded
+    ? row(label, (b.pts / b.credits).toFixed(2) + ' GPA · ' + (b.pct / b.credits).toFixed(1) + '% · ' + b.graded + ' cls')
+    : row(label, 'no graded classes');
+  el.innerHTML = '<div class="gpa-grid">' + ring +
+    '<div class="gpa-rows">' +
+      row('Weighted Average', s.pct.toFixed(1) + '%') +
+      row('Letter Grade Equivalent', s.letter) +
+      row('Graded Classes', s.graded + ' of ' + s.total) +
+      row('Credits Counted', fmtNum(s.credits)) +
+      semRow(s.buckets.s1, 'Semester 1') +
+      semRow(s.buckets.s2, 'Semester 2') +
+    '</div>' +
+  '</div>' +
+  '<p class="paste-hint" style="margin-top:10px">Credit-weighted across every semester, using each class\u2019s manual Current Grade override or its scored assignments.</p>';
+}
+
+/* ---------- School sub-view: Extracurricular (volunteer hours + credits) ---------- */
+let volModalId = null;
+function xcState(){
+  if (!state.extracurricular || typeof state.extracurricular !== 'object') state.extracurricular = {};
+  const x = state.extracurricular;
+  if (!Array.isArray(x.volunteerHours)) x.volunteerHours = [];
+  if (x.volunteerGoal === undefined || x.volunteerGoal === null) x.volunteerGoal = '';
+  if (x.xcCredits === undefined || x.xcCredits === null) x.xcCredits = '';
+  return x;
+}
+function volunteerTotal(){ return xcState().volunteerHours.reduce((sum, v) => sum + num(v.hours), 0); }
+function renderExtracurricular(){
+  const kpis = document.getElementById('xc-kpis');
+  if (!kpis) return;
+  const x = xcState();
+  const hours = volunteerTotal();
+  const goal = num(x.volunteerGoal);
+  const pct = goal > 0 ? Math.round(clamp(hours / goal * 100, 0, 100)) : 0;
+  const gc = graduationCredits();
+  kpis.innerHTML =
+    '<div class="xc-kpi"><span class="ck-label">Volunteer Hours Logged</span><span class="ck-value">' + fmtNum(hours) + 'h</span>' +
+      '<div class="xc-bar"><div style="width:' + pct + '%"></div></div>' +
+      '<span class="paste-hint" style="display:block;margin-top:6px">' + (goal > 0 ? pct + '% of ' + fmtNum(goal) + 'h goal' : 'Set a goal to track progress') + '</span></div>' +
+    '<div class="xc-kpi"><span class="ck-label">Course Credits</span><span class="ck-value">' + fmtNum(gc.courseCredits) + '</span>' +
+      '<span class="paste-hint" style="display:block;margin-top:6px">' + gc.courses + ' class' + (gc.courses === 1 ? '' : 'es') + ' in ' + schoolSem().toUpperCase() + '</span></div>' +
+    '<div class="xc-kpi"><span class="ck-label">Extracurricular Credits</span><span class="ck-value">' + fmtNum(gc.xcCredits) + '</span>' +
+      '<span class="paste-hint" style="display:block;margin-top:6px">Logged outside timetable</span></div>' +
+    '<div class="xc-kpi"><span class="ck-label">Total Graduation Credits</span><span class="ck-value" style="color:var(--bright)">' + fmtNum(gc.total) + '</span>' +
+      '<span class="paste-hint" style="display:block;margin-top:6px">Courses + extracurricular</span></div>';
+  const goalEl = document.getElementById('xc-goal');
+  if (goalEl && document.activeElement !== goalEl) goalEl.value = x.volunteerGoal === '' ? '' : x.volunteerGoal;
+  const crEl = document.getElementById('xc-credits');
+  if (crEl && document.activeElement !== crEl) crEl.value = x.xcCredits === '' ? '' : x.xcCredits;
+  const kick = document.getElementById('xc-hours-kicker');
+  if (kick) kick.textContent = fmtNum(hours) + ' / ' + (goal > 0 ? fmtNum(goal) : '—') + ' hours';
+  const el = document.getElementById('xc-volunteer-table');
+  if (el){
+    const rows = x.volunteerHours.slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+    el.innerHTML = rows.length
+      ? '<table class="class-history"><thead><tr><th>Date</th><th>Organization</th><th>Hours</th><th>Notes</th><th></th></tr></thead><tbody>' +
+          rows.map(v => '<tr>' +
+            '<td>' + (v.date ? fmtDate(v.date) : '—') + '</td>' +
+            '<td><b>' + esc(v.org || '—') + '</b></td>' +
+            '<td>' + fmtNum(v.hours) + '</td>' +
+            '<td>' + esc(v.notes || '—') + '</td>' +
+            '<td style="white-space:nowrap"><button class="icon-btn" onclick="openVolunteerModal(\'' + v.id + '\')" title="Edit">✎</button>' +
+            '<button class="icon-btn danger" onclick="deleteVolunteer(\'' + v.id + '\')" title="Delete">✕</button></td></tr>').join('') +
+          '</tbody></table>'
+      : empty('No volunteer hours logged yet.');
+  }
+  renderGpaWidget();
+  const sum = document.getElementById('xc-credits-summary');
+  if (sum){
+    const cats = {};
+    (state.classCats || []).filter(c => (c.semester || 's1') === schoolSem()).forEach(c => {
+      const k = classCategory(c.label);
+      cats[k] = (cats[k] || 0) + classCredits(c);
+    });
+    sum.innerHTML =
+      '<table class="class-history"><thead><tr><th>Source</th><th>Credits</th></tr></thead><tbody>' +
+        Object.entries(cats).map(([k, v]) => '<tr><td>' + esc((CLASS_CATEGORIES[k] || CLASS_CATEGORIES.other).label) + ' courses · ' + schoolSem().toUpperCase() + '</td><td>' + fmtNum(v) + '</td></tr>').join('') +
+        '<tr><td>Semester 1 courses (' + gc.perSem.s1.n + ')</td><td>' + fmtNum(gc.perSem.s1.credits) + '</td></tr>' +
+        '<tr><td>Semester 2 courses (' + gc.perSem.s2.n + ')</td><td>' + fmtNum(gc.perSem.s2.credits) + '</td></tr>' +
+        '<tr><td>Extracurricular</td><td>' + fmtNum(gc.xcCredits) + '</td></tr>' +
+        '<tr><td><b>Total earned</b></td><td><b style="color:var(--bright)">' + fmtNum(gc.total) + '</b></td></tr>' +
+      '</tbody></table>' +
+      '<p class="paste-hint" style="margin-top:10px">Course credits sum each class\u2019s Credit value (default 4) across both semesters.</p>';
+  }
+}
+function saveXcSettings(){
+  const x = xcState();
+  const g = document.getElementById('xc-goal');
+  const c = document.getElementById('xc-credits');
+  if (g && document.activeElement === g) x.volunteerGoal = g.value.trim() === '' ? '' : optNum(g.value);
+  if (c && document.activeElement === c) x.xcCredits = c.value.trim() === '' ? '' : optNum(c.value);
+  save();
+  renderExtracurricular();
+}
+function openVolunteerModal(id){
+  const x = xcState();
+  const v = id ? x.volunteerHours.find(r => r.id === id) : null;
+  volModalId = v ? v.id : null;
+  openModal(v ? 'Edit Volunteer Hours' : 'Log Volunteer Hours');
+  const d = v || { date: todayKey(), org: '', hours: '', notes: '' };
+  modalBody.innerHTML =
+    '<div class="log-grid-2">' +
+      '<div class="field"><label>Date</label><input type="date" id="vol-date" value="' + esc(d.date || '') + '"></div>' +
+      '<div class="field"><label>Hours</label><input type="number" min="0" step="0.25" id="vol-hours" value="' + esc(d.hours ?? '') + '"></div>' +
+    '</div>' +
+    '<div class="field"><label>Organization / Activity</label><input id="vol-org" value="' + esc(d.org || '') + '" placeholder="e.g. Minor basketball refereeing"></div>' +
+    '<div class="field"><label>Notes</label><textarea id="vol-notes" rows="3">' + esc(d.notes || '') + '</textarea></div>' +
+    '<div style="display:flex;gap:8px;justify-content:flex-end">' +
+      (v ? '<button class="btn sm danger" onclick="deleteVolunteer()">Delete</button>' : '') +
+      '<button class="btn" onclick="saveVolunteer()">Save Hours</button>' +
+    '</div>';
+}
+function saveVolunteer(){
+  const v = id => document.getElementById(id).value.trim();
+  const data = { date: v('vol-date'), org: v('vol-org'), hours: v('vol-hours'), notes: v('vol-notes') };
+  if (!data.date || data.hours === ''){ toast('Date and hours are required', 'error'); return; }
+  snapshot();
+  const x = xcState();
+  if (volModalId){
+    const rec = x.volunteerHours.find(r => r.id === volModalId);
+    if (rec) Object.assign(rec, data);
+  } else {
+    x.volunteerHours.push({ id: uid(), ...data });
+  }
+  save(); closeModal(); renderExtracurricular();
+  toast('✓ Volunteer hours saved');
+}
+function deleteVolunteer(id){
+  snapshot();
+  const x = xcState();
+  x.volunteerHours = x.volunteerHours.filter(r => r.id !== (id || volModalId));
+  save(); closeModal(); renderExtracurricular();
+  toast('Volunteer entry deleted');
 }
 function classById(id){ return (state.classCats || []).find(c => c.id === id) || null; }
 function classByLabel(label){
   const wanted = String(label || '').trim().toLowerCase();
-  return (state.classCats || []).find(c => String(c.label || '').trim().toLowerCase() === wanted) || null;
+  const all = (state.classCats || []).filter(c => String(c.label || '').trim().toLowerCase() === wanted);
+  /* Prefer the class in the semester currently on screen, so same-named courses
+     in S1/S2 never resolve to the wrong detail page. */
+  return all.find(c => (c.semester || 's1') === schoolSem()) || all[0] || null;
 }
 function openClassDetail(idOrLabel){
   const c = classById(idOrLabel) || classByLabel(idOrLabel);
@@ -4392,7 +4989,13 @@ function openClassDetail(idOrLabel){
   switchTab('school');
 }
 function classGrade(c){
-  const scored = (state.school || []).filter(a => String(a.course || '').trim().toLowerCase() === String(c.label || '').trim().toLowerCase() && a.score !== '' && a.score !== undefined && a.score !== null && Number.isFinite(parseFloat(a.score)));
+  const label = String(c.label || '').trim().toLowerCase();
+  const sem = c.semester || 's1';
+  const sameName = (state.school || []).filter(a => String(a.course || '').trim().toLowerCase() === label);
+  // Same-named classes in S1 and S2 must not share grades: prefer this class's semester.
+  const scoped = sameName.filter(a => (a.semester || sem) === sem);
+  const pool = scoped.length ? scoped : sameName;
+  const scored = pool.filter(a => a.score !== '' && a.score !== undefined && a.score !== null && Number.isFinite(parseFloat(a.score)));
   if (c.currentGrade !== '' && c.currentGrade !== undefined && c.currentGrade !== null) return parseFloat(c.currentGrade) || 0;
   if (!scored.length) return null;
   let weightTotal = 0, weighted = 0;
@@ -4408,11 +5011,14 @@ function saveClassDetail(id){
   snapshot();
   const cur = document.getElementById('class-current-grade');
   const target = document.getElementById('class-target-grade');
+  const credits = document.getElementById('class-credits');
   c.currentGrade = cur && cur.value.trim() !== '' ? optNum(cur.value) : '';
   c.targetGrade = target && target.value.trim() !== '' ? optNum(target.value) : '';
+  if (credits && credits.value.trim() !== '') c.credits = optNum(credits.value);
   save();
   renderClassDetail();
-  toast('✓ Class grade targets updated');
+  renderSchoolClasses();
+  toast('✓ Class details updated');
 }
 function renderSchoolClasses(){
   const el = document.getElementById('school-classes');
@@ -4442,9 +5048,9 @@ function renderClassDetail(){
     '<tr onclick="editSchool(\'' + a.id + '\')"><td>' + (a.dueDate ? fmtDate(a.dueDate) : '—') + '</td><td>' + esc(a.category || 'Other') + '</td><td>' + esc(a.assignment || '—') + '</td><td>' + (a.score !== '' && a.score !== undefined && a.score !== null ? esc(a.score) + '%' : '—') + '</td><td>' + (a.weight !== '' && a.weight !== undefined && a.weight !== null ? esc(a.weight) + '%' : '—') + '</td></tr>'
   ).join('') + '</tbody></table>' : empty('No assignment history for this class yet.');
   el.innerHTML = '<div class="class-detail-head"><div><button class="chip-btn" onclick="setSchoolView(\'classes\')">← Classes</button><h2 class="page-title" style="margin-top:12px">' + esc(c.label) + '</h2><div class="class-detail-meta">' + classCategoryHtml(c.label) + chip('#45a29e', (c.semester || 's1').toUpperCase()) + classMetaHtml(c) + '</div></div><span class="kicker">CLASS DETAIL</span></div>' +
-    '<div class="class-detail-grid"><div class="class-kpi"><span class="ck-label">Current Grade</span><span class="ck-value">' + (grade === null ? '—' : fmtNum(grade) + '%') + '</span></div><div class="class-kpi"><span class="ck-label">Target Grade</span><span class="ck-value">' + (c.targetGrade !== '' && c.targetGrade !== undefined ? fmtNum(c.targetGrade) + '%' : '—') + '</span></div><div class="class-kpi"><span class="ck-label">History Items</span><span class="ck-value">' + assignments.length + '</span></div></div>' +
-    '<div class="school-form-row" style="max-width:560px"><div class="field"><label>Current Grade (%) <span class="hint">optional override</span></label><input id="class-current-grade" type="number" min="0" max="100" step="0.1" value="' + (c.currentGrade !== '' && c.currentGrade !== undefined ? esc(c.currentGrade) : '') + '"></div><div class="field"><label>Target Grade (%)</label><input id="class-target-grade" type="number" min="0" max="100" step="0.1" value="' + (c.targetGrade !== '' && c.targetGrade !== undefined ? esc(c.targetGrade) : '') + '"></div></div>' +
-    '<button class="btn sm" onclick="saveClassDetail(\'' + c.id + '\')">Save Grade Targets</button>' +
+    '<div class="class-detail-grid"><div class="class-kpi"><span class="ck-label">Current Grade</span><span class="ck-value">' + (grade === null ? '—' : fmtNum(grade) + '%') + '</span></div><div class="class-kpi"><span class="ck-label">Target Grade</span><span class="ck-value">' + (c.targetGrade !== '' && c.targetGrade !== undefined ? fmtNum(c.targetGrade) + '%' : '—') + '</span></div><div class="class-kpi"><span class="ck-label">History Items</span><span class="ck-value">' + assignments.length + '</span></div><div class="class-kpi"><span class="ck-label">Credits</span><span class="ck-value">' + fmtNum(classCredits(c)) + '</span></div></div>' +
+    '<div class="school-form-row" style="max-width:560px"><div class="field"><label>Current Grade (%) <span class="hint">optional override</span></label><input id="class-current-grade" type="number" min="0" max="100" step="0.1" value="' + (c.currentGrade !== '' && c.currentGrade !== undefined ? esc(c.currentGrade) : '') + '"></div><div class="field"><label>Target Grade (%)</label><input id="class-target-grade" type="number" min="0" max="100" step="0.1" value="' + (c.targetGrade !== '' && c.targetGrade !== undefined ? esc(c.targetGrade) : '') + '"></div><div class="field"><label>Credits</label><input id="class-credits" type="number" min="0" max="10" step="0.5" value="' + classCredits(c) + '"></div></div>' +
+    '<button class="btn sm" onclick="saveClassDetail(\'' + c.id + '\')">Save Class Details</button>' +
     '<div class="log-label" style="margin-top:22px">HISTORY LOG <span class="hint">Assignments · Tests · Quizzes</span></div>' + history;
 }
 function renderSchoolTT(){
@@ -4690,12 +5296,24 @@ function renderFilmGames(){
     [['pts', 'PTS'], ['ast', 'AST'], ['reb', 'REB'], ['stl', 'STL'], ['blk', 'BLK'], ['to', 'TO'], ['min', 'MIN']].forEach(([f, l]) => {
       if (g[f] !== undefined && g[f] !== '' && parseFloat(g[f]) > 0) parts.push(parseFloat(g[f]) + ' ' + l.toLowerCase());
     });
+    if (num(g.fga) > 0) parts.push(Math.round(num(g.fgm) / num(g.fga) * 100) + '% fg');
     return parts.join(' · ');
   };
-  el.innerHTML = toolbar +
+  const avg = gameAverages(list);
+  const avgStrip = avg
+    ? '<div class="game-avg-strip">' +
+        '<span class="ga-kicker">PER-GAME AVERAGES <i>(' + avg.counted + ' game' + (avg.counted === 1 ? '' : 's') + ' with stats' + (gameFilterSeason !== 'All' ? ' · ' + esc(gameFilterSeason) : '') + (gameFilterClub !== 'All' ? ' · ' + esc(gameFilterClub) : '') + ')</i></span>' +
+        '<span class="ga-item"><span class="ga-l">PPG</span><span class="ga-v">' + avg.ppg.toFixed(1) + '</span></span>' +
+        '<span class="ga-item"><span class="ga-l">APG</span><span class="ga-v">' + avg.apg.toFixed(1) + '</span></span>' +
+        '<span class="ga-item"><span class="ga-l">RPG</span><span class="ga-v">' + avg.rpg.toFixed(1) + '</span></span>' +
+        '<span class="ga-item"><span class="ga-l">FG%</span><span class="ga-v">' + (avg.fg === null ? '—' : avg.fg.toFixed(1) + '%') + '</span></span>' +
+        '<span class="ga-item"><span class="ga-l">SPG</span><span class="ga-v">' + (avg.spg === null ? '—' : avg.spg.toFixed(1)) + '</span></span>' +
+      '</div>'
+    : '';
+  el.innerHTML = avgStrip + toolbar +
     (list.length
       ? list.map(g => {
-          const meta = [g.season, g.club].filter(Boolean).join(' · ');
+          const meta = [g.season, g.club, g.tournament].filter(Boolean).join(' · ');
           const sl = statLine(g);
           return '<div class="game-row">' +
             '<span class="g-date">' + esc(g.date || '—') + '</span>' +
@@ -4710,11 +5328,28 @@ function renderFilmGames(){
         }).join('')
       : empty('No games yet — add your first game log.'));
 }
+/* Running per-game averages for the games currently in view. */
+function gameAverages(list){
+  if (!list.length) return null;
+  const withStats = list.filter(g => ['pts', 'ast', 'reb', 'stl', 'blk', 'fgm', 'fga'].some(f => num(g[f]) > 0));
+  const base = withStats.length ? withStats : list;
+  const n = base.length;
+  if (!n) return null;
+  const sum = f => base.reduce((s, g) => s + num(g[f]), 0);
+  const fga = sum('fga'), fgm = sum('fgm');
+  const hasSteals = base.some(g => num(g.stl) > 0 || num(g.blk) > 0);
+  return {
+    counted: n, games: list.length,
+    ppg: sum('pts') / n, apg: sum('ast') / n, rpg: sum('reb') / n,
+    spg: hasSteals ? (sum('stl') + sum('blk')) / n : null,
+    fg: fga > 0 ? Math.round(fgm / fga * 1000) / 10 : null
+  };
+}
 function openGameModal(id){
   const g = id ? state.film.games.find(x => x.id === id) : null;
   gameModalId = id || null;
   openModal(g ? 'Edit Game — ' + g.opponent : 'Add Game');
-  const d = g || { season: '', club: '', date: todayKey(), opponent: '', scoreUs: '', scoreThem: '', pts: '', ast: '', reb: '', stl: '', blk: '', to: '', min: '', videoUrl: '', oppNotes: '', notes: '' };
+  const d = g || { season: '', club: '', tournament: '', date: todayKey(), opponent: '', scoreUs: '', scoreThem: '', pts: '', ast: '', reb: '', stl: '', blk: '', to: '', min: '', fgm: '', fga: '', videoUrl: '', oppNotes: '', notes: '' };
   const statIn = (label, f) =>
     '<div class="field stat-field"><label>' + label + '</label><input type="number" min="0" step="any" id="gm-' + f + '" class="game-score-input" value="' + esc(d[f] ?? '') + '"></div>';
   modalBody.innerHTML =
@@ -4723,6 +5358,7 @@ function openGameModal(id){
       '<div class="field inline-block stat-field" style="flex:1.6 1 130px"><label>Club / Team</label><input id="gm-club" class="mini-input" value="' + esc(d.club || '') + '" list="club-list" placeholder="U16 Selects"></div>' +
       '<div class="field inline-block stat-field"><label>Game Date</label><input type="date" id="gm-date" class="mini-input" value="' + esc(d.date || '') + '"></div>' +
     '</div>' +
+    '<div class="field"><label>Tournament / League <span class="hint">optional</span></label><input id="gm-tournament" value="' + esc(d.tournament || '') + '" placeholder="e.g. BC Provincial Championships"></div>' +
     '<div class="compact-row">' +
       '<div class="field inline-block stat-field" style="flex:1.6 1 130px"><label>Opponent</label><input id="gm-opp" class="mini-input" value="' + esc(d.opponent || '') + '" placeholder="Langley Thunder"></div>' +
       '<div class="field inline-block stat-field"><label>Our</label><input type="number" id="gm-us" class="game-score-input" value="' + esc(d.scoreUs ?? '') + '"></div>' +
@@ -4732,6 +5368,7 @@ function openGameModal(id){
     '<div class="stats-row">' +
       statIn('PTS', 'pts') + statIn('AST', 'ast') + statIn('REB', 'reb') +
       statIn('STL', 'stl') + statIn('BLK', 'blk') + statIn('TO', 'to') + statIn('MIN', 'min') +
+      statIn('FG Made', 'fgm') + statIn('FG Att', 'fga') +
     '</div>' +
     '<div class="field"><label>Opponent Details / Scouting</label><textarea id="gm-oppnotes" rows="3">' + esc(d.oppNotes || '') + '</textarea></div>' +
     '<div class="field"><label>Game Notes</label><textarea id="gm-notes" rows="3">' + esc(d.notes || '') + '</textarea></div>' +
@@ -4746,10 +5383,11 @@ function saveGame(){
   snapshot();
   const val = id => document.getElementById(id).value.trim();
   const data = {
-    season: val('gm-season'), club: val('gm-club'), date: val('gm-date'),
+    season: val('gm-season'), club: val('gm-club'), tournament: val('gm-tournament'), date: val('gm-date'),
     opponent: val('gm-opp'), scoreUs: val('gm-us'), scoreThem: val('gm-them'),
     pts: val('gm-pts'), ast: val('gm-ast'), reb: val('gm-reb'),
     stl: val('gm-stl'), blk: val('gm-blk'), to: val('gm-to'), min: val('gm-min'),
+    fgm: val('gm-fgm'), fga: val('gm-fga'),
     videoUrl: safeUrl(val('gm-video')), oppNotes: val('gm-oppnotes'), notes: val('gm-notes')
   };
   if (!data.date || !data.opponent){ toast('Game date and opponent are required', 'error'); return; }
@@ -4812,6 +5450,7 @@ function newPlay(){
   playDraft = {
     id: null, name: '', team: '', type: 'Offense', primPos: 'PG', secPos: 'SG',
     context: '', status: 'active', useWhen: '',
+    roles: {},                                                 // O1..O5 / D1..D5 role specs
     steps: [{ id: uid(), desc: '', tokens: blankTokens() }],   // MAIN line frames
     branches: []                                               // git-style offshoot branch paths
   };
@@ -4823,6 +5462,7 @@ function loadPlay(id){
   if (!p) return;
   playDraft = JSON.parse(JSON.stringify(p));
   playDraft.branches = Array.isArray(playDraft.branches) ? playDraft.branches : [];
+  playDraft.roles = (playDraft.roles && typeof playDraft.roles === 'object') ? playDraft.roles : {};
   // Migrate any legacy sub-frame branches / missing ids into clean main-line steps.
   // Stored step ids are PRESERVED so saved branch splitFrom / mergeTo links stay intact.
   const flat = [];
@@ -5083,6 +5723,109 @@ function ballGlyph(){
     '<circle cx="0" cy="1" r=".09" fill="rgba(40,20,0,.5)"/><circle cx="1" cy="0" r=".09" fill="rgba(40,20,0,.5)"/>' +
   '</g>';
 }
+/* ---------- Player roles: click any player token to assign their job ---------- */
+const PLAY_ROLES = ['Primary Handler', 'Secondary Handler', 'Screener', 'Corner Spacer', 'Cutter', 'Roller',
+  'Post-Up Presence', 'Shooter', 'Rim Runner', 'Transition Wing', 'On-Ball Defender', 'Help Defender',
+  'Rim Protector', 'Rebounder', 'Other'];
+const PLAY_POSITIONS = ['PG', 'SG', 'SF', 'PF', 'C'];
+const NBA_ARCHETYPES = [
+  'Jalen Brunson — Heavy Pick-and-Roll', 'Stephen Curry — Off-Ball Movement Shooter',
+  'Draymond Green — Point Forward / Switch Defender', 'Klay Thompson — Catch-and-Shoot Spacer',
+  'Rudy Gobert — Rim Protector / Roll Man', 'Jimmy Butler — Late-Clock Isolation',
+  'Nikola Jokic — High-Post Hub', 'Jrue Holiday — Perimeter Stopper',
+  'Bam Adebayo — Short-Roll Playmaker', 'Tyrese Haliburton — Transition Engine'
+];
+let roleModalTok = null;
+function playRoles(){
+  if (!playDraft) return {};
+  if (!playDraft.roles || typeof playDraft.roles !== 'object') playDraft.roles = {};
+  return playDraft.roles;
+}
+function roleFor(tokId){ return playRoles()[tokId] || null; }
+function roleInitials(role){
+  return String(role || '').split(/[\s/]+/).filter(Boolean).map(w => w[0]).join('').slice(0, 3).toUpperCase();
+}
+function roleSummary(r){
+  if (!r) return '';
+  return [r.pos, r.role, r.teammate ? '→ ' + r.teammate : '', r.archetype].filter(Boolean).join(' · ');
+}
+function roleCourtLabel(r){
+  if (!r) return '';
+  const teammate = String(r.teammate || '').split(' ')[0];
+  return [r.pos || '', teammate || roleInitials(r.role)].filter(Boolean).join(' ');
+}
+function teamRosterNames(){
+  const names = new Set();
+  const add = v => { const n = String(v || '').trim(); if (n) names.add(n); };
+  Object.values(playRoles()).forEach(r => add(r && r.teammate));
+  (state.film.plays || []).forEach(p => Object.values(p.roles || {}).forEach(r => add(r && r.teammate)));
+  ((state.film.study && state.film.study.player) || []).forEach(n => add(n.player));
+  return [...names].sort();
+}
+function openPlayerRoleModal(tokId){
+  if (!playDraft || !tokId || tokId === 'B'){ return; }
+  roleModalTok = tokId;
+  const r = roleFor(tokId) || {};
+  const unit = tokId.startsWith('O') ? 'Offense' : 'Defense';
+  openModal('Player Roles — ' + unit + ' #' + tokId.slice(1));
+  const opt = (list, cur, blank) => (blank ? '<option value="">' + blank + '</option>' : '') +
+    list.map(v => '<option value="' + esc(v) + '"' + (cur === v ? ' selected' : '') + '>' + esc(v) + '</option>').join('');
+  const roster = teamRosterNames();
+  modalBody.innerHTML =
+    '<div class="log-grid-2">' +
+      '<div class="field"><label>Primary Role in Play</label><select id="pr-role">' + opt(PLAY_ROLES, r.role || '', '— Not set —') + '</select></div>' +
+      '<div class="field"><label>Main Position</label><select id="pr-pos">' + opt(PLAY_POSITIONS, r.pos || '', '— Not set —') + '</select></div>' +
+    '</div>' +
+    '<div class="field"><label>NBA Archetype Comparison</label><input id="pr-arch" list="arch-list" value="' + esc(r.archetype || '') + '" placeholder="e.g. Jalen Brunson - Heavy Pick-and-Roll"></div>' +
+    '<div class="field"><label>Teammate Assignment</label><input id="pr-mate" list="roster-list" value="' + esc(r.teammate || '') + '" placeholder="Who executes this spot?"></div>' +
+    '<div class="field"><label>Role Notes</label><textarea id="pr-notes" rows="2" placeholder="Reads, counters, coaching points for this spot...">' + esc(r.notes || '') + '</textarea></div>' +
+    '<datalist id="arch-list">' + NBA_ARCHETYPES.map(a => '<option value="' + esc(a) + '"></option>').join('') + '</datalist>' +
+    '<datalist id="roster-list">' + roster.map(n => '<option value="' + esc(n) + '"></option>').join('') + '</datalist>' +
+    '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">' +
+      (r.role || r.pos || r.teammate || r.archetype ? '<button class="btn sm danger-ghost" onclick="clearPlayerRole()">Clear Role</button>' : '') +
+      '<button class="btn" onclick="savePlayerRole()">Save Role</button>' +
+    '</div>';
+}
+function savePlayerRole(){
+  if (!playDraft || !roleModalTok) return;
+  const v = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  const role = { role: v('pr-role'), pos: v('pr-pos'), archetype: v('pr-arch'), teammate: v('pr-mate'), notes: v('pr-notes') };
+  snapshot();
+  if (!role.role && !role.pos && !role.archetype && !role.teammate && !role.notes) delete playRoles()[roleModalTok];
+  else playRoles()[roleModalTok] = role;
+  const tok = roleModalTok;
+  roleModalTok = null;
+  closeModal();
+  renderFilmPlays();
+  toast('✓ Role set for ' + (tok.startsWith('O') ? 'offense' : 'defense') + ' #' + tok.slice(1));
+}
+function clearPlayerRole(){
+  if (!playDraft || !roleModalTok) return;
+  snapshot();
+  delete playRoles()[roleModalTok];
+  roleModalTok = null;
+  closeModal();
+  renderFilmPlays();
+  toast('Role cleared');
+}
+function rolesPanelHtml(){
+  const roles = playRoles();
+  const ids = ['O1', 'O2', 'O3', 'O4', 'O5', 'D1', 'D2', 'D3', 'D4', 'D5'];
+  const assigned = ids.filter(id => roles[id]).length;
+  const row = id => {
+    const r = roles[id] || null;
+    const isO = id.startsWith('O');
+    const col = isO ? '#2563ff' : '#e11d48';
+    return '<div class="role-row">' +
+      '<span class="role-tok" style="border-color:' + col + ';color:' + col + '">' + (isO ? 'O' : 'D') + id.slice(1) + '</span>' +
+      '<span class="role-desc">' + (r ? esc(roleSummary(r)) : '<i style="color:var(--muted)">No role assigned — click the token on the court</i>') + '</span>' +
+      '<button class="btn sm" onclick="openPlayerRoleModal(\'' + id + '\')">' + (r ? '✎ Edit' : '＋ Assign') + '</button>' +
+    '</div>';
+  };
+  return '<div class="card-head"><h3>Assign Player Roles</h3><span class="kicker">' + assigned + ' / 10 assigned</span></div>' +
+    '<p class="paste-hint" style="margin-bottom:8px">Click any player token on the court diagram — or use the buttons below — to set their role, position, NBA archetype comparison and who executes the spot.</p>' +
+    '<div class="role-list">' + ids.map(row).join('') + '</div>';
+}
 function renderFilmPlays(){
   const el = document.getElementById('film-plays');
   if (!el) return;
@@ -5119,9 +5862,13 @@ function renderFilmPlays(){
     if (id === 'B'){
       return '<g data-tok="B" transform="translate(' + t.x + ' ' + t.y + ')">' + ballGlyph() + '</g>';
     }
-    return '<g data-tok="' + id + '" transform="translate(' + t.x + ' ' + t.y + ')">' +
+    const r = roleFor(id);
+    const label = roleCourtLabel(r);
+    return '<g data-tok="' + id + '" transform="translate(' + t.x + ' ' + t.y + ')" style="cursor:pointer">' +
+      (r ? '<circle r="3.05" fill="none" stroke="#66fcf1" stroke-width=".28" stroke-dasharray=".9 .7"/>' : '') +
       '<circle r="2.3" fill="' + c.fill + '" stroke="' + c.stroke + '" stroke-width=".4" style="cursor:grab"/>' +
       '<text y=".7" text-anchor="middle" font-size="2.2" fill="#fff" font-weight="800">' + c.label + '</text>' +
+      (label ? '<text y="4.6" text-anchor="middle" font-size="1.6" fill="' + c.stroke + '" font-weight="700">' + esc(label) + '</text>' : '') +
     '</g>';
   }).join('');
   const stepTree = stepTreeHtml();
@@ -5172,7 +5919,7 @@ function renderFilmPlays(){
         '<div class="step-frame">' +            '<div class="card-head"><h3>' + stepFrameLabel() + '</h3><span class="kicker">Frame description</span></div>' +
           '<div class="step-ctrl">' +
             '<button class="btn sm" onclick="prevStep()" title="Previous">◀ Previous</button>' +
-            '<span class="step-count">Drag tokens to position each frame</span>' +
+            '<span class="step-count">Drag tokens to position each frame · click a player to assign their role</span>' +
             '<button class="btn sm" onclick="nextStep()">Next ▶</button>' +
           '</div>' +
           '<textarea class="step-desc" id="pl-desc" placeholder="Describe this frame / execution note...">' + esc(step.desc || '') + '</textarea>' +
@@ -5184,6 +5931,7 @@ function renderFilmPlays(){
           '</div>' +
           '<div class="step-tree">' + stepTree + '</div>' +
         '</div>' +
+        '<div class="card" style="margin-top:14px">' + rolesPanelHtml() + '</div>' +
       '</div>' +
     '</div>' +
     listHtml;
@@ -5329,9 +6077,14 @@ function deleteStudyNote(id){
 /* ============================================================
    TAB 6 — FINANCE TRACKER
    ============================================================ */
-const FIN_INCOME_CATS = ['Allowance', 'Part-Time Job', 'Refereeing/Coaching', 'Refurbishing/Reselling', 'Gifts'];
-const FIN_EXPENSE_CATS = ['Club Team Fees', 'Camp/Clinic Registrations', 'Basketball Shoes/Gear', 'Recovery Tools', 'Travel/Tournament Meals', 'School Supplies', 'Testing Fees', 'Food/Social', 'Emergency Fund'];
-const FIN_CATS = [...new Set([...FIN_INCOME_CATS, ...FIN_EXPENSE_CATS, 'Other'])];
+const FIN_INCOME_CATS = ['Jobs', 'Allowance', 'NIL/Sponsorships', 'Prize Money'];
+const FIN_EXPENSE_CATS = ['Gear/Shoes', 'Training/Coaching Fees', 'Travel/Fuel', 'Nutrition/Supplements', 'Tournament Fees'];
+/* Older saves keep their original categories — still selectable, never rewritten. */
+const FIN_LEGACY_CATS = ['Part-Time Job', 'Refereeing/Coaching', 'Refurbishing/Reselling', 'Gifts', 'Club Team Fees',
+  'Camp/Clinic Registrations', 'Basketball Shoes/Gear', 'Recovery Tools', 'Travel/Tournament Meals',
+  'School Supplies', 'Testing Fees', 'Food/Social', 'Emergency Fund'];
+const FIN_CATS = [...new Set([...FIN_INCOME_CATS, ...FIN_EXPENSE_CATS, ...FIN_LEGACY_CATS, 'Other'])];
+const FIN_SAVINGS_IDEAS = ['Summer Travel Ball', 'Personal Trainer', 'New Shoes', 'Post-Grad Fund'];
 let txModalId = null;
 function monthKey(d){ const x = d || new Date(); return x.getFullYear() + '-' + pad(x.getMonth() + 1); }
 function finMonth(){ return monthKey(new Date()); }
@@ -5454,31 +6207,101 @@ function renderFinTrend(){
 }
 function renderFinance(){
   renderFinKPIs();
-  renderFinTx();
-  renderFinSavings();
-  renderFinCats();
   renderFinTrend();
+  renderFinIncomeBlock();
+  renderFinExpenseBlock();
+  renderFinCats();
+  renderFinBudget();
+  renderFinSavings();
+  renderFinPortfolio();
+  renderFinAssets();
+  renderFinCompound();
+  renderFinInvestTable();
 }
-function renderFinTx(){
-  const el = document.getElementById('finance-tx');
+function finTxRows(type, limit){
+  return state.finance.transactions.filter(t => txInView(t) && (t.type === 'income' ? 'income' : 'expense') === type)
+    .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
+    .slice(0, limit || 40);
+}
+function finTxRowHtml(t){
+  return '<div class="tx-row">' +
+    '<span class="tx-date">' + esc(t.date || '—') + '</span>' +
+    '<span class="tx-desc">' + esc(t.desc) + '</span>' +
+    '<span class="tx-cat">' + esc(t.cat || '') + '</span>' +
+    '<span class="tx-amt ' + (t.type === 'income' ? 'in' : 'out') + '">' + (t.type === 'income' ? '+' : '−') + '$' + fmtNum(t.amount) + '</span>' +
+    '<button class="icon-btn" onclick="openTxModal(\'' + t.id + '\')" title="Edit">✎</button>' +
+    '<button class="icon-btn danger" onclick="deleteTx(\'' + t.id + '\')" title="Delete">✕</button>' +
+  '</div>';
+}
+function finCatTotals(type, monthOnly){
+  const by = {}, m = finMonth();
+  state.finance.transactions.forEach(t => {
+    if ((t.type === 'income' ? 'income' : 'expense') !== type) return;
+    if (!txInView(t)) return;
+    if (monthOnly && !(t.date || '').startsWith(m)) return;
+    const c = t.cat || 'Other';
+    by[c] = (by[c] || 0) + (parseFloat(t.amount) || 0);
+  });
+  return by;
+}
+function finBlockSummary(type){
+  const m = finMonth();
+  let month = 0, view = 0;
+  state.finance.transactions.forEach(t => {
+    if ((t.type === 'income' ? 'income' : 'expense') !== type) return;
+    if (!txInView(t)) return;
+    const a = parseFloat(t.amount) || 0;
+    view += a;
+    if ((t.date || '').startsWith(m)) month += a;
+  });
+  return { month, view, cats: Object.keys(finCatTotals(type, false)).length };
+}
+function finBlockHtml(type, emptyMsg, ideas){
+  const s = finBlockSummary(type);
+  const list = finTxRows(type);
+  const kpis =
+    '<div class="fin-budget" style="margin-bottom:12px">' +
+      '<div class="fin-budget-stat"><div class="fb-label">This Month</div><div class="fb-val" style="color:' + (type === 'income' ? '#2ecc71' : '#f0a500') + '">$' + fmtNum(s.month) + '</div></div>' +
+      '<div class="fin-budget-stat"><div class="fb-label">' + finViewLabel() + ' Total</div><div class="fb-val">$' + fmtNum(s.view) + '</div></div>' +
+      '<div class="fin-budget-stat"><div class="fb-label">Categories Used</div><div class="fb-val">' + s.cats + '</div></div>' +
+    '</div>';
+  return kpis + (list.length
+    ? list.map(finTxRowHtml).join('')
+    : empty(emptyMsg) + '<div class="paste-hint" style="margin-top:8px">Suggested: <b>' + ideas.join(' · ') + '</b></div>');
+}
+function renderFinIncomeBlock(){
+  const el = document.getElementById('fin-income-block');
   if (!el) return;
-  const list = state.finance.transactions.filter(txInView).slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-  el.innerHTML = list.length
-    ? list.map(t =>
-        '<div class="tx-row">' +
-          '<span class="tx-date">' + esc(t.date || '—') + '</span>' +
-          '<span class="tx-desc">' + esc(t.desc) + '</span>' +
-          '<span class="tx-cat">' + esc(t.cat || '') + '</span>' +
-          '<span class="tx-amt ' + (t.type === 'income' ? 'in' : 'out') + '">' + (t.type === 'income' ? '+' : '−') + '$' + fmtNum(t.amount) + '</span>' +
-          '<button class="icon-btn danger" onclick="deleteTx(\'' + t.id + '\')" title="Delete">✕</button>' +
-        '</div>').join('')
-    : empty('No transactions yet.');
+  el.innerHTML = finBlockHtml('income', 'No income logged in this view.', FIN_INCOME_CATS);
+}
+function renderFinExpenseBlock(){
+  const el = document.getElementById('fin-expense-block');
+  if (!el) return;
+  el.innerHTML = finBlockHtml('expense', 'No athlete expenses logged in this view.', FIN_EXPENSE_CATS);
+}
+function renderFinBudget(){
+  const el = document.getElementById('fin-budget');
+  if (!el) return;
+  const t = finTotals();
+  const net = t.minc - t.mexp;
+  const saved = state.finance.savings.reduce((sum, s) => sum + (parseFloat(s.current) || 0), 0);
+  const targets = state.finance.savings.reduce((sum, s) => sum + (parseFloat(s.target) || 0), 0);
+  const pct = targets > 0 ? Math.round(saved / targets * 100) : 0;
+  el.innerHTML =
+    '<div class="fin-budget">' +
+      '<div class="fin-budget-stat"><div class="fb-label">Saved Toward Goals</div><div class="fb-val" style="color:#66a3ff">$' + fmtNum(saved) + '</div></div>' +
+      '<div class="fin-budget-stat"><div class="fb-label">Goal Targets</div><div class="fb-val">$' + fmtNum(targets) + '</div></div>' +
+      '<div class="fin-budget-stat"><div class="fb-label">Monthly Net</div><div class="fb-val" style="color:' + (net >= 0 ? '#2ecc71' : '#e63946') + '">' + (net >= 0 ? '+' : '−') + '$' + fmtNum(Math.abs(net)) + '</div></div>' +
+      '<div class="fin-budget-stat"><div class="fb-label">Budget Status</div><div class="fb-val" style="color:' + (t.yexp > t.yinc ? '#e63946' : '#2ecc71') + '">' + (t.yexp > t.yinc ? 'OVER' : 'ON TRACK') + '</div></div>' +
+    '</div>' +
+    '<div class="xc-bar" style="margin-top:12px"><div style="width:' + clamp(pct, 0, 100) + '%"></div></div>' +
+    '<p class="paste-hint" style="margin-top:6px">' + pct + '% of every savings target is funded (' + finViewLabel() + ').</p>';
 }
 function renderFinSavings(){
   const el = document.getElementById('finance-savings');
   if (!el) return;
-  const addBtn = '<div style="text-align:right;margin-bottom:10px"><button class="btn sm" onclick="openSavingsModal()">+ New Goal</button></div>';
-  const presets = ['Summer AAU Travel Fund', 'Senior Year Gear', 'Post-Grad Fund'];
+  const addBtn = '';
+  const presets = FIN_SAVINGS_IDEAS;
   el.innerHTML = addBtn + (state.finance.savings.length
     ? state.finance.savings.map(s => {
         const pct = clamp(parseFloat(s.target) > 0 ? (parseFloat(s.current) / parseFloat(s.target)) * 100 : 0, 0, 100);
@@ -5525,11 +6348,210 @@ function renderFinCats(){
         '</div>').join('')
     : empty('No expenses this month.');
 }
-function openTxModal(id){
+/* ---------- Section D: Investing & Wealth (beginner-friendly) ---------- */
+const INVEST_CATS = ['Index Funds / S&P 500', 'High-Yield Savings', 'Individual Stocks', 'Crypto / Other'];
+const INVEST_CAT_COLORS = {
+  'Index Funds / S&P 500': '#2ecc71',
+  'High-Yield Savings': '#66a3ff',
+  'Individual Stocks': '#f0a500',
+  'Crypto / Other': '#9d4edd'
+};
+function investPlan(){
+  if (!state.finance.investPlan || typeof state.finance.investPlan !== 'object') state.finance.investPlan = { start: '', monthly: '', rate: 7 };
+  return state.finance.investPlan;
+}
+function investmentValue(i){
+  const amount = num(i.amount);
+  const buy = parseFloat(i.buyPrice);
+  const cur = parseFloat(i.currentPrice);
+  if (!amount) return 0;
+  if (!Number.isFinite(buy) || buy <= 0) return amount;
+  if (!Number.isFinite(cur) || cur <= 0) return amount;
+  return amount * (cur / buy);
+}
+function portfolioTotals(){
+  let invested = 0, value = 0;
+  (state.finance.investments || []).forEach(i => { invested += num(i.amount); value += investmentValue(i); });
+  const growth = invested > 0 ? Math.round((value - invested) / invested * 1000) / 10 : null;
+  return { invested, value, growth, profit: value - invested };
+}
+function renderFinPortfolio(){
+  const el = document.getElementById('fin-portfolio');
+  if (!el) return;
+  const p = portfolioTotals();
+  const up = p.profit >= 0;
+  el.innerHTML =
+    '<div class="fin-budget">' +
+      '<div class="fin-budget-stat"><div class="fb-label">Total Invested</div><div class="fb-val">$' + fmtNum(p.invested) + '</div></div>' +
+      '<div class="fin-budget-stat"><div class="fb-label">Current Value</div><div class="fb-val" style="color:#9d4edd">$' + fmtNum(Math.round(p.value * 100) / 100) + '</div></div>' +
+      '<div class="fin-budget-stat"><div class="fb-label">Net Growth %</div><div class="fb-val" style="color:' + (up ? '#2ecc71' : '#e63946') + '">' +
+        (p.growth === null ? '—' : (up ? '+' : '') + fmtNum(p.growth) + '%') + '</div></div>' +
+      '<div class="fin-budget-stat"><div class="fb-label">Profit / Loss</div><div class="fb-val" style="color:' + (up ? '#2ecc71' : '#e63946') + '">' +
+        (up ? '+' : '−') + '$' + fmtNum(Math.abs(Math.round(p.profit * 100) / 100)) + '</div></div>' +
+    '</div>' +
+    '<p class="paste-hint" style="margin-top:10px">Growth is based on the buy price vs the current price you log for each asset. Leave the current price out and the position simply counts at cost.</p>';
+}
+function renderFinAssets(){
+  const el = document.getElementById('fin-assets');
+  if (!el) return;
+  const rows = INVEST_CATS.map(cat => {
+    const list = (state.finance.investments || []).filter(i => i.category === cat);
+    const value = list.reduce((s, i) => s + investmentValue(i), 0);
+    const invested = list.reduce((s, i) => s + num(i.amount), 0);
+    return { cat, value, invested, n: list.length };
+  });
+  const total = rows.reduce((s, r) => s + r.value, 0);
+  el.innerHTML = total > 0
+    ? rows.map(r =>
+        '<div class="asset-row">' +
+          '<span class="asset-name"><b style="color:' + INVEST_CAT_COLORS[r.cat] + '">' + esc(r.cat) + '</b>' + (r.n ? ' <span class="hint">' + r.n + ' position' + (r.n === 1 ? '' : 's') + '</span>' : '') + '</span>' +
+          '<span class="asset-track"><span class="asset-fill" style="width:' + (r.value / total * 100) + '%;background:' + INVEST_CAT_COLORS[r.cat] + ';display:block"></span></span>' +
+          '<span class="asset-val">$' + fmtNum(Math.round(r.value * 100) / 100) + ' <span class="hint">' + Math.round(r.value / total * 100) + '%</span></span>' +
+        '</div>').join('')
+    : empty('No investments logged yet — start with a broad index fund and add as you go.');
+}
+/* Compound growth: month-by-month simulation, no external math. */
+function compoundSeries(start, monthly, annualRate, years){
+  const months = Math.max(1, Math.round(years * 12));
+  const r = (parseFloat(annualRate) || 0) / 100 / 12;
+  let bal = num(start), contributed = num(start);
+  const byYear = [];
+  for (let m = 1; m <= months; m++){
+    bal = bal * (1 + r) + num(monthly);
+    contributed += num(monthly);
+    if (m % 12 === 0) byYear.push({ year: m / 12, bal, contributed });
+  }
+  return { final: bal, contributed, byYear };
+}
+function renderFinCompound(){
+  const el = document.getElementById('fin-compound');
+  if (!el) return;
+  const plan = investPlan();
+  const start = num(plan.start), monthly = num(plan.monthly), rate = parseFloat(plan.rate) || 0;
+  const s5 = compoundSeries(start, monthly, rate, 5);
+  const s10 = compoundSeries(start, monthly, rate, 10);
+  const s = compoundSeries(start, monthly, rate, 10);
+  const peak = Math.max.apply(null, s.byYear.map(y => y.bal).concat([1]));
+  el.innerHTML =
+    '<div class="compact-row">' +
+      '<div class="field inline-block"><label>Starting Amount ($)</label><input type="number" min="0" step="1" id="inv-start" value="' + esc(plan.start ?? '') + '" oninput="saveInvestPlan()" placeholder="0"></div>' +
+      '<div class="field inline-block"><label>Monthly Contribution ($)</label><input type="number" min="0" step="1" id="inv-monthly" value="' + esc(plan.monthly ?? '') + '" oninput="saveInvestPlan()" placeholder="50"></div>' +
+      '<div class="field inline-block"><label>Annual Return (%)</label><input type="number" min="0" max="20" step="0.5" id="inv-rate" value="' + esc(plan.rate ?? 7) + '" oninput="saveInvestPlan()" placeholder="7"></div>' +
+    '</div>' +
+    '<div class="compound-out">' +
+      '<div class="compound-cell"><div class="cc-label">Value in 5 Years</div><div class="cc-val" id="inv-out-5">$' + fmtNum(Math.round(s5.final)) + '</div></div>' +
+      '<div class="compound-cell"><div class="cc-label">Value in 10 Years</div><div class="cc-val" id="inv-out-10" style="color:var(--bright)">$' + fmtNum(Math.round(s10.final)) + '</div></div>' +
+      '<div class="compound-cell"><div class="cc-label">You Contributed</div><div class="cc-val" id="inv-out-contrib">$' + fmtNum(Math.round(s10.contributed)) + '</div></div>' +
+      '<div class="compound-cell"><div class="cc-label">Interest Earned</div><div class="cc-val" id="inv-out-earned" style="color:#2ecc71">+$' + fmtNum(Math.round(s10.final - s10.contributed)) + '</div></div>' +
+    '</div>' +
+    '<div class="compound-bars" id="inv-bars">' + s.byYear.map(y =>
+      '<span class="compound-bar" style="height:' + clamp(y.bal / peak * 100, 2, 100) + '%" title="Year ' + y.year + ': $' + fmtNum(Math.round(y.bal)) + '"></span>').join('') + '</div>' +
+    '<p class="paste-hint" style="margin-top:8px">Assumes contributions are added at the end of each month and returns compound monthly. An S&P 500 index fund has historically averaged roughly 7–10% a year — returns are never guaranteed.</p>';
+}
+/* Recompute only the outputs, so typing in the calculator never rebuilds the inputs. */
+function updateCompoundOutputs(){
+  const plan = investPlan();
+  const s5 = compoundSeries(num(plan.start), num(plan.monthly), plan.rate, 5);
+  const s10 = compoundSeries(num(plan.start), num(plan.monthly), plan.rate, 10);
+  const s = compoundSeries(num(plan.start), num(plan.monthly), plan.rate, 10);
+  const peak = Math.max.apply(null, s.byYear.map(y => y.bal).concat([1]));
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  set('inv-out-5', '$' + fmtNum(Math.round(s5.final)));
+  set('inv-out-10', '$' + fmtNum(Math.round(s10.final)));
+  set('inv-out-contrib', '$' + fmtNum(Math.round(s10.contributed)));
+  set('inv-out-earned', '+$' + fmtNum(Math.round(s10.final - s10.contributed)));
+  const bars = document.getElementById('inv-bars');
+  if (bars) bars.innerHTML = s.byYear.map(y =>
+    '<span class="compound-bar" style="height:' + clamp(y.bal / peak * 100, 2, 100) + '%" title="Year ' + y.year + ': $' + fmtNum(Math.round(y.bal)) + '"></span>').join('');
+}
+function saveInvestPlan(){
+  const plan = investPlan();
+  const g = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  plan.start = g('inv-start') === '' ? '' : num(g('inv-start'));
+  plan.monthly = g('inv-monthly') === '' ? '' : num(g('inv-monthly'));
+  const r = g('inv-rate');
+  plan.rate = r === '' ? '' : clamp(parseFloat(r) || 0, 0, 20);
+  save();
+  updateCompoundOutputs();
+}
+function renderFinInvestTable(){
+  const el = document.getElementById('fin-invest-table');
+  if (!el) return;
+  const list = (state.finance.investments || []).slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+  el.innerHTML = list.length
+    ? '<table class="invest-table"><thead><tr><th>Date</th><th>Asset Name</th><th>Category</th><th>Amount Invested</th><th>Buy Price</th><th>Current Price</th><th>Value</th><th></th></tr></thead><tbody>' +
+      list.map(i => {
+        const val = investmentValue(i);
+        const vs = val - num(i.amount);
+        return '<tr>' +
+          '<td>' + (i.date ? esc(fmtDate(i.date)) : '—') + '</td>' +
+          '<td><b>' + esc(i.asset || '—') + '</b></td>' +
+          '<td><span class="asset-name" style="color:' + INVEST_CAT_COLORS[i.category] + '">' + esc(i.category) + '</span></td>' +
+          '<td>$' + fmtNum(i.amount) + '</td>' +
+          '<td>' + (i.buyPrice === '' || i.buyPrice === undefined ? '—' : '$' + fmtNum(i.buyPrice)) + '</td>' +
+          '<td>' + (i.currentPrice === '' || i.currentPrice === undefined ? '—' : '$' + fmtNum(i.currentPrice)) + '</td>' +
+          '<td>$' + fmtNum(Math.round(val * 100) / 100) + (num(i.amount) && vs ? ' <span class="hint" style="color:' + (vs >= 0 ? '#2ecc71' : '#e63946') + '">' + (vs >= 0 ? '+' : '−') + '$' + fmtNum(Math.abs(Math.round(vs * 100) / 100)) + '</span>' : '') + '</td>' +
+          '<td style="white-space:nowrap"><button class="icon-btn" onclick="openInvestmentModal(\'' + i.id + '\')" title="Edit">✎</button>' +
+          '<button class="icon-btn danger" onclick="deleteInvestment(\'' + i.id + '\')" title="Delete">✕</button></td></tr>';
+      }).join('') +
+      '</tbody></table>'
+    : empty('Nothing logged yet — add your first position (even $20 in a savings account counts).');
+}
+let investModalId = null;
+function openInvestmentModal(id){
+  const i = id ? (state.finance.investments || []).find(x => x.id === id) : null;
+  investModalId = id || null;
+  openModal(i ? 'Edit Investment' : 'Log Investment');
+  const d = i || { date: todayKey(), asset: '', category: 'Index Funds / S&P 500', amount: '', buyPrice: '', currentPrice: '' };
+  modalBody.innerHTML =
+    '<div class="log-grid-2">' +
+      '<div class="field"><label>Date</label><input type="date" id="iv-date" value="' + esc(d.date || '') + '"></div>' +
+      '<div class="field"><label>Amount Invested ($)</label><input type="number" min="0" step="0.01" id="iv-amount" value="' + esc(d.amount ?? '') + '"></div>' +
+    '</div>' +
+    '<div class="field"><label>Asset Name</label><input id="iv-asset" value="' + esc(d.asset || '') + '" placeholder="e.g. VOO — Vanguard S&P 500 ETF"></div>' +
+    '<div class="field"><label>Asset Category</label><select id="iv-cat">' + INVEST_CATS.map(c => '<option value="' + esc(c) + '"' + (d.category === c ? ' selected' : '') + '>' + esc(c) + '</option>').join('') + '</select></div>' +
+    '<div class="log-grid-2">' +
+      '<div class="field"><label>Buy Price ($) <span class="hint">per share / unit</span></label><input type="number" min="0" step="0.01" id="iv-buy" value="' + esc(d.buyPrice ?? '') + '"></div>' +
+      '<div class="field"><label>Current Price ($) <span class="hint">optional</span></label><input type="number" min="0" step="0.01" id="iv-cur" value="' + esc(d.currentPrice ?? '') + '"></div>' +
+    '</div>' +
+    '<p class="paste-hint" style="margin-top:8px">Prices are optional — with no current price the position counts at cost, so your portfolio value never guesses for you.</p>' +
+    '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">' +
+      (i ? '<button class="btn sm danger" onclick="deleteInvestment()">Delete</button>' : '') +
+      '<button class="btn" onclick="saveInvestment()">Save Investment</button>' +
+    '</div>';
+}
+function saveInvestment(){
+  const v = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  const data = {
+    date: v('iv-date'), asset: v('iv-asset'),
+    category: INVEST_CATS.includes(v('iv-cat')) ? v('iv-cat') : INVEST_CATS[0],
+    amount: v('iv-amount'), buyPrice: v('iv-buy'), currentPrice: v('iv-cur')
+  };
+  if (!data.asset || data.amount === ''){ toast('Asset name and amount are required', 'error'); return; }
+  snapshot();
+  if (!Array.isArray(state.finance.investments)) state.finance.investments = [];
+  if (investModalId){
+    const i = state.finance.investments.find(x => x.id === investModalId);
+    if (i) Object.assign(i, data);
+  } else {
+    state.finance.investments.push({ id: uid(), ...data });
+  }
+  save(); closeModal(); renderFinance();
+  toast('✓ Investment saved');
+}
+function deleteInvestment(id){
+  snapshot();
+  state.finance.investments = (state.finance.investments || []).filter(x => x.id !== (id || investModalId));
+  save(); closeModal(); renderFinance();
+  toast('Investment removed');
+}
+
+function openTxModal(id, presetType){
   const t = id ? state.finance.transactions.find(x => x.id === id) : null;
   txModalId = id || null;
-  openModal(t ? 'Edit Transaction' : 'Log Transaction');
-  const d = t || { date: todayKey(), desc: '', amount: '', cat: 'Food', type: 'expense' };
+  const defType = (presetType === 'income' || presetType === 'expense') ? presetType : 'expense';
+  openModal(t ? 'Edit Transaction' : (defType === 'income' ? 'Log Income' : 'Log Expense'));
+  const d = t || { date: todayKey(), desc: '', amount: '', cat: '', type: defType };
   modalBody.innerHTML =
     '<div class="compact-row">' +
       '<div class="field inline-block"><label>Date</label><input type="date" id="tx-date" value="' + esc(d.date || '') + '" onchange="txGradeHint()"></div>' +
@@ -5559,9 +6581,13 @@ function rebuildFinCats(){
   const t = document.getElementById('tx-type');
   const c = document.getElementById('tx-cat');
   if (!t || !c) return;
-  const opts = t.value === 'income' ? [...FIN_INCOME_CATS, 'Other'] : [...FIN_EXPENSE_CATS, 'Other'];
+  const primary = t.value === 'income' ? FIN_INCOME_CATS : FIN_EXPENSE_CATS;
+  /* Keep legacy + already-saved categories selectable so old transactions still edit cleanly. */
+  const saved = [...new Set(state.finance.transactions.filter(x => (x.type === 'income' ? 'income' : 'expense') === t.value).map(x => x.cat).filter(Boolean))];
+  const opts = [...new Set([...primary, ...saved, ...FIN_LEGACY_CATS, 'Other'])];
   const cur = c.value;
   c.innerHTML = opts.map(o => '<option' + (cur === o ? ' selected' : '') + '>' + o + '</option>').join('');
+  if (!opts.includes(cur)) c.value = primary[0];
 }
 function saveTx(){
   snapshot();
@@ -5942,13 +6968,42 @@ function setRecruitFilter(v){
   save();
   renderRecruiting();
 }
+function recruitDivFilter(){ return state.settings.recruitDivFilter || 'all'; }
+function setRecruitDivFilter(v){
+  state.settings.recruitDivFilter = (v === 'all' || RECRUIT_DIVISIONS.includes(v)) ? v : 'all';
+  save();
+  renderRecruiting();
+}
+/* Days since the most recent contact — an interaction or the stored lastContact date. */
+function daysSinceContact(c){
+  let latest = c.lastContact || '';
+  (c.interactions || []).forEach(i => { if (i.date && i.date > latest) latest = i.date; });
+  if (!latest) return null;
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const d = keyToDate(latest); d.setHours(0, 0, 0, 0);
+  return Math.round((today - d) / 86400000);
+}
+function contactBadgeHtml(c){
+  const days = daysSinceContact(c);
+  if (days === null) return '<span class="rec-days stale">No contact logged</span>';
+  const stale = days > CONTACT_STALE_DAYS;
+  const label = days === 0 ? 'Contacted today' : days + 'd since contact';
+  return '<span class="rec-days' + (stale ? ' stale' : ' fresh') + '" title="' + (stale ? 'Over ' + CONTACT_STALE_DAYS + ' days — follow up' : 'Recent contact') + '">' + label + '</span>';
+}
 function recruitFilterChips(){
   const cur = recruitFilter();
+  const div = recruitDivFilter();
   const parts = ['<span class="kicker">FILTER BY STATUS</span>'];
   parts.push('<button class="chip-btn' + (cur === 'all' ? ' active' : '') + '" onclick="setRecruitFilter(\'all\')">All (' + state.recruiting.length + ')</button>');
   RECRUIT_STATUSES.forEach(st => {
     const n = state.recruiting.filter(c => c.status === st).length;
     parts.push('<button class="chip-btn' + (cur === st ? ' active' : '') + '" onclick="setRecruitFilter(\'' + st + '\')">' + esc(st) + ' (' + n + ')</button>');
+  });
+  parts.push('<span class="kicker" style="margin-left:12px">TARGET DIVISION</span>');
+  parts.push('<button class="chip-btn' + (div === 'all' ? ' active' : '') + '" onclick="setRecruitDivFilter(\'all\')">All Divisions</button>');
+  RECRUIT_DIVISIONS.forEach(dv => {
+    const n = state.recruiting.filter(c => c.division === dv).length;
+    parts.push('<button class="chip-btn' + (div === dv ? ' active' : '') + '" onclick="setRecruitDivFilter(\'' + dv + '\')">' + esc(dv) + ' (' + n + ')</button>');
   });
   return parts.join('');
 }
@@ -5958,9 +7013,18 @@ function renderRecruiting(){
   if (!filterEl || !board) return;
   if (!Array.isArray(state.recruiting)) state.recruiting = [];
   const cur = recruitFilter();
+  const div = recruitDivFilter();
   filterEl.innerHTML = recruitFilterChips();
+  const inView = c => (cur === 'all' || c.status === cur) && (div === 'all' || c.division === div);
+  if (div !== 'all'){
+    const hits = state.recruiting.filter(inView);
+    board.innerHTML = hits.length
+      ? '<div class="rec-col" style="grid-column:1/-1"><div class="rec-col-head"><h3>Target Division · ' + esc(div) + '</h3><span class="rec-count">' + hits.length + '</span></div><div class="rec-divlist">' + hits.map(recruitCardHtml).join('') + '</div></div>'
+      : '<div class="rec-col" style="grid-column:1/-1">' + '<div class="rec-empty">No schools in ' + esc(div) + ' yet.</div></div>';
+    return;
+  }
   board.innerHTML = RECRUIT_STATUSES.map(st => {
-    const list = state.recruiting.filter(c => c.status === st && (cur === 'all' || cur === st));
+    const list = state.recruiting.filter(c => c.status === st && inView(c));
     const cards = list.length ? list.map(recruitCardHtml).join('') : '<div class="rec-empty">No schools here yet.</div>';
     return '<div class="rec-col">' +
       '<div class="rec-col-head"><h3>' + esc(st) + '</h3><span class="rec-count">' + list.length + '</span></div>' +
@@ -5971,12 +7035,27 @@ function renderRecruiting(){
 function recruitCardHtml(c){
   const statusOpts = RECRUIT_STATUSES.map(s => '<option value="' + s + '"' + (c.status === s ? ' selected' : '') + '>' + s + '</option>').join('');
   const contact = [c.email, c.phone].filter(Boolean).join(' · ');
+  const ints = (c.interactions || []).slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+  const intHtml = ints.length
+    ? '<div class="rc-int-head"><b>Interaction Tracker</b><span class="rec-count">' + ints.length + '</span></div>' +
+      ints.slice(0, 3).map(i =>
+        '<div class="rec-int-row"><span class="rec-int-type">' + esc(i.type) + '</span>' +
+          '<span>' + (i.date ? esc(fmtDate(i.date)) : '—') + '</span>' +
+          (i.notes ? '<i>' + esc(i.notes) + '</i>' : '') +
+          '<button class="icon-btn danger" onclick="deleteInteraction(\'' + c.id + '\',\'' + i.id + '\')" title="Delete interaction">✕</button></div>').join('') +
+      (ints.length > 3 ? '<div class="rc-row" style="color:var(--muted)">+ ' + (ints.length - 3) + ' earlier</div>' : '')
+    : '';
   return '<div class="rec-card">' +
     '<h4>' + esc(c.school || 'Unnamed school') + '</h4>' +
+    '<div class="rec-tags">' + contactBadgeHtml(c) +
+      '<span class="rec-div">' + esc(c.division || 'Other') + '</span>' +
+      '<span class="rec-tier ' + (String(c.priorityRank || '').startsWith('Tier 1') ? 't1' : String(c.priorityRank || '').startsWith('Safety') ? 'safety' : 't2') + '">' + esc(c.priorityRank || 'Tier 2 Backup') + '</span></div>' +
     ((c.coach || c.role) ? '<div class="rc-sub">' + esc(c.coach || '—') + (c.role ? ' · <span class="rec-role">' + esc(c.role) + '</span>' : '') + '</div>' : '') +
     (c.lead ? '<div class="rc-row"><b>Assignee / Lead</b>' + esc(c.lead) + '</div>' : '') +
     (contact ? '<div class="rc-row"><b>Contact Info</b>' + esc(contact) + '</div>' : '') +
     (c.lastContact ? '<div class="rc-row"><b>Last Contact</b>' + fmtDate(c.lastContact) + '</div>' : '') +
+    '<button class="btn sm" style="width:100%;margin-top:8px" onclick="openInteractionModal(\'' + c.id + '\')">＋ Log Interaction</button>' +
+    intHtml +
     (c.filmLink ? '<div class="rc-row"><b>Highlights / Film Sent</b><a class="rec-link" href="' + esc(c.filmLink) + '" target="_blank" rel="noopener">' + esc(c.filmLink) + '</a></div>' : '') +
     (c.notes ? '<div class="rc-notes"><b>Feedback / Notes</b> ' + esc(c.notes) + '</div>' : '') +
     '<div class="rc-actions">' +
@@ -5985,6 +7064,60 @@ function recruitCardHtml(c){
       '<button class="icon-btn danger" onclick="deleteCoach(\'' + c.id + '\')" title="Delete">✕</button>' +
     '</div>' +
   '</div>';
+}
+/* ---------- Interaction Tracker: log calls, visits, camps and offers ---------- */
+let interactionCoachId = null;
+function interactionCoach(){ return (state.recruiting || []).find(c => c.id === interactionCoachId) || null; }
+function openInteractionModal(coachId){
+  const c = (state.recruiting || []).find(x => x.id === coachId);
+  if (!c){ toast('School not found', 'error'); return; }
+  interactionCoachId = coachId;
+  openModal('Log Interaction — ' + (c.school || 'School'));
+  const typeOpts = INTERACTION_TYPES.map(t => '<option value="' + t + '">' + t + '</option>').join('');
+  modalBody.innerHTML =
+    '<div class="log-grid-2">' +
+      '<div class="field"><label>Interaction Type</label><select id="int-type">' + typeOpts + '</select></div>' +
+      '<div class="field"><label>Date</label><input type="date" id="int-date" value="' + todayKey() + '"></div>' +
+    '</div>' +
+    '<div class="field"><label>Notes / Outcome</label><textarea id="int-notes" rows="3" placeholder="What was said, next step, who to follow up with..."></textarea></div>' +
+    ((c.interactions || []).length
+      ? '<div class="log-label" style="margin-top:14px">LOGGED INTERACTIONS</div><div style="max-height:180px;overflow:auto">' +
+        c.interactions.slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || ''))).map(i =>
+          '<div class="rec-int-row"><span class="rec-int-type">' + esc(i.type) + '</span><span>' + (i.date ? esc(fmtDate(i.date)) : '—') + '</span>' +
+          (i.notes ? '<i>' + esc(i.notes) + '</i>' : '') +
+          '<button class="icon-btn danger" onclick="deleteInteraction(\'' + c.id + '\',\'' + i.id + '\')" title="Delete">✕</button></div>').join('') +
+        '</div>'
+      : '') +
+    '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">' +
+      '<button class="btn sm ghost" onclick="closeModal()">Cancel</button>' +
+      '<button class="btn" onclick="saveInteraction()">Save Interaction</button>' +
+    '</div>';
+}
+function saveInteraction(){
+  const c = interactionCoach();
+  if (!c) return;
+  const type = document.getElementById('int-type').value;
+  const date = document.getElementById('int-date').value;
+  const notes = document.getElementById('int-notes').value.trim();
+  if (!date){ toast('Pick an interaction date', 'error'); return; }
+  snapshot();
+  c.interactions = c.interactions || [];
+  c.interactions.push({ id: uid(), type: INTERACTION_TYPES.includes(type) ? type : 'Call', date, notes });
+  if (!c.lastContact || date > c.lastContact) c.lastContact = date;
+  /* Logging any outreach moves a cold lead off the top of the funnel. */
+  if (c.status === 'Uncontacted') c.status = 'Contacted';
+  save(); closeModal(); renderRecruiting();
+  toast('✓ ' + type + ' logged for ' + (c.school || 'school'));
+}
+function deleteInteraction(coachId, intId){
+  const c = (state.recruiting || []).find(x => x.id === coachId);
+  if (!c) return;
+  snapshot();
+  c.interactions = (c.interactions || []).filter(i => i.id !== intId);
+  save();
+  renderRecruiting();
+  if (document.getElementById('modal-overlay') && !document.getElementById('modal-overlay').classList.contains('hidden')) openInteractionModal(coachId);
+  toast('Interaction deleted');
 }
 function moveCoach(id, status){
   const c = state.recruiting.find(x => x.id === id);
@@ -6011,6 +7144,8 @@ function openCoachModal(id){
       '<div class="field"><label>Phone</label><input id="c-phone" value="' + esc(c ? c.phone : '') + '"></div>' +
       '<div class="field"><label>Last Contact Date</label><input id="c-last" type="date" value="' + esc(c ? c.lastContact : '') + '"></div>' +
       '<div class="field"><label>Status / Career Phase</label><select id="c-status">' + statusOpts + '</select></div>' +
+      '<div class="field"><label>Target Division</label><select id="c-division">' + RECRUIT_DIVISIONS.map(dv => '<option value="' + dv + '"' + (c && c.division === dv ? ' selected' : '') + '>' + dv + '</option>').join('') + '</select></div>' +
+      '<div class="field"><label>Priority Rank</label><select id="c-tier">' + RECRUIT_TIERS.map(t => '<option value="' + t + '"' + (c && c.priorityRank === t ? ' selected' : '') + '>' + t + '</option>').join('') + '</select></div>' +
       '<div class="field full"><label>Highlights / Film Link Sent</label><input id="c-film" value="' + esc(c ? c.filmLink : '') + '" placeholder="https://..."></div>' +
       '<div class="field full"><label>Feedback Received / Notes</label><textarea id="c-notes" placeholder="Coach feedback, interest level, next steps...">' + esc(c ? c.notes : '') + '</textarea></div>' +
     '</div>' +
@@ -6027,14 +7162,17 @@ function saveCoach(){
   const data = {
     school, lead: v('c-lead'), coach: v('c-coach'), role: v('c-role'),
     email: v('c-email'), phone: v('c-phone'), lastContact: v('c-last'),
-    status: v('c-status'), filmLink: v('c-film'), notes: v('c-notes')
+    status: v('c-status'), filmLink: v('c-film'), notes: v('c-notes'),
+    division: v('c-division'), priorityRank: v('c-tier')
   };
   if (!RECRUIT_STATUSES.includes(data.status)) data.status = 'Uncontacted';
+  if (!RECRUIT_DIVISIONS.includes(data.division)) data.division = 'Other';
+  if (!RECRUIT_TIERS.includes(data.priorityRank)) data.priorityRank = 'Tier 2 Backup';
   if (coachModalId){
     const c = state.recruiting.find(x => x.id === coachModalId);
     if (c) Object.assign(c, data);
   } else {
-    state.recruiting.push({ id: uid(), ...data });
+    state.recruiting.push({ id: uid(), interactions: [], ...data });
   }
   coachModalId = null;
   save();
@@ -6090,14 +7228,17 @@ function bindEvents(){
     e.target.value = '';
   });
   const playsHost = document.getElementById('film-plays');
+  let tokDown = null;      // distinguishes a click (assign role) from a drag (reposition)
   if (playsHost){
     playsHost.addEventListener('pointerdown', e => {
       const g = e.target.closest('[data-tok]');
       if (!g || !playDraft) return;
       dragTok = g.dataset.tok;
+      tokDown = { id: dragTok, x: e.clientX, y: e.clientY, moved: false };
       e.preventDefault();
     });
     playsHost.addEventListener('pointermove', e => {
+      if (tokDown && !tokDown.moved && (Math.abs(e.clientX - tokDown.x) > 4 || Math.abs(e.clientY - tokDown.y) > 4)) tokDown.moved = true;
       if (!dragTok || !playDraft) return;
       const canvas = document.getElementById('play-canvas');
       if (!canvas) return;
@@ -6111,7 +7252,12 @@ function bindEvents(){
       const g = canvas.querySelector('[data-tok="' + dragTok + '"]');
       if (g) g.setAttribute('transform', 'translate(' + tok.x + ' ' + tok.y + ')');
     });
-    const endDrag = () => { dragTok = null; };
+    const endDrag = () => {
+      /* A tap on a player token opens their role editor; dragging moves them. */
+      if (tokDown && !tokDown.moved && tokDown.id && tokDown.id !== 'B' && playDraft) openPlayerRoleModal(tokDown.id);
+      tokDown = null;
+      dragTok = null;
+    };
     playsHost.addEventListener('pointerup', endDrag);
     playsHost.addEventListener('pointercancel', endDrag);
   }
@@ -6139,6 +7285,789 @@ function startClock(){
   clockTimer = setInterval(tickClock, 1000);
 }
 
+/* ============================================================
+   TAB 8 — MENTAL (journaling + decision archive)
+   ============================================================ */
+function mentalState(){
+  if (!state.mental || typeof state.mental !== 'object') state.mental = { weekly: {}, decisions: [] };
+  const m = state.mental;
+  if (!m.weekly || typeof m.weekly !== 'object') m.weekly = {};
+  if (!Array.isArray(m.decisions)) m.decisions = [];
+  return m;
+}
+function weekStartKey(offset){
+  const d = new Date();
+  d.setDate(d.getDate() - ((d.getDay() + 6) % 7) + (offset || 0) * 7);   // Monday of the week
+  return dateKey(d);
+}
+function setMentalView(v){
+  state.settings.mentalView = v;
+  save();
+  applyMentalView();
+  renderMental();
+}
+function applyMentalView(){
+  const v = state.settings.mentalView || 'journal';
+  $$('#mental-subtabs .sub-tab').forEach(b => b.classList.toggle('active', b.dataset.mview === v));
+  const map = { journal: 'mview-journal', decisions: 'mview-decisions' };
+  Object.entries(map).forEach(([k, id]) => {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('active', k === v);
+  });
+}
+function renderMental(){
+  renderJournalDaily();
+  renderJournalWeekly();
+  renderDecisionTable();
+}
+function renderJournalDaily(){
+  const el = document.getElementById('journal-daily');
+  if (!el) return;
+  const keys = Object.keys(state.logs || {}).filter(k => hasLogData(state.logs[k])).sort((a, b) => b.localeCompare(a)).slice(0, 12);
+  const kick = document.getElementById('journal-kicker');
+  if (kick) kick.textContent = keys.length + ' recent entr' + (keys.length === 1 ? 'y' : 'ies');
+  el.innerHTML = keys.length
+    ? keys.map(k => {
+        const v = state.logs[k] || {};
+        const bits = [];
+        if (v.score) bits.push('Day score ' + v.score + '/10');
+        if (v.win) bits.push(v.win);
+        if (v.film) bits.push(v.film);
+        if (v.meal) bits.push(v.meal);
+        if (v.weighIn) bits.push('Weigh-in ' + fmtNum(v.weighIn) + ' lbs');
+        if (v.sleepOverride === undefined && v.bedTime && v.wakeTime) bits.push('Sleep ' + fmtSleepDur(sleepCalc(v.bedTime, v.wakeTime)));
+        return '<div class="journal-entry"><b>' + esc(fmtDate(k)) + '</b><p>' + (bits.length ? esc(bits.join(' · ')) : 'Entry logged.') + '</p>' +
+          '<button class="chip-btn" style="margin-top:6px" onclick="state.settings.logDate=\'' + k + '\';setLogView(\'entry\');switchTab(\'log\')">Open in Daily Log</button></div>';
+      }).join('')
+    : empty('No daily entries yet — write one in the Daily Log tab.');
+}
+let journalWeekOffset = 0;
+function currentWeekKey(){ return weekStartKey(journalWeekOffset); }
+function weeklyPromptValue(i){
+  const wk = mentalState().weekly[currentWeekKey()];
+  return (wk && wk.prompts && wk.prompts['q' + i]) || '';
+}
+function renderJournalWeekly(){
+  const el = document.getElementById('journal-weekly');
+  if (!el) return;
+  const kick = document.getElementById('journal-week');
+  if (kick) kick.textContent = 'Week of ' + fmtDate(currentWeekKey()) + (journalWeekOffset === 0 ? ' (current)' : '');
+  el.innerHTML = WEEKLY_PROMPTS.map((q, i) =>
+    '<div class="prompt-block"><label>' + (i + 1) + '. ' + esc(q) + '</label>' +
+      '<textarea rows="3" data-prompt="' + i + '" oninput="saveWeeklyPrompt(' + i + ',this.value)" placeholder="Write it out...">' + esc(weeklyPromptValue(i)) + '</textarea></div>').join('') +
+    '<button class="chip-btn" onclick="shiftWeek(-1)">← Previous Week</button> <button class="chip-btn" onclick="shiftWeek(1)">Next Week →</button>';
+}
+function shiftWeek(delta){
+  journalWeekOffset = clamp(journalWeekOffset + delta, -26, 0);
+  renderJournalWeekly();
+}
+function saveWeeklyPrompt(i, value){
+  const m = mentalState();
+  const key = currentWeekKey();
+  const wk = m.weekly[key] || (m.weekly[key] = { prompts: {} });
+  wk.prompts = wk.prompts || {};
+  wk.prompts['q' + i] = value;
+  save();
+}
+
+/* ---------- 8B: Decision Archive ---------- */
+let decisionModalId = null;
+function starsHtml(n){
+  const v = clamp(Math.round(num(n) || 0), 0, 5);
+  return '<span class="stars" title="' + v + ' / 5 confidence">' + '★'.repeat(v) + '☆'.repeat(5 - v) + '</span>';
+}
+function renderDecisionTable(){
+  const el = document.getElementById('decision-table');
+  if (!el) return;
+  const rows = mentalState().decisions.slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+  el.innerHTML = rows.length
+    ? '<table class="decision-table"><thead><tr><th>Decision Name</th><th>Type</th><th>Framework Used</th><th>Confidence</th><th>Reviewed</th><th>Notes</th><th></th></tr></thead><tbody>' +
+      rows.map(d => '<tr>' +
+        '<td><b>' + esc(d.name || '—') + '</b>' + (d.date ? '<span class="qt-date">' + esc(fmtDate(d.date)) + '</span>' : '') + '</td>' +
+        '<td>' + esc(d.type || 'Small') + '</td>' +
+        '<td>' + esc(d.framework || '—') + '</td>' +
+        '<td>' + starsHtml(d.confidence) + '</td>' +
+        '<td><input type="checkbox" ' + (d.reviewed ? 'checked' : '') + ' onchange="toggleDecisionReviewed(\'' + d.id + '\')" title="Mark as reviewed"></td>' +
+        '<td style="max-width:280px">' + esc(d.notes || '—') + '</td>' +
+        '<td style="white-space:nowrap"><button class="icon-btn" onclick="openDecisionModal(\'' + d.id + '\')" title="Edit">✎</button>' +
+        '<button class="icon-btn danger" onclick="deleteDecision(\'' + d.id + '\')" title="Delete">✕</button></td></tr>').join('') +
+      '</tbody></table>'
+    : empty('No decisions logged yet — archive your first call.');
+}
+function openDecisionModal(id){
+  const m = mentalState();
+  const d = id ? m.decisions.find(x => x.id === id) : null;
+  decisionModalId = d ? d.id : null;
+  openModal(d ? 'Edit Decision' : 'Log Decision');
+  const data = d || { name: '', type: 'Small', framework: 'Gut Check', confidence: 3, reviewed: false, notes: '', date: todayKey() };
+  const opts = (list, cur) => list.map(v => '<option value="' + esc(v) + '"' + (cur === v ? ' selected' : '') + '>' + esc(v) + '</option>').join('');
+  modalBody.innerHTML =
+    '<div class="field"><label>Decision Name</label><input id="dec-name" value="' + esc(data.name || '') + '" placeholder="e.g. Committed to U16 Selects"></div>' +
+    '<div class="log-grid-2">' +
+      '<div class="field"><label>Type</label><select id="dec-type">' + opts(DECISION_TYPES, data.type) + '</select></div>' +
+      '<div class="field"><label>Framework Used</label><select id="dec-framework">' + opts(DECISION_FRAMEWORKS, data.framework) + '</select></div>' +
+    '</div>' +
+    '<div class="log-grid-2">' +
+      '<div class="field"><label>Confidence Rating (1–5 stars)</label><select id="dec-confidence">' + [1,2,3,4,5].map(n => '<option value="' + n + '"' + (Number(data.confidence) === n ? ' selected' : '') + '>' + '★'.repeat(n) + ' (' + n + ')</option>').join('') + '</select></div>' +
+      '<div class="field"><label>Decision Date</label><input type="date" id="dec-date" value="' + esc(data.date || '') + '"></div>' +
+    '</div>' +
+    '<div class="field"><label>Notes / Review</label><textarea id="dec-notes" rows="4" placeholder="What happened, what you learned, what you would change...">' + esc(data.notes || '') + '</textarea></div>' +
+    '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">' +
+      (d ? '<button class="btn sm danger" onclick="deleteDecision()">Delete</button>' : '') +
+      '<button class="btn" onclick="saveDecision()">Save Decision</button>' +
+    '</div>';
+}
+function saveDecision(){
+  const v = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  const data = {
+    name: v('dec-name'), type: v('dec-type'), framework: v('dec-framework'),
+    confidence: num(v('dec-confidence')) || 3, date: v('dec-date'), notes: v('dec-notes')
+  };
+  if (!data.name){ toast('Decision name is required', 'error'); return; }
+  snapshot();
+  const m = mentalState();
+  if (decisionModalId){
+    const d = m.decisions.find(x => x.id === decisionModalId);
+    if (d) Object.assign(d, data);
+  } else {
+    m.decisions.push({ id: uid(), reviewed: false, ...data });
+  }
+  save(); closeModal(); renderDecisionTable();
+  toast('✓ Decision archived');
+}
+function deleteDecision(id){
+  snapshot();
+  const m = mentalState();
+  m.decisions = m.decisions.filter(x => x.id !== (id || decisionModalId));
+  save(); closeModal(); renderDecisionTable();
+  toast('Decision deleted');
+}
+function toggleDecisionReviewed(id){
+  const m = mentalState();
+  const d = m.decisions.find(x => x.id === id);
+  if (!d) return;
+  snapshot();
+  d.reviewed = !d.reviewed;
+  save();
+  renderDecisionTable();
+  toast(d.reviewed ? '✓ Marked reviewed' : 'Marked unreviewed');
+}
+
+/* ============================================================
+   LIVE WORKOUT MODE — focus overlay, tap counters, rest timer
+   ============================================================ */
+const LIVE_CATEGORIES = ['3-PT', 'FT', 'Lay', 'Other'];
+const LIVE_CAT_META = {
+  '3-PT':  { label: '3-Pointers',  setType: 'Shooting',     spot: '3-Pointer',  color: '#2563ff' },
+  'FT':    { label: 'Free Throws', setType: 'Free Throws',  spot: 'Free Throw', color: '#f0a500' },
+  'Lay':   { label: 'Finishes',    setType: 'Finishing',    spot: 'Paint',      color: '#9d4edd' },
+  'Other': { label: 'Other / Form', setType: 'Shooting',    spot: '',           color: '#45a29e' }
+};
+const REST_PRESETS = [30, 60, 90];
+const MENTAL_MIN_ATTEMPTS = 15;
+const MENTAL_PCT_THRESHOLD = 40;
+const MENTAL_MESSAGE = 'Stay calm, reset your base, focus on your follow-through — one rep at a time.';
+let liveTicker = null;
+let liveAudio = null;
+
+function liveState(){
+  if (!state.live || typeof state.live !== 'object') state.live = {};
+  const l = state.live;
+  l.active = !!l.active;
+  if (!l.dateKey) l.dateKey = state.settings.logDate || todayKey();
+  if (typeof l.location !== 'string') l.location = 'DT';
+  if (typeof l.note !== 'string') l.note = '';
+  if (typeof l.drill !== 'string') l.drill = '';
+  if (!Number.isFinite(l.startedAt)) l.startedAt = 0;
+  if (!Number.isFinite(l.pausedAt)) l.pausedAt = 0;
+  if (!Number.isFinite(l.drillStartAt) || !l.drillStartAt) l.drillStartAt = Date.now();
+  if (!Number.isFinite(l.restEndsAt)) l.restEndsAt = 0;
+  if (!REST_PRESETS.includes(l.restPreset)) l.restPreset = 30;
+  if (!LIVE_CATEGORIES.includes(l.category)) l.category = '3-PT';
+  if (typeof l.mentalDismissed !== 'boolean') l.mentalDismissed = false;
+  if (typeof l.timerOn !== 'boolean') l.timerOn = true;   // stopwatch is OPTIONAL — log reps with it off
+  if (!Array.isArray(l.chunks)) l.chunks = [];
+  return l;
+}
+function liveRunning(){ const l = liveState(); return l.active && !l.pausedAt; }
+function liveSessionMs(){ const l = liveState(); if (!l.startedAt) return 0; return Math.max(0, (l.pausedAt || Date.now()) - l.startedAt); }
+function liveDrillMs(){ const l = liveState(); if (!l.active) return 0; return Math.max(0, (l.pausedAt || Date.now()) - l.drillStartAt); }
+function fmtClock(ms){ const t = Math.max(0, Math.round((ms || 0) / 1000)); return pad(Math.floor(t / 60)) + ':' + pad(t % 60); }
+function liveTotals(){
+  const l = liveState();
+  let attempts = 0, makes = 0, reps = 0;
+  l.chunks.forEach(c => { attempts += num(c.attempts); makes += num(c.makes); reps += num(c.reps); });
+  const pct = attempts > 0 ? Math.round(makes / attempts * 1000) / 10 : null;
+  return { attempts, makes, reps, pct, volume: attempts + reps, drills: l.chunks.length };
+}
+function liveDrillName(){ const l = liveState(); return (l.drill || '').trim() || (LIVE_CAT_META[l.category].label + ' drill'); }
+function liveChunk(){
+  const l = liveState();
+  const name = liveDrillName();
+  let c = l.chunks.find(x => String(x.name).toLowerCase() === name.toLowerCase() && x.category === l.category);
+  if (!c){
+    c = { name, category: l.category, setType: LIVE_CAT_META[l.category].setType, attempts: 0, makes: 0, reps: 0 };
+    l.chunks.push(c);
+  }
+  return c;
+}
+function liveMentalActive(){
+  const t = liveTotals();
+  return t.attempts >= MENTAL_MIN_ATTEMPTS && t.pct !== null && t.pct < MENTAL_PCT_THRESHOLD;
+}
+
+/* ---------- audio + visual pings ---------- */
+function liveInitAudio(){
+  try {
+    if (!liveAudio){
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) liveAudio = new AC();
+    }
+    if (liveAudio && liveAudio.state === 'suspended' && liveAudio.resume) liveAudio.resume();
+  } catch (e){ liveAudio = null; }
+}
+function liveBeep(freq, dur, when){
+  if (!liveAudio) return;
+  try {
+    const o = liveAudio.createOscillator(), g = liveAudio.createGain();
+    o.type = 'sine';
+    o.frequency.value = freq;
+    o.connect(g); g.connect(liveAudio.destination);
+    const t0 = liveAudio.currentTime + (when || 0);
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(0.16, t0 + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.start(t0); o.stop(t0 + dur + 0.03);
+  } catch (e){ /* audio is a nicety, never a blocker */ }
+}
+function livePingRest(){
+  liveInitAudio();
+  liveBeep(880, 0.16, 0);
+  liveBeep(1180, 0.22, 0.2);
+  const box = document.getElementById('live-rest-box');
+  if (box){ box.classList.remove('done'); void box.offsetWidth; box.classList.add('done'); }
+}
+function liveFlashStats(){
+  const el = document.getElementById('live-stats');
+  if (!el) return;
+  el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump');
+}
+
+/* ---------- start / pause / rest / finish ---------- */
+function startLiveWorkout(){
+  snapshot();
+  const l = liveState();
+  l.active = true;
+  l.startedAt = Date.now();
+  l.pausedAt = 0;
+  l.drillStartAt = Date.now();
+  l.restEndsAt = 0;
+  l.mentalDismissed = false;
+  l.dateKey = state.settings.logDate || todayKey();
+  liveInitAudio();
+  save();
+  openLiveOverlay();
+  startLiveTicker();
+  toast('🔴 Live workout started — tap as you go');
+}
+function openLiveOverlay(){
+  renderLive();
+  const el = document.getElementById('live-overlay');
+  if (el) el.classList.remove('hidden');
+  if (document.body && document.body.classList) document.body.classList.add('live-mode');
+}
+function closeLiveOverlay(){
+  const el = document.getElementById('live-overlay');
+  if (el) el.classList.add('hidden');
+  if (document.body && document.body.classList) document.body.classList.remove('live-mode');
+}
+function toggleLivePause(){
+  const l = liveState();
+  if (!l.active) return;
+  if (l.pausedAt){
+    const delta = Date.now() - l.pausedAt;
+    l.startedAt += delta;
+    l.drillStartAt += delta;
+    if (l.restEndsAt) l.restEndsAt += delta;
+    l.pausedAt = 0;
+    toast('▶ Session resumed');
+  } else {
+    l.pausedAt = Date.now();
+    toast('⏸ Session paused');
+  }
+  save();
+  renderLive();
+}
+function liveTap(kind){
+  const l = liveState();
+  if (!l.active) return;
+  if (l.pausedAt) toggleLivePause();          // tapping resumes a paused session
+  const c = liveChunk();
+  if (kind === 'make'){ c.attempts = num(c.attempts) + 1; c.makes = num(c.makes) + 1; }
+  else if (kind === 'miss'){ c.attempts = num(c.attempts) + 1; }
+  else { c.reps = num(c.reps) + 1; }
+  if (!liveMentalActive()) l.mentalDismissed = false;   // re-arm once he's back above the line
+  snapshotDebounced();
+  save();
+  renderLive();
+  liveFlashStats();
+}
+/* Quick correction for accidental double-taps — never drops a counter below zero. */
+function liveUndo(kind){
+  const l = liveState();
+  if (!l.active) return;
+  const name = liveDrillName();
+  const c = l.chunks.find(x => String(x.name).toLowerCase() === name.toLowerCase() && x.category === l.category)
+         || l.chunks[l.chunks.length - 1];
+  if (!c){ toast('Nothing logged yet to subtract', 'error'); return; }
+  if (kind === 'make'){
+    if (num(c.makes) <= 0){ toast('No makes to remove on this drill', 'error'); return; }
+    c.makes = num(c.makes) - 1;
+    c.attempts = Math.max(num(c.makes), num(c.attempts) - 1);
+  } else if (kind === 'miss'){
+    const miss = num(c.attempts) - num(c.makes);
+    if (miss <= 0){ toast('No misses to remove on this drill', 'error'); return; }
+    c.attempts = Math.max(0, num(c.attempts) - 1);
+  } else {
+    if (num(c.reps) <= 0){ toast('No reps to remove on this drill', 'error'); return; }
+    c.reps = num(c.reps) - 1;
+  }
+  snapshotDebounced();
+  save();
+  renderLive();
+  liveFlashStats();
+}
+function toggleLiveTimer(){
+  const l = liveState();
+  l.timerOn = !l.timerOn;
+  save();
+  renderLive();
+  toast(l.timerOn ? '⏱ Timer on — session time will be recorded' : '⏱ Timer off — logging counters only');
+}
+function setLiveField(field, value){
+  const l = liveState();
+  if (field === 'category'){
+    if (!LIVE_CATEGORIES.includes(value)) return;
+    l.category = value;
+    l.drillStartAt = Date.now();
+  } else if (field === 'drill'){
+    l.drill = value;
+  } else if (field === 'location'){
+    l.location = value;
+  } else if (field === 'note'){
+    l.note = value;
+  } else return;
+  snapshotDebounced();
+  save();
+  if (field !== 'drill' && field !== 'note') renderLive();
+}
+function resetLiveDrillTimer(){
+  const l = liveState();
+  l.drillStartAt = Date.now();
+  save();
+  renderLive();
+  toast('Drill timer restarted');
+}
+function startLiveRest(sec){
+  const l = liveState();
+  if (!l.active) return;
+  const s = REST_PRESETS.includes(sec) ? sec : 30;
+  l.restPreset = s;
+  l.restEndsAt = (l.pausedAt || Date.now()) + s * 1000;
+  liveInitAudio();
+  save();
+  renderLive();
+  startLiveTicker();
+  toast('⏱ ' + s + 's rest started');
+}
+function skipLiveRest(){
+  const l = liveState();
+  l.restEndsAt = 0;
+  save();
+  renderLive();
+}
+function dismissMentalBanner(){ liveState().mentalDismissed = true; save(); renderLive(); }
+function removeLiveChunk(name, category){
+  const l = liveState();
+  snapshot();
+  l.chunks = l.chunks.filter(c => !(c.name === name && c.category === category));
+  save();
+  renderLive();
+}
+function cancelLiveWorkout(){
+  const l = liveState();
+  if (typeof confirm === 'function' && !confirm('Discard this live session? Nothing will be saved.')) return;
+  l.active = false;
+  l.startedAt = 0;
+  l.pausedAt = 0;
+  l.restEndsAt = 0;
+  l.chunks = [];
+  l.mentalDismissed = false;
+  save();
+  stopLiveTicker();
+  renderLive();
+  closeLiveOverlay();
+  renderAll();
+  toast('Live session discarded');
+}
+function finishLiveWorkout(){
+  const l = liveState();
+  const chunks = l.chunks.filter(c => num(c.attempts) > 0 || num(c.reps) > 0);
+  if (!chunks.length){ toast('Log at least one make, miss or rep first', 'error'); return; }
+  snapshot();
+  const key = l.dateKey || state.settings.logDate || todayKey();
+  /* Time is optional: with the stopwatch off nothing is added to the session duration. */
+  const mins = l.timerOn ? Math.max(1, Math.round(liveSessionMs() / 60000)) : 0;
+  const groups = {};
+  chunks.forEach(c => { (groups[c.setType] = groups[c.setType] || []).push(c); });
+  const sets = Object.entries(groups).map(([setType, list]) => ({
+    id: uid(), setType,
+    drills: list.map(c => ({
+      name: c.name,
+      spot: LIVE_CAT_META[c.category].spot,
+      attempts: num(c.attempts) ? String(num(c.attempts)) : '',
+      makes: num(c.makes) ? String(num(c.makes)) : '',
+      reps: num(c.reps) ? String(num(c.reps)) : '',
+      category: c.category
+    }))
+  }));
+  let s = state.workouts[key];
+  if (s && s.type === 'basketball'){
+    s.sets = Array.isArray(s.sets) ? s.sets : [];
+    sets.forEach(st => s.sets.push(st));
+    if (mins) s.time = String(num(s.time) + mins);
+    s.liveSessions = num(s.liveSessions) + 1;
+    if (l.note) s.notes = (s.notes ? s.notes + ' — ' : '') + l.note;
+    if (!s.location && l.location) s.location = l.location;
+  } else {
+    s = { id: uid(), type: 'basketball', presetName: 'Live Session', location: l.location || 'DT',
+          time: mins ? String(mins) : '', notes: l.note || '', sets, liveSessions: 1 };
+    state.workouts[key] = s;
+  }
+  syncSessionToLog(key);
+  const t = liveTotals();
+  l.active = false;
+  l.startedAt = 0;
+  l.pausedAt = 0;
+  l.restEndsAt = 0;
+  l.mentalDismissed = false;
+  l.chunks = [];
+  save();
+  stopLiveTicker();
+  renderLive();
+  closeLiveOverlay();
+  renderAll();
+  livePingRest();
+  toast('✓ Live session saved — ' + t.makes + '/' + t.attempts + ' (' + (t.pct === null ? '—' : t.pct + '%') + ')' + (mins ? ' · ' + mins + ' min' : ' · timer off'));
+}
+function liveTick(){
+  const l = liveState();
+  if (!l.active){ stopLiveTicker(); return; }
+  if (l.timerOn){
+    const sc = document.getElementById('live-session-clock');
+    if (sc) sc.textContent = fmtClock(liveSessionMs());
+    const dc = document.getElementById('live-drill-clock');
+    if (dc) dc.textContent = fmtClock(liveDrillMs());
+  }
+  const rc = document.getElementById('live-rest-clock');
+  if (l.restEndsAt){
+    const left = l.restEndsAt - (l.pausedAt || Date.now());
+    if (left <= 0 && !l.pausedAt){
+      l.restEndsAt = 0;
+      save();
+      renderLive();
+      livePingRest();
+      toast('⏱ Rest complete — back to work');
+    } else if (rc){
+      rc.textContent = fmtClock(left);
+    }
+  } else if (rc){
+    rc.textContent = '--:--';
+  }
+}
+function startLiveTicker(){
+  stopLiveTicker();
+  liveTicker = setInterval(liveTick, 1000);
+}
+function stopLiveTicker(){
+  if (liveTicker){ clearInterval(liveTicker); liveTicker = null; }
+}
+function renderLive(){
+  const el = document.getElementById('live-overlay');
+  if (!el) return;
+  const l = liveState();
+  if (!l.active){ el.innerHTML = ''; return; }
+  const t = liveTotals();
+  const restLeft = l.restEndsAt ? l.restEndsAt - (l.pausedAt || Date.now()) : 0;
+  const catMeta = LIVE_CAT_META[l.category];
+  const mental = liveMentalActive() && !l.mentalDismissed;
+  const chunks = l.chunks.length
+    ? l.chunks.map(c =>
+        '<div class="live-chunk">' +
+          '<span class="lc-cat" style="color:' + LIVE_CAT_META[c.category].color + ';border-color:' + LIVE_CAT_META[c.category].color + '">' + esc(c.category) + '</span>' +
+          '<span class="lc-name">' + esc(c.name) + '</span>' +
+          '<span>' + fmtNum(c.makes) + ' / ' + fmtNum(c.attempts) + (num(c.reps) ? ' · ' + fmtNum(c.reps) + ' reps' : '') + '</span>' +
+          '<button class="icon-btn danger" onclick="removeLiveChunk(\'' + esc(String(c.name).replace(/'/g, '')) + '\',\'' + c.category + '\')" title="Remove">✕</button>' +
+        '</div>').join('')
+    : '<div class="empty sm">Nothing logged yet this session.</div>';
+  el.innerHTML =
+    '<div class="live-wrap">' +
+      '<div class="live-head">' +
+        '<span class="live-rec"><span class="dot"></span>LIVE SESSION</span>' +
+        (l.timerOn
+          ? '<div class="live-clock" id="live-session-clock">' + fmtClock(liveSessionMs()) + '<small>SESSION</small></div>' +
+            '<div class="live-clock" id="live-drill-clock">' + fmtClock(liveDrillMs()) + '<small>ACTIVE DRILL</small></div>'
+          : '<span class="live-timer-off">⏱ STOPWATCH OFF — counters only</span>') +
+        '<span class="live-spacer"></span>' +
+        '<button class="btn sm ghost" onclick="toggleLiveTimer()">' + (l.timerOn ? '⏱ Timer: On' : '⏱ Timer: Off') + '</button>' +
+        (l.timerOn ? '<button class="btn sm ghost" onclick="resetLiveDrillTimer()">↻ Reset drill timer</button>' : '') +
+        '<button class="btn sm ghost" onclick="toggleLivePause()">' + (l.pausedAt ? '▶ Resume' : '⏸ Pause') + '</button>' +
+        '<button class="btn sm ghost" onclick="closeLiveOverlay()">Minimize</button>' +
+      '</div>' +
+
+      '<div class="live-stats" id="live-stats">' +
+        '<div class="live-stat-row">' +
+          '<div class="live-stat"><div class="ls-label">Live Shooting %</div><div class="ls-val" style="color:var(--bright)">' + (t.pct === null ? '—' : t.pct + '%') + '</div></div>' +
+          '<div class="live-stat"><div class="ls-label">Makes / Attempts</div><div class="ls-val small">' + fmtNum(t.makes) + ' / ' + fmtNum(t.attempts) + '</div></div>' +
+          '<div class="live-stat"><div class="ls-label">Total Volume</div><div class="ls-val small">' + fmtNum(t.volume) + '</div></div>' +
+          '<div class="live-stat"><div class="ls-label">Reps Logged</div><div class="ls-val small">' + fmtNum(t.reps) + '</div></div>' +
+          '<div class="live-stat"><div class="ls-label">Active Drill</div><div class="ls-val small" style="font-size:14px">' + esc(liveDrillName()) + '</div></div>' +
+        '</div>' +
+      '</div>' +
+
+      (mental
+        ? '<div class="live-mental"><span style="font-size:20px">🧠</span><p><b>Mental reset:</b> ' + esc(MENTAL_MESSAGE) + '</p>' +
+          '<button class="chip-btn" onclick="dismissMentalBanner()">Got it</button></div>'
+        : '') +
+
+      '<div class="live-btns">' +
+        '<button class="live-btn make" onclick="liveTap(\'make\')">+1 Make</button>' +
+        '<button class="live-btn miss" onclick="liveTap(\'miss\')">+1 Miss</button>' +
+        '<button class="live-btn rep" onclick="liveTap(\'rep\')">+1 Rep</button>' +
+      '</div>' +
+      '<div class="live-fixrow">' +
+        '<button class="live-fix" onclick="liveUndo(\'make\')" title="Undo an accidental make">−1 Make</button>' +
+        '<button class="live-fix" onclick="liveUndo(\'miss\')" title="Undo an accidental miss">−1 Miss</button>' +
+        '<button class="live-fix" onclick="liveUndo(\'rep\')" title="Undo an accidental rep">−1 Rep</button>' +
+      '</div>' +
+
+      '<div class="live-rest' + (restLeft > 0 ? ' on' : '') + '" id="live-rest-box">' +
+        '<span class="kicker">REST COUNTDOWN</span>' +
+        '<span class="live-rest-clock" id="live-rest-clock">' + (restLeft > 0 ? fmtClock(restLeft) : '--:--') + '</span>' +
+        REST_PRESETS.map(s => '<button class="chip-btn' + (l.restPreset === s ? ' active' : '') + '" onclick="startLiveRest(' + s + ')">' + s + 's</button>').join('') +
+        '<button class="chip-btn" onclick="skipLiveRest()">Skip rest</button>' +
+        '<span class="paste-hint">Pings audibly + flashes when the countdown finishes.</span>' +
+      '</div>' +
+
+      '<div class="live-sec card" style="box-shadow:none">' +
+        '<div class="compact-row">' +
+          '<div class="field inline-block"><label>Drill / Skill</label><input id="live-drill-input" value="' + esc(l.drill || '') + '" placeholder="e.g. 5 Spot Midrange" onchange="setLiveField(\'drill\',this.value)"></div>' +
+          '<div class="field inline-block"><label>Category <span class="hint">badge routing</span></label><select onchange="setLiveField(\'category\',this.value)">' +
+            LIVE_CATEGORIES.map(c => '<option value="' + c + '"' + (l.category === c ? ' selected' : '') + '>' + c + ' — ' + LIVE_CAT_META[c].label + '</option>').join('') +
+          '</select></div>' +
+          '<div class="field inline-block"><label>Location</label><input id="live-loc" value="' + esc(l.location || '') + '" placeholder="DT" onchange="setLiveField(\'location\',this.value)"></div>' +
+        '</div>' +
+        '<p class="paste-hint" style="margin-top:6px">Routed to ' + esc(catMeta.label) + ' · ' + esc(catMeta.setType) + ' set on save.</p>' +
+      '</div>' +
+
+      '<div class="live-sec card" style="box-shadow:none">' +
+        '<div class="card-head"><h3>Logged This Session</h3><span class="kicker">' + t.drills + ' drill' + (t.drills === 1 ? '' : 's') + '</span></div>' +
+        chunks +
+        '<div class="field" style="margin-top:10px"><label>Session Notes</label><textarea rows="2" id="live-note" placeholder="How did it feel? Anything to remember?" oninput="setLiveField(\'note\',this.value)">' + esc(l.note || '') + '</textarea></div>' +
+      '</div>' +
+
+      '<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end">' +
+        '<button class="btn ghost" onclick="cancelLiveWorkout()">Discard Session</button>' +
+        '<button class="btn" onclick="finishLiveWorkout()">✓ Finish &amp; Save Session</button>' +
+      '</div>' +
+    '</div>';
+}
+
+/* ============================================================
+   NOTION WEEKLY SUMMARY — Markdown generator + clipboard copy
+   ============================================================ */
+function weeklyWindow(){
+  const start = keyToDate(weekStartKey(0));           // Monday of the current week
+  const end = new Date(start); end.setDate(end.getDate() + 6);
+  return { startKey: dateKey(start), endKey: dateKey(end) };
+}
+function inWeekWindow(k, r){ return !!k && k >= r.startKey && k <= r.endKey; }
+function weekDayKeys(r){
+  const out = [];
+  const d = keyToDate(r.startKey);
+  for (let i = 0; i < 7; i++){ out.push(dateKey(d)); d.setDate(d.getDate() + 1); }
+  return out;
+}
+function weeklyAthleticsData(r){
+  let attempts = 0, makes = 0, live = 0, sessions = 0;
+  Object.entries(state.workouts || {}).forEach(([k, s]) => {
+    if (!inWeekWindow(k, r) || !s || s.type !== 'basketball') return;
+    const m = drillTotals(basketAllDrills(s));
+    attempts += num(m.shots);
+    makes += num(m.makes);
+    live += num(s.liveSessions);
+    sessions++;
+  });
+  const games = (state.film.games || []).filter(g => inWeekWindow(g.date, r))
+    .sort((a, b) => String(a.date).localeCompare(String(b.date)));
+  return { attempts, makes, live, sessions, games, pct: attempts ? Math.round(makes / attempts * 1000) / 10 : null };
+}
+function weeklyHabitsData(r){
+  const keys = weekDayKeys(r);
+  const good = (state.habits || []).filter(h => (h.type || 'good') !== 'bad');
+  const bad = (state.habits || []).filter(h => h.type === 'bad');
+  let done = 0, possible = 0;
+  const perHabit = good.map(h => {
+    let n = 0;
+    keys.forEach(k => { possible++; if (state.logs[k] && state.logs[k].habits && state.logs[k].habits[h.id]){ n++; done++; } });
+    return { label: h.label, days: n, streak: habitStreak(h) };
+  });
+  const banned = bad.map(h => {
+    let n = 0;
+    keys.forEach(k => { if (state.logs[k] && state.logs[k].habits && state.logs[k].habits[h.id]) n++; });
+    return { label: h.label, clean: n, streak: habitStreak(h), target: h.target };
+  });
+  return { good: perHabit, bad: banned, done, possible, rate: possible ? Math.round(done / possible * 100) : 0 };
+}
+function weeklyRecruitingData(r){
+  const rows = [];
+  (state.recruiting || []).forEach(c => (c.interactions || []).forEach(i => {
+    if (inWeekWindow(i.date, r)) rows.push({ coach: c.school || 'School', type: i.type, date: i.date, notes: i.notes || '' });
+  }));
+  return rows.sort((a, b) => String(b.date).localeCompare(String(a.date)));
+}
+function buildWeeklyMarkdown(){
+  const r = weeklyWindow();
+  const gs = gpaSummary();
+  const gc = graduationCredits();
+  const ath = weeklyAthleticsData(r);
+  const hab = weeklyHabitsData(r);
+  const rec = weeklyRecruitingData(r);
+  const L = [];
+  L.push('# 🏀 Phoenix OS — Weekly Summary');
+  L.push('');
+  L.push('**Week of ' + fmtDate(r.startKey, { long: true }) + ' → ' + fmtDate(r.endKey, { long: true }) + '**  ');
+  L.push('_Generated ' + new Date().toLocaleString() + ' · Phoenix OS BETA V1.2_');
+  L.push('');
+
+  /* ---------- Academics ---------- */
+  L.push('## 🎓 Weekly Academics');
+  L.push('');
+  L.push('- **Overall GPA:** ' + (gs.gpa === null ? '—' : gs.gpa.toFixed(2) + ' / 4.0') +
+    (gs.pct === null ? '' : ' (weighted average ' + gs.pct.toFixed(1) + '% · ' + gs.letter + ')'));
+  L.push('- **Earned graduation credits:** ' + fmtNum(gc.total) + ' total · Semester 1 ' + fmtNum(gc.perSem.s1.credits) +
+    ' · Semester 2 ' + fmtNum(gc.perSem.s2.credits) + ' · Extracurricular ' + fmtNum(gc.xcCredits));
+  L.push('- **Volunteer hours:** ' + fmtNum(volunteerTotal()) + (num((state.extracurricular || {}).volunteerGoal) ? ' / ' + fmtNum(num(state.extracurricular.volunteerGoal)) + ' goal' : ''));
+  L.push('');
+  const classes = (state.classCats || []).slice();
+  L.push('**Class grades**');
+  L.push('');
+  if (classes.length){
+    L.push('| Class | Semester | Grade | Letter | Credits |');
+    L.push('| --- | --- | --- | --- | --- |');
+    classes.forEach(c => {
+      const g = classGrade(c);
+      L.push('| ' + (c.label || 'Class') + ' | ' + String(c.semester || 's1').toUpperCase() + ' | ' +
+        (g === null || g === undefined ? '—' : fmtNum(Math.round(g * 10) / 10) + '%') + ' | ' +
+        (g === null || g === undefined ? '—' : gpaFor(g).letter) + ' | ' + fmtNum(classCredits(c)) + ' |');
+    });
+  } else {
+    L.push('_No classes registered yet._');
+  }
+  L.push('');
+  const todayK = todayKey();
+  const dueSoon = (state.school || []).filter(a => !['Completed', 'Handed In'].includes(a.status) && a.dueDate)
+    .filter(a => inWeekWindow(a.dueDate, r) || a.dueDate < todayK)
+    .sort((a, b) => String(a.dueDate).localeCompare(String(b.dueDate)));
+  L.push('**Upcoming / due assignments**');
+  L.push('');
+  if (dueSoon.length){
+    dueSoon.forEach(a => {
+      const overdue = a.dueDate < todayK;
+      L.push('- ' + (overdue ? '🔴 **OVERDUE ' + fmtDate(a.dueDate) + '**' : '🟡 Due ' + fmtDate(a.dueDate)) + ' — ' + (a.assignment || 'Assignment') +
+        ' _(' + (a.course || 'Course') + ' · ' + (a.category || 'Other') + ' · ' + (a.priority || 'Medium') + ' priority · ' + (a.status || 'Not Started') + ')_');
+    });
+  } else {
+    L.push('- ✅ Nothing due or overdue right now.');
+  }
+  L.push('');
+
+  /* ---------- Athletics ---------- */
+  L.push('## 🏀 Weekly Athletics');
+  L.push('');
+  L.push('- **Shot volume:** ' + fmtNum(ath.makes) + ' makes on ' + fmtNum(ath.attempts) + ' attempts' +
+    (ath.pct === null ? '' : ' — **' + ath.pct + '%**'));
+  L.push('- **Live workouts completed:** ' + fmtNum(ath.live));
+  L.push('- **Workout sessions logged:** ' + fmtNum(ath.sessions));
+  L.push('- **Games logged:** ' + fmtNum(ath.games.length));
+  ath.games.forEach(g => {
+    const score = (g.scoreUs !== undefined && g.scoreUs !== '') ? ' — ' + g.scoreUs + '–' + (g.scoreThem || 0) : '';
+    L.push('  - ' + fmtDate(g.date) + ' vs **' + (g.opponent || 'Opponent') + '**' + score +
+      ([g.season, g.club, g.tournament].filter(Boolean).length ? ' _(' + [g.season, g.club, g.tournament].filter(Boolean).join(' · ') + ')_' : ''));
+  });
+  L.push('');
+
+  /* ---------- Habits ---------- */
+  L.push('## ✅ Habit & Banned List Highlights');
+  L.push('');
+  L.push('- **Good habit completion:** ' + hab.rate + '% (' + hab.done + ' of ' + hab.possible + ' check-ins across the week)');
+  if (hab.good.length){
+    L.push('- **Streaks:** ' + hab.good.map(h => h.label + ' 🔥' + h.streak + ' (' + h.days + '/7 this week)').join(' · '));
+  } else {
+    L.push('- _No good habits tracked._');
+  }
+  if (hab.bad.length){
+    hab.bad.forEach(h => L.push('- **Banned list — ' + h.label + ':** ' + h.clean + '/7 days clean · current streak 🔥' + h.streak + (h.target ? ' · monthly target ' + h.target + ' days' : '')));
+  } else {
+    L.push('- _No banned habits tracked._');
+  }
+  L.push('');
+
+  /* ---------- Recruiting ---------- */
+  L.push('## 📞 Recruiting CRM Log');
+  L.push('');
+  if (rec.length){
+    rec.forEach(i => L.push('- ' + fmtDate(i.date) + ' · **' + i.type + '** — ' + i.coach + (i.notes ? ': ' + i.notes : '')));
+  } else {
+    L.push('- _No coach interactions logged this week._');
+  }
+  L.push('');
+  L.push('---');
+  L.push('_Phoenix OS · local-first workspace_');
+  return L.join('\n');
+}
+function openNotionExport(){
+  const md = buildWeeklyMarkdown();
+  const r = weeklyWindow();
+  openModal('Export to Notion — Weekly Summary');
+  const body = document.getElementById('modal-body');
+  if (!body) return;
+  body.innerHTML =
+    '<p class="paste-hint" style="margin-bottom:10px">Pre-formatted Markdown for the week of <b>' + esc(fmtDate(r.startKey, { long: true })) + '</b> → <b>' + esc(fmtDate(r.endKey)) + '</b>. Copy it, then paste into any Notion page — headings, bullets and tables convert automatically.</p>' +
+    '<textarea class="notion-md" id="notion-md" readonly spellcheck="false">' + esc(md) + '</textarea>' +
+    '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">' +
+      '<button class="btn sm ghost" onclick="closeModal()">Close</button>' +
+      '<button class="btn" onclick="copyNotionExport()">⧉ Copy to Clipboard</button>' +
+    '</div>';
+}
+function copyNotionExport(){
+  const ta = document.getElementById('notion-md');
+  const md = ta ? ta.value : '';
+  if (!md){ toast('Nothing to copy', 'error'); return; }
+  const fallback = () => {
+    if (!ta) return;
+    try { ta.removeAttribute('readonly'); ta.focus(); ta.select(); } catch (e){}
+    toast('Select the text and copy manually (Ctrl+C)', 'error');
+  };
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(md).then(() => toast('✓ Markdown copied — paste into Notion')).catch(fallback);
+      return;
+    }
+  } catch (e){ /* fall through to manual copy */ }
+  fallback();
+}
+
 /* ---------- Boot ---------- */
 state = loadState();
 pmType = state.settings.pmType || 'basketball';
@@ -6146,7 +8075,7 @@ bindEvents();
 applyTab();
 renderAll();
 startClock();
-cloudStart();
+if (liveState().active){ openLiveOverlay(); startLiveTicker(); }
 </script>
 </body>
 </html>
