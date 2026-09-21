@@ -140,6 +140,8 @@ body{
 }
 #topbar-title{ font-size:19px; letter-spacing:.06em; color:var(--hi); }
 #topbar-date{ font-size:12px; color:var(--muted); margin-top:1px; }
+.clock-shell{ display:flex; align-items:center; gap:12px; margin-left:auto; white-space:nowrap; }
+.beta-label{ font-family:var(--mono); font-size:10px; letter-spacing:.14em; color:var(--amber); font-weight:800; padding:4px 7px; border:1px solid rgba(240,165,0,.45); border-radius:var(--r); background:rgba(240,165,0,.08); }
 .clock{ font-family:var(--mono); font-size:20px; color:var(--bright); letter-spacing:.08em; white-space:nowrap; }
 
 #view{ flex:1; padding:22px 26px 46px; }
@@ -263,8 +265,9 @@ input[type=range]:focus{ box-shadow:none; }
 .ws-row{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px; align-items:center; }
 .ws-row input.grow{ flex:1 1 140px; }
 .ws-row input.n{ width:72px; flex:none; }
-.ws-row input.n.wide{ width:90px; }
-.ws-row select.ws-settype{ width:118px; flex:none; padding:6px 8px; font-size:12px; }
+.ws-row input.n.wide{ width:90px; }  .ws-row select.drill-category{ width:72px; flex:0 0 72px; padding:6px 5px; font-size:10.5px; color:var(--bright); }
+  .ws-row .drill-category + input.grow{ min-width:110px; }
+
 .pr-box{
   display:inline-flex; align-items:center; gap:5px; flex:none;
   font-size:10.5px; font-weight:800; letter-spacing:.06em; color:var(--amber);
@@ -546,8 +549,17 @@ input[type=range]:focus{ box-shadow:none; }
 .rank-tbl td.ex-name{ font-weight:700; color:var(--hi); }
 .rank-tbl .tier-hdr{ color:var(--muted); font-size:9.5px; font-weight:800; letter-spacing:.1em; }
 
-/* ---------- Lifetime Badge Vault ---------- */
-.badge-vault{ display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px; }
+/* ---------- Lifetime Badge Vault ---------- */  .badge-vault{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:12px; }
+  .badge-tier-group{ background:var(--bg2); border:1px solid var(--line); border-radius:var(--r); padding:10px; }
+  .badge-tier-name{ display:flex; align-items:center; gap:7px; margin-bottom:8px; color:var(--hi); font-size:12px; }
+  .badge-tier-name .b-icon{ font-size:19px; }
+  .badge-tier-row{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
+  .badge-tier-row .badge-tile{ min-width:0; padding:8px 5px; gap:4px; border-radius:6px; }
+  .badge-tier-row .b-name{ font-size:10px; }
+  .badge-tier-row .b-thresh{ font-size:8.5px; }
+  .badge-tier-row .b-prog{ height:3px; }
+  .badge-tier-row .b-pct{ font-size:8px; }
+
 .badge-tile{
   display:flex; flex-direction:column; align-items:center; text-align:center; gap:6px;
   padding:14px 10px; background:var(--bg2); border:1px solid var(--line); border-radius:var(--r);
@@ -596,10 +608,32 @@ input[type=range]:focus{ box-shadow:none; }
 .cc-edit-row select{ width:auto; flex:none; padding:6px 8px; font-size:12px; }
 .cc-add{ display:grid; grid-template-columns:1fr 90px 1fr auto auto; gap:8px; margin-bottom:12px; align-items:center; }
 .cc-add input, .cc-add select{ padding:7px 9px; font-size:12px; min-width:0; }
-.cc-item{ display:flex; align-items:center; gap:8px; padding:8px 10px; margin-bottom:7px; background:var(--bg2); border:1px solid var(--line); border-radius:var(--r); }
-.cc-item b{ flex:1; font-size:12.5px; color:var(--hi); }
-.cc-meta{ font-family:var(--mono); font-size:10.5px; color:var(--muted); font-weight:400; }
-@media (max-width: 900px){ .cc-add{ grid-template-columns:1fr 1fr; } .cc-add .btn{ grid-column:1 / -1; } }
+/* ---------- School class categories & detail view ---------- */
+.class-category{ display:inline-flex; align-items:center; gap:5px; font-size:9px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; padding:3px 7px; border-radius:999px; white-space:nowrap; }
+.class-category.stem{ color:#2ec4b6; background:rgba(46,196,182,.12); border:1px solid rgba(46,196,182,.45); }
+.class-category.literature{ color:#ff6b6b; background:rgba(230,57,70,.12); border:1px solid rgba(230,57,70,.45); }
+.class-category.electives{ color:#66a3ff; background:rgba(72,133,237,.13); border:1px solid rgba(72,133,237,.48); }
+.class-category.other{ color:var(--accent); background:rgba(69,162,158,.12); border:1px solid rgba(69,162,158,.42); }
+.cc-swatch{ width:10px; height:10px; border-radius:50%; flex:none; background:var(--accent); box-shadow:0 0 7px currentColor; }
+.cc-item{ cursor:pointer; }
+.cc-item:hover{ border-color:var(--accent); }
+.class-cards{ display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:10px; }
+.class-card{ min-height:76px; margin:0; }
+.class-card-grade{ flex:none; font-family:var(--mono); font-size:14px; font-weight:800; color:var(--bright); }
+.tt-class{ cursor:pointer; border-left-color:var(--class-color, var(--accent)); background:var(--class-bg, rgba(69,162,158,.1)); }
+.tt-class:hover{ filter:brightness(1.18); transform:translateY(-1px); }
+.class-detail-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:14px 0 16px; }
+.class-kpi{ background:var(--bg2); border:1px solid var(--line); border-radius:var(--r); padding:13px; }
+.class-kpi .ck-label{ display:block; font-size:9px; letter-spacing:.15em; color:var(--muted); font-weight:800; text-transform:uppercase; margin-bottom:5px; }
+.class-kpi .ck-value{ font-family:var(--mono); font-size:20px; color:var(--bright); }
+.class-history{ width:100%; border-collapse:collapse; font-size:12px; }
+.class-history th,.class-history td{ padding:8px 10px; border-bottom:1px solid var(--line); text-align:left; }
+.class-history th{ font-size:9px; letter-spacing:.13em; color:var(--muted); text-transform:uppercase; }
+.class-history tr{ cursor:pointer; }
+.class-history tr:hover td{ background:rgba(69,162,158,.05); }
+.class-detail-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+.class-detail-meta{ display:flex; gap:7px; flex-wrap:wrap; align-items:center; margin-top:5px; }  @media (max-width:720px){ .clock-shell{ gap:7px; } .clock{ font-size:16px; } .class-detail-grid{ grid-template-columns:1fr; } }
+
 
 /* ---------- Finance multi-year ---------- */
 .fin-year-chips{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:14px; }
@@ -948,6 +982,50 @@ input[type=range]:focus{ box-shadow:none; }
   .log-grid-2{ grid-template-columns:1fr; }
   .pm-grid{ grid-template-columns:1fr; }
 }
+/* ---------- Banned List (bad habits) + habit targets ---------- */
+.chip-btn.active{ border-color:var(--accent); color:var(--bright); background:rgba(69,162,158,.12); }
+.banned-card{ border-color:rgba(230,57,70,.45); }
+.banned-card .card-head h3{ color:var(--danger); }
+.banned-kicker{ color:var(--danger); }
+.banned-stat{ font-family:var(--mono); font-size:11px; color:var(--danger); }
+.banned-grid{
+  display:grid; gap:2px; overflow-x:auto; margin-top:12px;
+  border:1px solid var(--line); border-radius:var(--r); padding:8px;
+}
+.banned-grid .xlabel{ font-size:11px; color:var(--text); display:flex; flex-direction:column; justify-content:center; padding-right:8px; min-width:0; }
+.banned-grid .mtd.on{ background:var(--danger); }
+.banned-grid .mtd:hover{ border-color:rgba(230,57,70,.65); }
+.habit-target{
+  flex:none; font-family:var(--mono); font-size:10px; color:var(--accent);
+  background:rgba(69,162,158,.1); border:1px solid rgba(69,162,158,.35);
+  border-radius:999px; padding:3px 8px;
+}
+
+/* ---------- Recruiting CRM ---------- */
+.rec-filter{ display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-bottom:16px; }
+.rec-board{ display:grid; grid-template-columns:repeat(5,minmax(220px,1fr)); gap:12px; align-items:start; overflow-x:auto; padding-bottom:6px; }
+.rec-col{ background:var(--bg2); border:1px solid var(--line); border-radius:var(--r); padding:10px; min-width:220px; }
+.rec-col-head{ display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:10px; border-bottom:1px solid var(--line); padding-bottom:8px; }
+.rec-col-head h3{ font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--hi); }
+.rec-count{ font-family:var(--mono); font-size:10.5px; color:var(--accent); }
+.rec-card{ background:var(--card); border:1px solid var(--line); border-left:3px solid var(--accent); border-radius:var(--r); padding:11px; margin-bottom:9px; transition:border-color .15s, transform .15s; }
+.rec-card:hover{ border-color:rgba(69,162,158,.55); transform:translateY(-1px); }
+.rec-card h4{ font-size:13px; color:var(--hi); margin-bottom:3px; word-break:break-word; }
+.rec-card .rc-sub{ font-size:11px; color:var(--muted); }
+.rec-card .rc-row{ font-size:11px; color:var(--text); margin-top:6px; word-break:break-word; }
+.rec-card .rc-row b{ display:block; color:var(--muted); font-weight:800; font-size:9px; letter-spacing:.12em; text-transform:uppercase; margin-bottom:2px; }
+.rec-card .rc-notes{ font-size:11px; color:var(--muted); margin-top:7px; border-top:1px dashed var(--line); padding-top:7px; max-height:74px; overflow:hidden; }
+.rec-card .rc-actions{ display:flex; gap:6px; align-items:center; margin-top:9px; }
+.rec-card select.rec-move{ flex:1; font-size:11px; padding:5px 7px; }
+.rec-role{ font-size:9.5px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); }
+.rec-empty{ font-size:11.5px; color:var(--muted); font-style:italic; text-align:center; padding:14px 6px; }
+.rec-link{ color:var(--bright); font-size:11px; word-break:break-all; text-decoration:none; }
+.rec-link:hover{ text-decoration:underline; }
+
+/* ---------- Curriculum / description panels ---------- */
+.curr-note{ min-height:160px; font-family:var(--mono); font-size:12px; line-height:1.6; }
+.curr-head{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px; }
+.curr-toggle{ display:inline-flex; align-items:center; gap:8px; font-size:12.5px; font-weight:700; color:var(--text); cursor:pointer; margin-top:4px; }
 </style>
 </head>
 <body>
@@ -988,6 +1066,7 @@ input[type=range]:focus{ box-shadow:none; }
       <button class="nav-btn" data-tab="goals" onclick="switchTab('goals')"><span class="nav-num">04</span><span>Goal Matrix</span></button>
       <button class="nav-btn" data-tab="film" onclick="switchTab('film')"><span class="nav-num">05</span><span>Film Study</span></button>
       <button class="nav-btn" data-tab="finance" onclick="switchTab('finance')"><span class="nav-num">06</span><span>Finance Tracker</span></button>
+      <button class="nav-btn" data-tab="recruiting" onclick="switchTab('recruiting')"><span class="nav-num">07</span><span>Recruiting CRM</span></button>
     </nav>
 
     <div class="side-util">
@@ -1011,7 +1090,10 @@ input[type=range]:focus{ box-shadow:none; }
         <h2 id="topbar-title">Dashboard</h2>
         <p id="topbar-date"></p>
       </div>
-      <div class="clock" id="clock">--:--:--</div>
+      <div class="clock-shell">
+        <span class="beta-label">BETA V1.0</span>
+        <div class="clock" id="clock" aria-label="Live digital clock">--:--:--</div>
+      </div>
     </header>
 
     <div id="view">
@@ -1196,6 +1278,7 @@ input[type=range]:focus{ box-shadow:none; }
         <div class="school-tabs">
           <button class="chip-btn active" id="sview-btn-assign" onclick="setSchoolView('assign')">Assignments</button>
           <button class="chip-btn" id="sview-btn-tt" onclick="setSchoolView('tt')">🗓 Timetable</button>
+          <button class="chip-btn" id="sview-btn-classes" onclick="setSchoolView('classes')">▦ Classes</button>
         </div>
         <div class="school-toolbar" style="margin-bottom:14px">
           <span class="kicker">SEMESTER VIEW</span>
@@ -1265,6 +1348,9 @@ input[type=range]:focus{ box-shadow:none; }
               </div>
             </div>
             <div class="school-toolbar" style="margin-bottom:12px">
+              <button class="chip-btn" id="sfilter-all" onclick="setSchoolFilter('all')">All</button>
+              <button class="chip-btn" id="sfilter-active" onclick="setSchoolFilter('active')">Active</button>
+              <button class="chip-btn" id="sfilter-archived" onclick="setSchoolFilter('archived')">Archived</button>
               <select id="filter-cat" onchange="renderSchool()" style="width:auto"><option value="">All Courses</option></select>
               <select id="filter-prio" onchange="renderSchool()" style="width:auto"><option value="">All Priority</option><option>High</option><option>Medium</option><option>Low</option></select>
               <select id="filter-due" onchange="renderSchool()" style="width:auto"><option value="asc">Due: Earliest →</option><option value="desc">Due: Latest →</option></select>
@@ -1282,6 +1368,20 @@ input[type=range]:focus{ box-shadow:none; }
             <div class="card-head"><h3>Weekly Timetable</h3><span class="kicker" id="tt-count"></span></div>
             <div id="school-timetable"></div>
           </div>
+        </div>
+
+        <div id="sview-classes" style="display:none">
+          <div class="card">
+            <div class="card-head">
+              <div><h3>Classes</h3><p class="page-sub">Select a class to view grades, metadata, and assignment history.</p></div>
+              <span class="kicker" id="classes-count"></span>
+            </div>
+            <div id="school-classes"></div>
+          </div>
+        </div>
+
+        <div id="sview-class-detail" style="display:none">
+          <div class="card" id="school-class-detail"></div>
         </div>
       </section>
 
@@ -1395,6 +1495,19 @@ input[type=range]:focus{ box-shadow:none; }
         </div>
       </section>
 
+      <!-- ============ TAB 7: RECRUITING CRM ============ -->
+      <section id="tab-recruiting" class="tab">
+        <div class="card-head-row">
+          <div>
+            <h2 class="page-title">Recruiting CRM</h2>
+            <p class="page-sub">Coach &amp; school pipeline — track outreach, dialogue, offers and commitments.</p>
+          </div>
+          <button class="btn" onclick="openCoachModal()">+ New Coach / School</button>
+        </div>
+        <div class="rec-filter" id="rec-filter"></div>
+        <div class="rec-board" id="recruiting-board"></div>
+      </section>
+
     </div>
   </main>
 </div>
@@ -1438,7 +1551,9 @@ const CATEGORIES = {
   skiing:     { label: 'Skiing / Coaching',  color: '#9d4edd' },
   life:       { label: 'Life / Recovery',    color: '#e63946' }
 };
-const TITLES = { dashboard: 'Dashboard', log: 'Daily Log & Workouts', school: 'School', goals: 'Goal Matrix', film: 'Film Study', finance: 'Finance Tracker' };
+const TITLES = { dashboard: 'Dashboard', log: 'Daily Log & Workouts', school: 'School', goals: 'Goal Matrix', film: 'Film Study', finance: 'Finance Tracker', recruiting: 'Recruiting CRM' };
+const RECRUIT_STATUSES = ['Uncontacted', 'Contacted', 'Active Dialogue', 'Offer Extended', 'Committed / Archived'];
+const RECRUIT_ROLES = ['Head Coach', 'Assistant Coach', 'Lead Recruiter', 'Recruiting Coordinator', 'Other'];
 const TYPE_META = {
   basketball: { label: 'Basketball', color: '#45a29e' },
   lift:       { label: 'Lift',       color: '#f0a500' },
@@ -1448,7 +1563,27 @@ const LOCATIONS = ['Richmond Olympic Oval', 'Gaston Park', 'Central Park', 'DT',
 const LIFT_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const STRENGTH_CATS = ['Sprints', 'Plyometrics', 'Isometrics', 'Calisthenics'];
 const SET_TYPES = ['Shooting', 'Ball Handling', 'Finishing', 'Free Throws', 'Lifts'];
+const DRILL_CATS = ['3-PT', 'FT', 'Lay', 'Other'];
 const BH_STYLES = ['Stationary', 'Moving'];
+function defaultDrillCategory(setType){
+  if (setType === 'Free Throws') return 'FT';
+  if (setType === 'Finishing') return 'Lay';
+  if (setType === 'Shooting') return 'Other';
+  return 'Other';
+}
+function drillCategory(dr, setType){
+  const raw = dr && dr.category;
+  if (raw === 'FT' || raw === 'Lay' || raw === '3-PT') return raw;
+  if (setType === 'Free Throws') return 'FT';
+  if (setType === 'Finishing') return 'Lay';
+  if (setType === 'Shooting'){
+    // Preserve pre-category shooting history: older Corner / 3-Pointer rows
+    // were stored without a category (or with the migration's Other default).
+    const spot = String(dr && dr.spot || '').toLowerCase();
+    if (spot.includes('3') || spot.includes('corner')) return '3-PT';
+  }
+  return 'Other';
+}
 const DEFAULT_CLASS_SLOTS = [
   { label: 'Pre-Calculus 11', period: 'p1' },
   { label: 'EPP & New Media 10', period: 'p2' },
@@ -1459,6 +1594,7 @@ const DEFAULT_CLASS_SLOTS = [
 const safeUrl = value => /^https?:\/\//i.test(String(value || '').trim()) ? String(value).trim() : '';
 
 const LS_KEY = 'phoenix-os-v2';
+const WORKOUT_PRESETS_KEY = 'workout_presets';
 const DAY_ABBR = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
@@ -1474,6 +1610,70 @@ const DEFAULT_HABITS = [
   { id: 'h9', label: 'Phone scrolling in bed', type: 'bad' },
   { id: 'h10', label: 'Skipped stretch / mobility', type: 'bad' }
 ];
+
+/* ---------- Automatic seed data ----------
+   Loaded through mergeState() so a blank install, a legacy save, an imported
+   backup, and a cloud pull all receive the same baseline. A stored seedVersion
+   marks the seed as applied, so anything the user later deletes stays deleted
+   and no existing metric is ever overwritten.                                 */
+const SEED_VERSION = 1;
+const SEED_CLASSES = [
+  { label: 'Pre-Calculus 11', period: 'p1', currentGrade: 100, targetGrade: 95 }
+];
+const SEED_ASSIGNMENTS = [
+  { course: 'Pre-Calculus 11', assignment: 'Ch. 1.1 Quiz', dueDate: '2026-09-17',
+    category: 'Quiz', priority: 'Medium', status: 'Completed',
+    semester: 's1', weight: 1, score: 100 }
+];
+const SEED_PRESETS = {
+  basketball: [{
+    id: 'preset-dt-morning-1', type: 'basketball', name: 'DT Morning 1',
+    location: 'DT', time: '70', notes: '',
+    sets: [
+      { id: 'set-dtm-bh', setType: 'Ball Handling', drills: [
+        { name: '5 Min Ball Handling Warmup', reps: 90, style: 'Stationary', category: 'Other' },
+        { name: '5 Min On The Move Ball Handling', reps: '', style: 'Moving', category: 'Other' }
+      ]},
+      { id: 'set-dtm-sh', setType: 'Shooting', drills: [
+        { name: '5 Spot Midrange', spot: '5 Spots', attempts: 50, makes: '', category: 'Other' },
+        { name: "5 Spot 3's", spot: '5 Spots', attempts: 50, makes: '', category: '3-PT' },
+        { name: 'Total FT', spot: 'Free Throw', attempts: 6, makes: '', category: 'FT' }
+      ]}
+    ]
+  }],
+  lift: [],
+  strength: []
+};
+function seedDefaults(s){
+  if (!s || typeof s !== 'object') return s;
+  if ((Number(s.seedVersion) || 0) >= SEED_VERSION) return s;
+  if (!Array.isArray(s.school))    s.school = [];
+  if (!Array.isArray(s.classCats)) s.classCats = [];
+  SEED_CLASSES.forEach(seed => {
+    let c = s.classCats.find(x => String(x.label || '').trim().toLowerCase() === seed.label.toLowerCase());
+    if (!c){
+      c = { id: 'class-' + uid(), label: seed.label, category: classCategory(seed.label), room: '', teacher: '', period: seed.period, semester: 's1', currentGrade: '', targetGrade: '' };
+      s.classCats.push(c);
+    }
+    if (c.currentGrade === '' || c.currentGrade === undefined || c.currentGrade === null) c.currentGrade = seed.currentGrade;
+    if (c.targetGrade  === '' || c.targetGrade  === undefined || c.targetGrade  === null) c.targetGrade  = seed.targetGrade;
+  });
+  SEED_ASSIGNMENTS.forEach(seed => {
+    const dup = s.school.some(a => String(a.course || '').trim().toLowerCase() === seed.course.toLowerCase()
+                               && String(a.assignment || '').trim().toLowerCase() === seed.assignment.toLowerCase());
+    if (!dup) s.school.push({ ...seed, id: 'school-' + uid() });
+  });
+  s.presets = s.presets && typeof s.presets === 'object' ? s.presets : { basketball: [], lift: [], strength: [] };
+  ['basketball', 'lift', 'strength'].forEach(type => {
+    if (!Array.isArray(s.presets[type])) s.presets[type] = [];
+    (SEED_PRESETS[type] || []).forEach(seed => {
+      const dup = s.presets[type].some(x => String(x.name || '').trim().toLowerCase() === seed.name.toLowerCase());
+      if (!dup) s.presets[type].push(JSON.parse(JSON.stringify(seed)));
+    });
+  });
+  s.seedVersion = SEED_VERSION;
+  return s;
+}
 
 /* ---------- Micro helpers ---------- */
 const $  = sel => document.querySelector(sel);
@@ -1505,13 +1705,54 @@ function rgba(hex, a){ const n = parseInt(hex.slice(1), 16); const r = (n >> 16)
 const empty = msg => '<div class="empty">' + msg + '</div>';
 const chip = (color, label) => '<span class="chip" style="color:' + color + ';background:' + rgba(color, .13) + ';border:1px solid ' + rgba(color, .45) + '">' + label + '</span>';
 
+function mergePresetCollections(primary, secondary){
+  const out = {
+    basketball: Array.isArray(primary && primary.basketball) ? primary.basketball.slice() : [],
+    lift:       Array.isArray(primary && primary.lift)       ? primary.lift.slice()       : [],
+    strength:   Array.isArray(primary && primary.strength)   ? primary.strength.slice()   : []
+  };
+  ['basketball', 'lift', 'strength'].forEach(type => {
+    (Array.isArray(secondary && secondary[type]) ? secondary[type] : []).forEach(raw => {
+      const preset = migrateSessionPreset({ ...raw, type: raw.type || type });
+      const exists = out[type].some(x => (x.id && preset.id && x.id === preset.id) ||
+        (x.name && preset.name && x.name.trim().toLowerCase() === preset.name.trim().toLowerCase()));
+      if (!exists) out[type].push(preset);
+    });
+  });
+  return out;
+}
+function readWorkoutPresets(){
+  try {
+    const raw = localStorage.getItem(WORKOUT_PRESETS_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    // Accept either { basketball, lift, strength } or a flat preset array.
+    if (Array.isArray(parsed)) {
+      return parsed.reduce((all, item) => {
+        const type = item && TYPE_META[item.type] ? item.type : 'basketball';
+        (all[type] || (all[type] = [])).push(item);
+        return all;
+      }, { basketball: [], lift: [], strength: [] });
+    }
+    return parsed && typeof parsed === 'object' ? parsed : null;
+  } catch (e) {
+    console.warn('Workout preset load failed', e);
+    return null;
+  }
+}
+function persistWorkoutPresets(){
+  try { localStorage.setItem(WORKOUT_PRESETS_KEY, JSON.stringify(state.presets)); }
+  catch (e) { console.warn('Workout preset save failed', e); }
+}
+
 /* ---------- State (blank template initialization) ---------- */
 function defaultState(){
   return {
     version: 2,
+    seedVersion: 0,     // marks the automatic seed data as applied (see seedDefaults)
     habits: DEFAULT_HABITS.map(h => ({ ...h })),
     school: [],         // academic assignment database
-    classCats: DEFAULT_CLASS_SLOTS.map(c => ({ id: 'class-' + uid(), label: c.label, room: '', teacher: '', period: c.period, semester: 's1' })),      // registered classes (e.g. Pre-Calculus 11)
+    classCats: DEFAULT_CLASS_SLOTS.map(c => ({ id: 'class-' + uid(), label: c.label, category: classCategory(c.label), room: '', teacher: '', period: c.period, semester: 's1', currentGrade: '', targetGrade: '' })),      // registered classes (e.g. Pre-Calculus 11)
     presets: { basketball: [], lift: [], strength: [] },
     workouts: {},       // dateKey -> workout session (basketball | lift | strength)
     logs: {},           // dateKey -> journal entry
@@ -1529,36 +1770,41 @@ function defaultState(){
       transactions: [],  // { id, date, desc, amount, cat, type }
       savings: []        // { id, name, target, current, targetDate }
     },
+    recruiting: [],     // { id, school, lead, coach, role, email, phone, lastContact, notes, filmLink, status }
     settings: {
       activeTab: 'dashboard', logDate: yesterdayKey(), pmType: 'basketball',
       schoolSem: 's1',        // Semester 1 / Semester 2 view filter
+      schoolClassId: '',      // selected class detail page
       logView: 'session',     // Workout Sessions | Daily Log Entry | Records
       goalView: 'goals',      // Goal Cards | Habits
       filmView: 'games',      // My Games | Team Plays | Film Study
       studyView: 'player',    // Player Study | Team Study
-      schoolView: 'assign'    // School sub-view: Assignments | Timetable
+      schoolView: 'assign',   // School sub-view: Assignments | Timetable | Classes
+      schoolFilter: 'all',    // Assignments filter: all | active | archived
+      recruitFilter: 'all'    // Recruiting CRM filter: all | one of RECRUIT_STATUSES
     }
   };
 }
 
 function mergeState(p){
   const d = defaultState();
-  return {
+  const merged = {
     version: 2,
-    habits:   Array.isArray(p.habits)   && p.habits.length   ? p.habits.map(h => ({ ...h, type: h.type || 'good' })) : d.habits,
+    seedVersion: Number(p.seedVersion) || 0,
+    habits:   Array.isArray(p.habits)   && p.habits.length   ? p.habits.map(h => ({ ...h, type: h.type || 'good', desc: h.desc || '', target: h.target ?? '' })) : d.habits,
     school:   Array.isArray(p.school)   ? p.school.map(a => ({ ...a, semester: a.semester || 's1', status: a.status || 'Not Started' })) : d.school,
-    classCats: Array.isArray(p.classCats) ? p.classCats.map(c => ({ ...c, room: c.room || '', teacher: c.teacher || '', period: c.period || 'p1', semester: c.semester || 's1' })) : d.classCats,
-    presets: {
+    classCats: Array.isArray(p.classCats) && p.classCats.length ? p.classCats.map(c => ({ ...c, category: c.category || classCategory(c.label), room: c.room || '', teacher: c.teacher || '', period: c.period || 'p1', semester: c.semester || 's1', targetGrade: c.targetGrade ?? '', currentGrade: c.currentGrade ?? '' })) : d.classCats,
+    presets: mergePresetCollections({
       basketball: Array.isArray(p.presets && p.presets.basketball) ? p.presets.basketball.map(x => migrateSessionPreset({ ...x, notes: x.notes || '' })) : [],
       lift:       Array.isArray(p.presets && p.presets.lift)       ? p.presets.lift.map(x => ({ ...x, notes: x.notes || '' }))       : [],
       strength:   Array.isArray(p.presets && p.presets.strength)   ? p.presets.strength.map(x => ({ ...x, notes: x.notes || '' }))   : []
-    },
+    }, p.workout_presets),
     workouts:     p.workouts && typeof p.workouts === 'object'
       ? Object.fromEntries(Object.entries(p.workouts).map(([k, s]) => [k, migrateSessionPreset({ ...s, notes: (s && s.notes) || '' })]))
       : {},
     logs:         p.logs         && typeof p.logs === 'object'         ? p.logs         : {},
     todos:        p.todos        && typeof p.todos === 'object'        ? p.todos        : {},
-    goals:        Array.isArray(p.goals)        ? p.goals.map(g => ({ ...g, milestones: g.milestones || [], desc: g.desc || '' })) : d.goals,
+    goals:        Array.isArray(p.goals)        ? p.goals.map(g => ({ ...g, desc: g.desc || '', milestones: (g.milestones || []).map(m => ({ ...m, curriculum: m.curriculum || '' })) })) : d.goals,
     records: p.records && typeof p.records === 'object'
       ? {
           lifts:    Array.isArray(p.records.lifts)    ? p.records.lifts.map(r => ({ ...r }))    : [],
@@ -1584,18 +1830,35 @@ function mergeState(p){
           savings:      Array.isArray(p.finance.savings)      ? p.finance.savings.map(s => ({ ...s, targetDate: s.targetDate || '' }))      : []
         }
       : d.finance,
-    settings: { ...d.settings, ...(p.settings || {}) }
+    recruiting: Array.isArray(p.recruiting)
+      ? p.recruiting.map(c => ({
+          id: c.id || uid(), school: c.school || '', lead: c.lead || '', coach: c.coach || '',
+          role: c.role || 'Head Coach', email: c.email || '', phone: c.phone || '',
+          lastContact: c.lastContact || '', notes: c.notes || '', filmLink: c.filmLink || '',
+          status: RECRUIT_STATUSES.includes(c.status) ? c.status : 'Uncontacted'
+        }))
+      : [],
+    settings: { ...d.settings, ...(p.settings || {}), schoolClassId: (p.settings && p.settings.schoolClassId) || '', schoolFilter: ['all', 'active', 'archived'].includes(p.settings && p.settings.schoolFilter) ? p.settings.schoolFilter : 'all', recruitFilter: ['all', ...RECRUIT_STATUSES].includes(p.settings && p.settings.recruitFilter) ? p.settings.recruitFilter : 'all' }
   };
+  // Baseline data is merged in exactly once, then respected as user-owned.
+  return seedDefaults(merged);
 }
 
 let state;
 function loadState(){
   try {
     const raw = localStorage.getItem(LS_KEY);
-    return raw ? mergeState(JSON.parse(raw)) : defaultState();
+    // seedDefaults() is applied on the blank path too so a first run (empty
+    // localStorage) still opens with the baseline classes, quiz and preset.
+    const base = seedDefaults(raw ? mergeState(JSON.parse(raw)) : defaultState());
+    // Merge the compatibility key without deleting or resetting the primary app state.
+    base.presets = mergePresetCollections(base.presets, readWorkoutPresets());
+    return base;
   } catch (e) {
     console.warn('State load failed, using defaults', e);
-    return defaultState();
+    const fallback = seedDefaults(defaultState());
+    fallback.presets = mergePresetCollections(fallback.presets, readWorkoutPresets());
+    return fallback;
   }
 }
 
@@ -1608,6 +1871,7 @@ function flushSave(){
   clearTimeout(saveT);
   try {
     localStorage.setItem(LS_KEY, JSON.stringify(state));
+    persistWorkoutPresets();
     cloudQueuePush();
     flashSaved();
   } catch (e) {
@@ -1726,13 +1990,16 @@ async function cloudPull(initial){
 }
 
 /* ---------- Push: debounce writes to the cloud row ---------- */
-function cloudQueuePush(){
-  if (applyingRemote) return;
-  pendingPush = true;
-  clearTimeout(pushT);
-  // Keep local input handling synchronous and defer network work to the background.
-  pushT = setTimeout(() => { Promise.resolve().then(cloudFlush); }, 700);
-}
+  function cloudQueuePush(){
+    if (applyingRemote) return;
+    pendingPush = true;
+    clearTimeout(pushT);
+    pushT = setTimeout(() => {
+      // Yield before cloning or touching the client so keystrokes stay responsive.
+      if (typeof queueMicrotask === 'function') queueMicrotask(cloudFlush);
+      else Promise.resolve().then(cloudFlush);
+    }, 700);
+  }
 
 async function cloudFlush(){
   if (!pendingPush || !supa) return;
@@ -1982,6 +2249,8 @@ function renderAll(){
   renderHabitsPanel();
   renderClassCats();
   renderSchool();
+  renderSchoolClasses();
+  if (state.settings.schoolView === 'class-detail') renderClassDetail();
   const s1 = document.getElementById('sem-s1'), s2 = document.getElementById('sem-s2');
   if (s1) s1.classList.toggle('active', schoolSem() === 's1');
   if (s2) s2.classList.toggle('active', schoolSem() === 's2');
@@ -1992,6 +2261,7 @@ function renderAll(){
   if (state.settings.filmView === 'plays') renderFilmPlays();
   if (state.settings.filmView === 'study') renderFilmStudy();
   renderFinance();
+  renderRecruiting();
 }
 
 /* ============================================================
@@ -2000,10 +2270,11 @@ function renderAll(){
 function sessionRows(s){ return s.type === 'lift' ? s.exercises : s.items; }
 function blankDrill(setType){
   switch (setType){
-    case 'Ball Handling': return { name:'', reps:'', style:'Stationary' };
-    case 'Lifts':         return { name:'', sets:'', reps:'', weight:'', pr:false };
-    case 'Free Throws':   return { name:'', attempts:'', makes:'' };
-    default:              return { name:'', spot:'', attempts:'', makes:'' }; // Shooting, Finishing
+    case 'Ball Handling': return { name:'', reps:'', style:'Stationary', category:'Other' };
+    case 'Lifts':         return { name:'', sets:'', reps:'', weight:'', pr:false, category:'Other' };
+    case 'Free Throws':   return { name:'', attempts:'', makes:'', category:'FT' };
+    case 'Finishing':     return { name:'', spot:'', attempts:'', makes:'', category:'Lay' };
+    default:              return { name:'', spot:'', attempts:'', makes:'', category:'Other' };
   }
 }
 function blankSet(setType){ return { id: uid(), setType: setType || 'Shooting', drills: [blankDrill(setType || 'Shooting')] }; }
@@ -2110,6 +2381,9 @@ function bbDrillHtml(setType, dr, si, di){
   if (setType === 'Ball Handling'){
     return '<div class="ws-row">' +
       '<input class="grow" data-si="' + si + '" data-di="' + di + '" data-wf="name" placeholder="Drill name" value="' + esc(dr.name) + '">' +
+      '<select class="ws-settype drill-category" data-si="' + si + '" data-di="' + di + '" data-wf="category" title="Drill category">' +
+        DRILL_CATS.map(x => '<option' + (drillCategory(dr, setType) === x ? ' selected' : '') + '>' + x + '</option>').join('') +
+      '</select>' +
       '<input class="n" type="number" min="0" data-si="' + si + '" data-di="' + di + '" data-wf="reps" placeholder="Reps" title="Reps" value="' + esc(dr.reps) + '">' +
       '<select class="ws-settype" data-si="' + si + '" data-di="' + di + '" data-wf="style" title="Stationary / Moving">' +
         BH_STYLES.map(x => '<option' + ((dr.style || 'Stationary') === x ? ' selected' : '') + '>' + x + '</option>').join('') +
@@ -2117,7 +2391,9 @@ function bbDrillHtml(setType, dr, si, di){
   }
   if (setType === 'Lifts'){
     return '<div class="ws-row">' +
-      '<input class="grow" data-si="' + si + '" data-di="' + di + '" data-wf="name" placeholder="Lift (e.g. Get-Up)" value="' + esc(dr.name) + '">' +
+      '<select class="ws-settype drill-category" data-si="' + si + '" data-di="' + di + '" data-wf="category" title="Drill category">' +
+        DRILL_CATS.map(x => '<option' + (drillCategory(dr, setType) === x ? ' selected' : '') + '>' + x + '</option>').join('') +
+      '</select>' +
       '<input class="n" type="number" min="0" data-si="' + si + '" data-di="' + di + '" data-wf="sets" placeholder="Sets" value="' + esc(dr.sets) + '">' +
       '<input class="n" type="number" min="0" data-si="' + si + '" data-di="' + di + '" data-wf="reps" placeholder="Reps" value="' + esc(dr.reps) + '">' +
       '<input class="n wide" type="number" min="0" step="any" data-si="' + si + '" data-di="' + di + '" data-wf="weight" placeholder="lbs" value="' + esc(dr.weight) + '">' +
@@ -2127,6 +2403,9 @@ function bbDrillHtml(setType, dr, si, di){
     '<input class="grow" list="spots-list" data-si="' + si + '" data-di="' + di + '" data-wf="spot" placeholder="Spot" value="' + esc(dr.spot) + '">';
   return '<div class="ws-row">' +
     '<input class="grow" data-si="' + si + '" data-di="' + di + '" data-wf="name" placeholder="Drill name" value="' + esc(dr.name) + '">' +
+    '<select class="ws-settype drill-category" data-si="' + si + '" data-di="' + di + '" data-wf="category" title="Drill category">' +
+      DRILL_CATS.map(x => '<option' + (drillCategory(dr, setType) === x ? ' selected' : '') + '>' + x + '</option>').join('') +
+    '</select>' +
     spotIn +
     '<input class="n" type="number" min="0" data-si="' + si + '" data-di="' + di + '" data-wf="attempts" placeholder="Att" title="Optional" value="' + esc(dr.attempts) + '">' +
     '<input class="n" type="number" min="0" data-si="' + si + '" data-di="' + di + '" data-wf="makes" placeholder="Makes" value="' + esc(dr.makes) + '">' + rm + '</div>';
@@ -2186,6 +2465,7 @@ function renderWorkoutSession(key){
     '<div class="ws-head">' + chip(t.color, t.label) + chips +
       '<span class="ws-name">' + esc(s.presetName || 'Custom Session') + '</span>' +
       '<button class="btn sm ghost" onclick="changeWsPreset()">⚡ Change</button>' +
+      '<button class="btn sm ghost" onclick="createPresetFromWorkout()">＋ Create Preset</button>' +
       '<button class="icon-btn danger" onclick="clearWorkoutSession()" title="Clear session">🗑</button>' +
     '</div>' +
     '<div class="ws-body">' + body + '</div>' +
@@ -2381,6 +2661,41 @@ function changeWsPreset(){
   const s = state.workouts[state.settings.logDate];
   if (s) openPresetChooser(s.type);
 }
+function createPresetFromWorkout(){
+  const key = state.settings.logDate;
+  const session = state.workouts[key];
+  if (!session){ toast('Start or load a workout before creating a preset', 'error'); return; }
+  const name = window.prompt('Preset name', session.presetName || 'New Workout Preset');
+  if (!name || !name.trim()) return;
+  snapshot();
+  const preset = {
+    id: uid(), type: session.type, name: name.trim(), notes: session.notes || '',
+    time: optNum(session.time)
+  };
+  if (session.type === 'basketball'){
+    preset.location = session.location || 'Home';
+    preset.sets = JSON.parse(JSON.stringify(basketSets(session))).map(set => ({
+      id: set.id || uid(), setType: set.setType || 'Shooting',
+      drills: (set.drills || []).map(dr => cleanBbDrill(set.setType || 'Shooting', dr))
+    }));
+  } else if (session.type === 'lift'){
+    preset.day = session.day || 'Mon';
+    preset.exercises = JSON.parse(JSON.stringify(session.exercises || [])).map(r => ({
+      name: String(r.name || '').trim(), sets: optNum(r.sets), reps: optNum(r.reps), weight: optNum(r.weight), pr: !!r.pr
+    }));
+  } else {
+    preset.category = session.category || 'Sprints';
+    preset.items = JSON.parse(JSON.stringify(session.items || [])).map(r => ({
+      name: String(r.name || '').trim(), sets: optNum(r.sets), reps: optNum(r.reps), sec: !!r.sec, secs: optNum(r.secs)
+    }));
+  }
+  state.presets[session.type] = state.presets[session.type] || [];
+  state.presets[session.type].push(preset);
+  persistWorkoutPresets();
+  save();
+  openPresetManager(session.type);
+  toast('✓ Preset created — ' + preset.name);
+}
 
 /* ---------- Preset chooser ---------- */
 function openPresetChooser(type){
@@ -2443,12 +2758,11 @@ function blankDraft(type){
   return { id:null, name:'', category:'Sprints', items:[blankRow(type)], notes:'' };
 }
 function openPresetManager(type){
-  pmType = type;
-  state.settings.pmType = type;
-  if (!draftReadyForType(type)){
-    const list = state.presets[type];
-    pmDraft = list.length ? JSON.parse(JSON.stringify(list[0])) : blankDraft(type);
-  }
+  pmType = type || 'basketball';
+  state.settings.pmType = pmType;
+  // Start with a clean draft; saved templates remain listed and can be loaded
+  // into the editor explicitly with their Edit button.
+  pmDraft = blankDraft(pmType);
   renderPresetManager();
   document.getElementById('modal-overlay').classList.remove('hidden');
 }
@@ -2460,6 +2774,7 @@ function renderPresetManager(){
     ? list.map(p =>
         '<div class="pm-list-item' + (pmDraft && pmDraft.id === p.id ? ' active' : '') + '">' +
           '<span style="flex:1;min-width:0"><b style="word-break:break-word">' + esc(p.name) + '</b><br><span style="color:var(--muted);font-size:11px">' + presetMeta(p) + '</span></span>' +
+          '<button class="btn sm ghost" onclick="loadPresetSession(\'' + pmType + '\',\'' + p.id + '\')" title="Load for selected log date">Load</button>' +
           '<button class="icon-btn" onclick="editPreset(\'' + p.id + '\')" title="Edit">✎</button>' +
           '<button class="icon-btn danger" onclick="deletePreset(\'' + p.id + '\')" title="Delete">✕</button>' +
         '</div>').join('')
@@ -2480,9 +2795,13 @@ function pmSetTypeSel(st, si){
 }
 function pmBbDrillHtml(setType, dr, si, di){
   const rm = '<button class="icon-btn danger" onclick="removePmDrill(' + si + ',' + di + ')">✕</button>';
+  const cat = '<select class="ws-settype drill-category" data-psi="' + si + '" data-pdi="' + di + '" data-pf="category" title="Drill category">' +
+    DRILL_CATS.map(x => '<option' + (drillCategory(dr, setType) === x ? ' selected' : '') + '>' + x + '</option>').join('') +
+    '</select>';
   if (setType === 'Ball Handling'){
     return '<div class="ws-row">' +
       '<input class="grow" data-psi="' + si + '" data-pdi="' + di + '" data-pf="name" placeholder="Drill name" value="' + esc(dr.name) + '">' +
+      cat +
       '<input class="n" type="number" min="0" data-psi="' + si + '" data-pdi="' + di + '" data-pf="reps" placeholder="Reps" value="' + esc(dr.reps) + '">' +
       '<select class="ws-settype" data-psi="' + si + '" data-pdi="' + di + '" data-pf="style" title="Stationary / Moving">' +
         BH_STYLES.map(x => '<option' + ((dr.style || 'Stationary') === x ? ' selected' : '') + '>' + x + '</option>').join('') +
@@ -2491,6 +2810,7 @@ function pmBbDrillHtml(setType, dr, si, di){
   if (setType === 'Lifts'){
     return '<div class="ws-row">' +
       '<input class="grow" data-psi="' + si + '" data-pdi="' + di + '" data-pf="name" placeholder="Lift" value="' + esc(dr.name) + '">' +
+      cat +
       '<input class="n" type="number" min="0" data-psi="' + si + '" data-pdi="' + di + '" data-pf="sets" placeholder="Sets" value="' + esc(dr.sets) + '">' +
       '<input class="n" type="number" min="0" data-psi="' + si + '" data-pdi="' + di + '" data-pf="reps" placeholder="Reps" value="' + esc(dr.reps) + '">' +
       '<input class="n wide" type="number" min="0" step="any" data-psi="' + si + '" data-pdi="' + di + '" data-pf="weight" placeholder="lbs" value="' + esc(dr.weight) + '">' +
@@ -2500,7 +2820,7 @@ function pmBbDrillHtml(setType, dr, si, di){
     '<input class="grow" list="spots-list" data-psi="' + si + '" data-pdi="' + di + '" data-pf="spot" placeholder="Spot" value="' + esc(dr.spot) + '">';
   return '<div class="ws-row">' +
     '<input class="grow" data-psi="' + si + '" data-pdi="' + di + '" data-pf="name" placeholder="Drill name" value="' + esc(dr.name) + '">' +
-    spotIn +
+    cat + spotIn +
     '<input class="n" type="number" min="0" data-psi="' + si + '" data-pdi="' + di + '" data-pf="attempts" placeholder="Att" value="' + esc(dr.attempts) + '">' +
     '<input class="n" type="number" min="0" data-psi="' + si + '" data-pdi="' + di + '" data-pf="makes" placeholder="Makes" value="' + esc(dr.makes) + '">' + rm + '</div>';
 }
@@ -2585,9 +2905,9 @@ function updatePmSummary(){
 function cleanBbDrill(setType, dr){
   const out = { name: (dr.name || '').trim() };
   if (setType === 'Ball Handling'){ out.reps = optNum(dr.reps); out.style = BH_STYLES.includes(dr.style) ? dr.style : 'Stationary'; }
-  else if (setType === 'Lifts'){ out.sets = optNum(dr.sets); out.reps = optNum(dr.reps); out.weight = optNum(dr.weight); out.pr = !!dr.pr; }
-  else if (setType === 'Free Throws'){ out.attempts = optNum(dr.attempts); out.makes = optNum(dr.makes); }
-  else { out.spot = (dr.spot || '').trim(); out.attempts = optNum(dr.attempts); out.makes = optNum(dr.makes); }
+  else if (setType === 'Lifts'){ out.sets = optNum(dr.sets); out.reps = optNum(dr.reps); out.weight = optNum(dr.weight); out.pr = !!dr.pr; out.category = drillCategory(dr, setType); }
+  else if (setType === 'Free Throws'){ out.attempts = optNum(dr.attempts); out.makes = optNum(dr.makes); out.category = 'FT'; }
+  else { out.spot = (dr.spot || '').trim(); out.attempts = optNum(dr.attempts); out.makes = optNum(dr.makes); out.category = drillCategory(dr, setType); }
   return out;
 }
 function onPmInput(e){
@@ -2617,10 +2937,15 @@ function onPmChange(e){
     if (si !== undefined && f === 'setType'){
       const set = (pmDraft.sets || [])[parseInt(si, 10)];
       if (set){ set.setType = el.value; renderPresetManager(); }
-    } else if (si !== undefined && di !== undefined && f === 'pr'){
+    } else if (si !== undefined && di !== undefined && (f === 'pr' || f === 'category')){
       const set = (pmDraft.sets || [])[parseInt(si, 10)];
       const row = set && set.drills[parseInt(di, 10)];
-      if (row){ row.pr = el.checked; const b = el.closest('.pr-box'); if (b) b.classList.toggle('on', el.checked); }
+      if (row){
+        if (f === 'pr'){
+          row.pr = el.checked;
+          const b = el.closest('.pr-box'); if (b) b.classList.toggle('on', el.checked);
+        } else row.category = DRILL_CATS.includes(el.value) ? el.value : 'Other';
+      }
     } else if (si !== undefined && di !== undefined && f === 'style'){
       const set = (pmDraft.sets || [])[parseInt(si, 10)];
       const row = set && set.drills[parseInt(di, 10)];
@@ -2695,6 +3020,7 @@ function deletePreset(id){
   state.presets[pmType] = (state.presets[pmType] || []).filter(x => x.id !== id);
   if (pmDraft && pmDraft.id === id) pmDraft = null;
   save();
+  persistWorkoutPresets();
   renderPresetManager();
   toast('Preset deleted');
 }
@@ -2728,6 +3054,7 @@ function savePreset(){
   if (i >= 0) list[i] = p; else list.push(p);
   pmDraft = JSON.parse(JSON.stringify(p));
   save();
+  persistWorkoutPresets();
   renderPresetManager();
   toast('✓ Preset saved — ' + p.name);
 }
@@ -3422,55 +3749,90 @@ function deleteRankTier(id){
    LIFETIME BADGE VAULT — accumulation from saved workouts
    ============================================================ */
 const LIFETIME_BADGES = [
-  { key: 'threes', icon: '🎯', cat: '3-Pointers Made', list: [[1000, 'Shooter'], [2500, 'Sniper'], [5000, 'Flamethrower'], [10000, 'Sharpshooter'], [25000, 'Ice Vein'], [40000, 'Automatic']] },
-  { key: 'finishes', icon: '🏀', cat: 'Finishes Made', list: [[2000, 'Marksman'], [5000, 'Smooth Touch'], [20000, 'Slasher'], [125000, 'Jelly Fam'], [150000, 'Paint Beast'], [250000, 'Paint Beast II']] },
-  { key: 'fts', icon: '⛹️', cat: 'Free Throws Made', list: [[500, 'Automatic'], [750, 'Clutch Gene I'], [1000, 'Clutch Gene II'], [1500, 'Clutch Gene III'], [3500, 'Clutch Gene IV'], [8000, 'Clutch Gene V']] }
+  { key: 'threes', icon: '🎯', cat: '3PT Makes', list: [
+    ['Shooter', 500, 1000, 1500], ['Sniper', 2000, 2900, 3800], ['Flamethrower', 5000, 6200, 7400],
+    ['Sharpshooter', 9000, 11000, 13000], ['Ice Vein', 16000, 20000, 25000]
+  ]},
+  { key: 'finishes', icon: '🏀', cat: 'Finishes Made', list: [
+    ['Marksman', 1000, 3500, 5000], ['Smooth Touch', 7000, 9000, 11000], ['Slasher', 13500, 16000, 20000],
+    ['Jelly Fam', 28000, 40000, 54000], ['Paint Beast', 70000, 85000, 100000]
+  ]},
+  { key: 'fts', icon: '⛹️', cat: 'FT Made', list: [
+    ['Automatic', 150, 250, 350], ['Clutch Gene I', 460, 570, 700], ['Clutch Gene II', 1000, 1500, 2000],
+    ['Clutch Gene III', 2400, 2900, 3500], ['Clutch Gene IV', 4000, 5000, 6500]
+  ]}
 ];
+const BADGE_TIERS = ['Bronze', 'Silver', 'Gold'];
+function badgeTierFor(count, thresholds){
+  if (count >= thresholds[2]) return 2;
+  if (count >= thresholds[1]) return 1;
+  if (count >= thresholds[0]) return 0;
+  return -1;
+}
+/* Lifetime make totals, routed from every saved workout drill into its badge
+   category. Category resolution prefers an explicit drill category, then the
+   set type, then legacy shooting-spot text (Corner / 3-Pointer). */
 function lifetimeShotCounts(){
-  /* Background accumulation: every saved basketball session in localStorage contributes.
-     Shooting-set drills on a 3-Pointer / Corner spot count as 3-pointers; Finishing and
-     Free-Throw sets count their own buckets. */
-  const c = { threes: 0, finishes: 0, fts: 0, makes: 0, shots: 0 };
-  Object.values(state.workouts).forEach(s => {
-    if (!s || s.type !== 'basketball') return;
+  const out = { threes: 0, finishes: 0, fts: 0 };
+  const workouts = (typeof state !== 'undefined' && state && state.workouts && typeof state.workouts === 'object')
+    ? state.workouts : null;
+  if (!workouts) return out;
+  Object.keys(workouts).forEach(k => {
+    const s = workouts[k];
+    if (!s || s.type !== 'basketball' || typeof basketAllDrills !== 'function') return;
     basketAllDrills(s).forEach(dr => {
-      const st = dr.setType || 'Shooting';
-      const mk = num(dr.makes);
-      c.shots += num(dr.attempts);
-      c.makes += mk;
-      if (st === 'Free Throws') c.fts += mk;
-      else if (st === 'Finishing') c.finishes += mk;
-      else if (st === 'Shooting'){
-        const spot = String(dr.spot || '').toLowerCase();
-        if (spot.includes('3') || spot.includes('corner')) c.threes += mk;
-      }
+      if (!dr) return;
+      const a = num(dr.attempts);
+      const m = a > 0 ? Math.min(num(dr.makes), a) : num(dr.makes);
+      if (!m) return;
+      const cat = drillCategory(dr, dr.setType || 'Shooting');
+      if (cat === '3-PT') out.threes += m;
+      else if (cat === 'FT') out.fts += m;
+      else if (cat === 'Lay') out.finishes += m;
     });
   });
-  return c;
+  return out;
+}
+function emptyLifetimeCounts(){
+  return { threes: 0, finishes: 0, fts: 0 };
 }
 function badgeVaultStats(){
-  const c = lifetimeShotCounts();
+  const lifetimeShotCountsSafe = emptyLifetimeCounts();
+  let c = (typeof lifetimeShotCounts === 'function') ? lifetimeShotCounts() : null;
+  if (!c || typeof c !== 'object') c = lifetimeShotCountsSafe;
+  c = {
+    threes: num(c.threes) || 0,
+    finishes: num(c.finishes) || 0,
+    fts: num(c.fts) || 0
+  };
   let unlocked = 0, total = 0;
-  LIFETIME_BADGES.forEach(b => b.list.forEach(([th]) => { total++; if (c[b.key] >= th) unlocked++; }));
-  return { c, unlocked, total };
+  (LIFETIME_BADGES || []).forEach(b => (b.list || []).forEach(item => {
+    const thresholds = item.slice(1);
+    total += thresholds.length;
+    unlocked += thresholds.filter(th => c[b.key] >= th).length;
+  }));
+  if (!c || typeof c !== 'object') c = emptyLifetimeCounts();
+  return { c: (c && typeof c === 'object') ? c : emptyLifetimeCounts(), unlocked, total };
 }
-function badgeTileHtml(key, th, name, count){
-  const ok = count >= th;
-  const pct = Math.min(100, Math.round(count / th * 100));
+function badgeTileHtml(key, item, count){
+  const name = item[0], thresholds = item.slice(1), active = badgeTierFor(count, thresholds);
   const icon = (LIFETIME_BADGES.find(b => b.key === key) || {}).icon || '🏅';
-  return '<div class="badge-tile ' + (ok ? 'unlocked' : 'locked') + '" title="' + esc(name) + ' — ' + th.toLocaleString() + ' ' + key + '">' +
-    '<span class="b-icon">' + icon + '</span>' +
-    '<span class="b-name">' + esc(name) + '</span>' +
-    '<span class="b-thresh">' + th.toLocaleString() + (ok ? ' · ✓' : '') + '</span>' +
-    '<div class="b-prog"><i style="width:' + pct + '%"></i></div>' +
-    '<span class="b-pct">' + (ok ? 'UNLOCKED' : count.toLocaleString() + ' / ' + th.toLocaleString()) + '</span>' +
+  return '<div class="badge-tier-group" title="' + esc(name) + '">' +
+    '<div class="badge-tier-name"><span class="b-icon">' + icon + '</span><b>' + esc(name) + '</b></div>' +
+    '<div class="badge-tier-row">' + thresholds.map((th, i) =>
+      '<div class="badge-tile ' + (i <= active ? 'unlocked' : 'locked') + '">' +
+        '<span class="b-name">' + BADGE_TIERS[i] + '</span>' +
+        '<span class="b-thresh">' + th.toLocaleString() + ' makes' + (i <= active ? ' · ✓' : '') + '</span>' +
+        '<div class="b-prog"><i style="width:' + Math.min(100, Math.round(count / th * 100)) + '%"></i></div>' +
+      '</div>'
+    ).join('') + '</div>' +
   '</div>';
 }
 function badgeVaultHtml(){
   const { c } = badgeVaultStats();
   return LIFETIME_BADGES.map(b =>
     '<div class="rec-cat-label" style="margin-top:12px">' + b.icon + ' ' + b.cat + ' — lifetime <b style="color:var(--bright)">' + fmtNum(c[b.key]) + '</b></div>' +
-    '<div class="badge-vault">' + b.list.map(([th, name]) => badgeTileHtml(b.key, th, name, c[b.key])).join('') + '</div>'
+    '<div class="badge-vault">' + b.list.map(item => badgeTileHtml(b.key, item, c[b.key])).join('') + '</div>'
   ).join('');
 }
 function renderBadgeVault(){
@@ -3479,27 +3841,31 @@ function renderBadgeVault(){
   const { unlocked, total } = badgeVaultStats();
   el.innerHTML = badgeVaultHtml();
   const cnt = document.getElementById('badge-count');
-  if (cnt) cnt.textContent = unlocked + ' / ' + total + ' unlocked';
+  if (cnt) cnt.textContent = unlocked + ' / ' + total + ' tiers unlocked';
 }
 function renderDashBadges(){
   const el = document.getElementById('dash-badges');
   if (!el) return;
-  const { c, unlocked, total } = badgeVaultStats();
-  const rows = LIFETIME_BADGES.map(b => {
-    let nextI = b.list.findIndex(([th]) => c[b.key] < th);
-    if (nextI === -1) nextI = b.list.length - 1;
-    const [th, name] = b.list[nextI];
-    const pct = Math.min(100, Math.round(c[b.key] / th * 100));
-    const ok = c[b.key] >= th;
-    return '<div class="dash-bd-row' + (ok ? ' unlocked' : '') + '" onclick="setLogView(\'records\')" style="cursor:pointer">' +
-      '<span class="bd-ic">' + b.icon + '</span>' +
-      '<span class="bd-txt"><b>' + (ok ? 'LADDER COMPLETE — ' + name : 'Next: ' + name) + '</b><i>' + b.cat + '</i></span>' +
-      '<span class="bd-num">' + c[b.key].toLocaleString() + '</span>' +
-      '<span class="bd-bar"><i style="width:' + pct + '%"></i></span>' +
+  const stats = badgeVaultStats() || {};
+  const c = (stats.c && typeof stats.c === 'object') ? stats.c : emptyLifetimeCounts();
+  const unlocked = num(stats.unlocked) || 0;
+  const total = num(stats.total) || 0;
+  const rows = (LIFETIME_BADGES || []).map(b => {
+    const list = (b && b.list) || [];
+    const cnt = num(c[b.key]) || 0;
+    const completed = list.reduce((n, item) => n + item.slice(1).filter(th => cnt >= th).length, 0);
+    const next = list.flatMap(item => item.slice(1).map((th, i) => ({ th, name: item[0], tier: BADGE_TIERS[i] }))).find(x => cnt < x.th);
+    const last = list[list.length - 1];
+    const target = next || (last ? { th: last[3], name: last[0], tier: 'Gold' } : null);
+    const pct = target ? Math.min(100, Math.round(cnt / target.th * 100)) : 0;
+    return '<div class="dash-bd-row' + (list.length && completed === list.length * 3 ? ' unlocked' : '') + '" onclick="setLogView(\'records\')" style="cursor:pointer">' +
+      '<span class="bd-ic">' + (b.icon || '🏅') + '</span>' +
+      '<span class="bd-txt"><b>' + (target ? 'Next: ' + target.name + ' · ' + target.tier : 'Complete') + '</b><i>' + esc(b.cat || '') + '</i></span>' +
+      '<span class="bd-num">' + cnt.toLocaleString() + '</span><span class="bd-bar"><i style="width:' + pct + '%"></i></span>' +
     '</div>';
   }).join('');
   el.innerHTML = '<div class="dash-badge-strip">' + rows + '</div>' +
-    '<div class="paste-hint" style="margin-top:10px">' + unlocked + ' / ' + total + ' lifetime badges unlocked — tracked from every saved workout. Click a row to open Records.</div>';
+    '<div class="paste-hint" style="margin-top:10px">' + unlocked + ' / ' + total + ' Bronze, Silver, and Gold tiers unlocked — tracked from saved workouts.</div>';
 }
 
 /* ============================================================
@@ -3524,7 +3890,7 @@ function renderSchoolDeadlines(){
         if (a.dueDate === todayS){ cls = 'due-today'; dueTxt = 'Today · ' + dueTxt; }
         else if (a.dueDate < todayS){ cls = 'overdue'; }
         const pr = (a.priority || 'Medium').toLowerCase();
-        return '<div class="dl-item ' + cls + '" onclick="switchTab(\'school\')">' +
+        return '<div class="dl-item ' + cls + '" onclick="openClassDetail(\'' + esc(a.course || '') + '\')" title="Open class details">' +
           '<b>' + esc(a.assignment) + '</b>' +
           '<span class="dl-course">' + esc(a.course) + '</span>' +
           '<span class="dl-prio ' + pr + '">' + esc(a.priority || 'Medium') + '</span>' +
@@ -3608,8 +3974,9 @@ function monthlyTrackerHtml(){
     cells.push('<span class="mth' + (k === todayK ? ' today' : '') + '" title="' + fmtDate(k) + '">' + d + '</span>');
   }
   const header = cells.join('');
-  const rows = state.habits.map(h => {
-    let out = '<span class="xlabel">' + esc(h.label) + '</span>';
+  const good = state.habits.filter(h => (h.type || 'good') === 'good');
+  const rows = good.map(h => {
+    let out = '<span class="xlabel">' + esc(h.label) + (habitTarget(h) ? ' <i class="h-desc">🎯 ' + habitMonthDoneCount(h) + '/' + habitTarget(h) + 'd</i>' : '') + '</span>';
     for (let d = 1; d <= daysInMonth; d++){
       const k = y + '-' + pad(m + 1) + '-' + pad(d);
       const ok = !!(state.logs[k] && state.logs[k].habits && state.logs[k].habits[h.id]);
@@ -3627,10 +3994,69 @@ function monthlyTrackerHtml(){
         '<button class="chip-btn" onclick="setHabitMonth(1)">Next ▶</button>' +
       '</div>' +
     '</div>' +
-    '<div class="mt-grid" style="grid-template-columns:180px repeat(' + daysInMonth + ',1fr)">' +
-      header + rows.join('') +
-    '</div>' +
+    (good.length
+      ? '<div class="mt-grid" style="grid-template-columns:180px repeat(' + daysInMonth + ',1fr)">' + header + rows.join('') + '</div>'
+      : '<div class="empty sm">No good habits yet — add one above to start tracking.</div>') +
     '<div class="paste-hint" style="margin-top:10px">Click any dot to toggle that day\'s completion. The tracker reads saved daily logs.</div>' +
+  '</div>';
+}
+function habitTarget(h){ return num(h && h.target); }
+function habitMonthDays(){
+  const base = habitMonthBase();
+  return new Date(base.getFullYear(), base.getMonth() + 1, 0).getDate();
+}
+function habitMonthDoneCount(h){
+  const base = habitMonthBase();
+  const y = base.getFullYear(), m = base.getMonth();
+  const days = new Date(y, m + 1, 0).getDate();
+  let done = 0;
+  for (let d = 1; d <= days; d++){
+    const k = y + '-' + pad(m + 1) + '-' + pad(d);
+    if (state.logs[k] && state.logs[k].habits && state.logs[k].habits[h.id]) done++;
+  }
+  return done;
+}
+function bannedTrackerHtml(){
+  const base = habitMonthBase();
+  const y = base.getFullYear(), m = base.getMonth();
+  const daysInMonth = new Date(y, m + 1, 0).getDate();
+  const todayK = todayKey();
+  const monthLabel = MONTHS[m] + ' ' + y;
+  const bad = state.habits.filter(h => (h.type || 'good') === 'bad');
+  if (!bad.length){
+    return '<div class="card banned-card mt-card">' +
+      '<div class="card-head"><h3>BANNED LIST</h3><span class="kicker banned-kicker">0 habits</span></div>' +
+      '<div class="empty sm">No banned habits tracked. Add one with the “Bad Habit” type above.</div>' +
+    '</div>';
+  }
+  const cells = ['<span class="xlabel">Banned Habit</span>'];
+  for (let d = 1; d <= daysInMonth; d++){
+    const k = y + '-' + pad(m + 1) + '-' + pad(d);
+    cells.push('<span class="mth' + (k === todayK ? ' today' : '') + '" title="' + fmtDate(k) + '">' + d + '</span>');
+  }
+  const rows = bad.map(h => {
+    let out = '<span class="xlabel">' + esc(h.label) + '</span>';
+    for (let d = 1; d <= daysInMonth; d++){
+      const k = y + '-' + pad(m + 1) + '-' + pad(d);
+      const clean = !!(state.logs[k] && state.logs[k].habits && state.logs[k].habits[h.id]);
+      out += '<span class="mtd' + (clean ? ' on' : '') + (k === todayK ? ' today' : '') + '" data-h="' + h.id + '" data-k="' + k + '" onclick="toggleHabitDate(\'' + h.id + '\',\'' + k + '\')" title="' + fmtDate(k) + '"></span>';
+    }
+    return out;
+  });
+  const totalClean = bad.reduce((n, h) => n + habitMonthDoneCount(h), 0);
+  const totalPossible = bad.length * daysInMonth;
+  return '<div class="card banned-card mt-card">' +
+    '<div class="card-head">' +
+      '<h3>BANNED LIST — DAYS CLEAN</h3>' +
+      '<span class="banned-stat">' + totalClean + ' / ' + totalPossible + ' clean days logged</span>' +
+      '<div class="mt-nav">' +
+        '<button class="chip-btn" onclick="setHabitMonth(-1)">◀ Prev</button>' +
+        '<span class="mt-ml">' + monthLabel + '</span>' +
+        '<button class="chip-btn" onclick="setHabitMonth(1)">Next ▶</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="banned-grid" style="grid-template-columns:180px repeat(' + daysInMonth + ',1fr)">' + cells.join('') + rows.join('') + '</div>' +
+    '<div class="paste-hint" style="margin-top:10px">A filled box = a <b>day clean / avoided</b> rather than a standard completion. Streaks in the list below count consecutive clean days.</div>' +
   '</div>';
 }
 function toggleHabitDate(id, key){
@@ -3647,13 +4073,8 @@ function renderHabitsPanel(){
   if (!el) return;
   const key = state.settings.logDate;
   const entry = state.logs[key] || {};
-  const col = (type, title, kl) => {
-    const list = state.habits.filter(h => (h.type || 'good') === type);
-    return '<div class="card">' +
-      '<div class="habit-col-head"><h3 class="page-sub" style="margin:0">' + title + '</h3><span class="kicker ' + kl + '">' + list.length + '</span></div>' +
-      (list.length ? list.map(h => habitRowHtml(h, entry).row).join('') : '<div class="empty sm">None yet.</div>') +
-    '</div>';
-  };
+  const goodList = state.habits.filter(h => (h.type || 'good') === 'good');
+  const badList  = state.habits.filter(h => (h.type || 'good') === 'bad');
   el.innerHTML =
     '<div class="habit-add">' +
       '<input id="habit-new" placeholder="New habit name" onkeydown="if(event.key===\'Enter\'){event.preventDefault();addHabit()}">' +
@@ -3661,11 +4082,17 @@ function renderHabitsPanel(){
       '<button class="btn sm" onclick="addHabit()">+ Add Habit</button>' +
     '</div>' +
     monthlyTrackerHtml() +
-    '<div class="habits-grid">' +
-      col('good', 'GOOD HABITS', 'good') +
-      col('bad', 'BAD HABITS', 'bad') +
+    '<div class="card" style="margin-bottom:16px">' +
+      '<div class="habit-col-head"><h3 class="page-sub" style="margin:0">GOOD HABITS</h3><span class="kicker good">' + goodList.length + '</span></div>' +
+      (goodList.length ? goodList.map(h => habitRowHtml(h, entry).row).join('') : '<div class="empty sm">None yet.</div>') +
     '</div>' +
-    '<div class="paste-hint" style="margin-top:12px">Streak = consecutive days completed (today included if already checked). Checkboxes reflect <b>' + fmtDate(key) + '</b>.</div>';
+    bannedTrackerHtml() +
+    '<div class="card banned-card">' +
+      '<div class="habit-col-head"><h3 class="page-sub" style="margin:0">BANNED LIST</h3><span class="kicker bad">' + badList.length + '</span></div>' +
+      '<div class="paste-hint" style="margin-bottom:10px">Tracked as <b>days clean / avoided</b> — a checkmark logs a day you stayed away from the habit.</div>' +
+      (badList.length ? badList.map(h => habitRowHtml(h, entry).row).join('') : '<div class="empty sm">None yet.</div>') +
+    '</div>' +
+    '<div class="paste-hint" style="margin-top:12px">Streak = consecutive days completed (good) or kept clean (banned). Checkboxes reflect <b>' + fmtDate(key) + '</b>. Use <b>Description / Target</b> to set a monthly goal.</div>';
 }
 function toggleHabitPanel(id){
   toggleHabit(id);
@@ -3687,11 +4114,14 @@ function habitRowHtml(h, entry){
       '</div>'
     };
   }
+  const isBad = (h.type || 'good') === 'bad';
   return {
     row: '<div class="habit-row' + (done ? ' done' : '') + '">' +
-      '<input type="checkbox" ' + (done ? 'checked' : '') + ' onchange="toggleHabitPanel(\'' + h.id + '\')">' +
+      '<input type="checkbox" ' + (done ? 'checked' : '') + ' onchange="toggleHabitPanel(\'' + h.id + '\')" title="' + (isBad ? 'Log today as kept clean' : 'Mark today complete') + '">' +
       '<span class="h-label">' + esc(h.label) + (h.desc ? '<i class="h-desc">' + esc(h.desc) + '</i>' : '') + '</span>' +
+      (habitTarget(h) ? '<span class="habit-target">🎯 ' + habitMonthDoneCount(h) + '/' + habitTarget(h) + ' Days</span>' : '') +
       '<span class="streak' + (st >= 3 ? ' hot' : '') + '">🔥 ' + st + '</span>' +
+      '<button class="btn sm ghost" onclick="openHabitDetail(\'' + h.id + '\')" title="Description & monthly target days">Description / Target</button>' +
       '<button class="icon-btn" onclick="toggleEditHabit(\'' + h.id + '\')" title="Edit habit">✎</button>' +
       '<button class="icon-btn danger" onclick="removeHabit(\'' + h.id + '\')" title="Remove habit">✕</button>' +
     '</div>'
@@ -3719,7 +4149,7 @@ function addHabit(){
   const label = inp.value.trim();
   if (!label){ toast('Enter a habit name', 'error'); return; }
   const type = document.getElementById('habit-new-type').value;
-  state.habits.push({ id: uid(), label, type });
+  state.habits.push({ id: uid(), label, type, desc: '', target: '' });
   inp.value = '';
   save();
   renderHabitsPanel();
@@ -3736,6 +4166,45 @@ function removeHabit(id){
   renderHabits();
   renderLogHistory();
   toast(h ? 'Habit removed — ' + h.label : 'Habit removed');
+}
+function openHabitDetail(id){
+  const h = state.habits.find(x => x.id === id);
+  if (!h) return;
+  openModal('Habit — ' + h.label);
+  const days = habitMonthDays();
+  modalBody.innerHTML =
+    '<div class="field"><label>Habit Name</label><input id="hd-name" value="' + esc(h.label) + '"></div>' +
+    '<div class="field"><label>Type</label><select id="hd-type">' +
+      '<option value="good"' + ((h.type || 'good') === 'good' ? ' selected' : '') + '>Good Habit</option>' +
+      '<option value="bad"' + ((h.type || 'good') === 'bad' ? ' selected' : '') + '>Bad Habit (Banned List)</option>' +
+    '</select></div>' +
+    '<div class="field"><label>Description / Notes</label><textarea id="hd-desc" placeholder="Why this habit matters, how to hit it, cues...">' + esc(h.desc || '') + '</textarea></div>' +
+    '<div class="field"><label>Target Days This Month</label><input id="hd-target" type="number" min="0" max="31" step="1" value="' + (habitTarget(h) || '') + '" placeholder="e.g. 20"><span class="hint">Show as Target: 20/' + days + ' Days</span></div>' +
+    '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">' +
+      '<button class="btn sm danger-ghost" onclick="removeHabitFromDetail(\'' + h.id + '\')">Delete Habit</button>' +
+      '<button class="btn" onclick="saveHabitDetail(\'' + h.id + '\')">Save</button>' +
+    '</div>';
+}
+function saveHabitDetail(id){
+  snapshot();
+  const h = state.habits.find(x => x.id === id);
+  if (!h) return;
+  const name = (document.getElementById('hd-name').value || '').trim();
+  if (name) h.label = name;
+  h.type = document.getElementById('hd-type').value;
+  h.desc = (document.getElementById('hd-desc').value || '').trim();
+  const raw = (document.getElementById('hd-target').value || '').trim();
+  h.target = raw === '' ? '' : Math.max(0, Math.min(31, parseInt(raw, 10) || 0));
+  save();
+  closeModal();
+  renderHabitsPanel();
+  renderHabits();
+  renderLogHistory();
+  toast('✓ Habit updated');
+}
+function removeHabitFromDetail(id){
+  removeHabit(id);
+  closeModal();
 }
 
 /* ============================================================
@@ -3761,8 +4230,29 @@ function setSchoolSem(sem){
 function schoolPrioClass(p){
   return p === 'High' ? 'pri-high' : p === 'Medium' ? 'pri-med' : 'pri-low';
 }
+const CLASS_CATEGORIES = {
+  stem: { label: 'STEM', color: '#2ec4b6' },
+  literature: { label: 'Literature', color: '#ff6b6b' },
+  electives: { label: 'Electives', color: '#66a3ff' },
+  other: { label: 'Other', color: '#45a29e' }
+};
+function classCategory(label){
+  const name = String(label || '').trim().toLowerCase();
+  if (['pre-calculus 11', 'computer science 11', 'metalwork 11'].includes(name)) return 'stem';
+  if (['epp & new media 10', 'social studies'].includes(name)) return 'literature';
+  if (['career life ed 10', 'marketing & promotion', 'physical education'].includes(name)) return 'electives';
+  return 'other';
+}
+function classTheme(label){
+  const key = classCategory(label), meta = CLASS_CATEGORIES[key];
+  return { key, label: meta.label, color: meta.color, bg: rgba(meta.color, .12) };
+}
+function classCategoryHtml(label){
+  const t = classTheme(label);
+  return '<span class="class-category ' + t.key + '">' + esc(t.label) + '</span>';
+}
 const SCHOOL_PERIODS = ['p1', 'p2', 'p3', 'p4', 'off'];
-const SCHOOL_PERIOD_LABELS = { p1: 'Period 1', p2: 'Period 2', p3: 'Period 3', p4: 'Period 4', off: 'Off-Time' };
+const SCHOOL_PERIOD_LABELS = { p1: 'Period 1', p2: 'Period 2', p3: 'Period 3', p4: 'Period 4', off: 'Period 5 · Off-Time' };
 function periodLabel(p){ return SCHOOL_PERIOD_LABELS[p] || 'Period ' + (p || ''); }
 let ccEditId = null;
 function classMetaHtml(c, compact){
@@ -3791,9 +4281,9 @@ function renderClassCats(){
             '</span>' +
           '</div>';
         }
-        return      '<div class="cc-item"><span class="cc-swatch" style="background:var(--accent)"></span><b>' + esc(c.label) + '</b>' + chip('#45a29e', (c.semester || 's1').toUpperCase()) + classMetaHtml(c) +
-          '<button class="icon-btn" onclick="toggleEditClass(\'' + c.id + '\')" title="Edit class">✎</button>' +
-          '<button class="icon-btn danger" onclick="deleteClassCat(\'' + c.id + '\')" title="Remove class">✕</button></div>';
+        return      '<div class="cc-item" onclick="openClassDetail(\'' + c.id + '\')" title="Open class details"><span class="cc-swatch" style="background:' + classTheme(c.label).color + ';color:' + classTheme(c.label).color + '"></span><b>' + esc(c.label) + '</b>' + classCategoryHtml(c.label) + chip('#45a29e', (c.semester || 's1').toUpperCase()) + classMetaHtml(c) +
+          '<button class="icon-btn" onclick="event.stopPropagation();toggleEditClass(\'' + c.id + '\')" title="Edit class">✎</button>' +
+          '<button class="icon-btn danger" onclick="event.stopPropagation();deleteClassCat(\'' + c.id + '\')" title="Remove class">✕</button></div>';
       }).join('')
     : '<div class="empty sm">No registered classes yet — add them above.</div>';
   const dl = document.getElementById('school-cats');
@@ -3813,10 +4303,12 @@ function addClassCat(){
   if (state.classCats.some(c => c.label.toLowerCase() === label.toLowerCase())){ toast('Class already registered', 'error'); return; }
   state.classCats.push({
     id: 'class-' + uid(), label,
+    category: classCategory(label),
     room: document.getElementById('cc-room').value.trim(),
     teacher: document.getElementById('cc-teacher').value.trim(),
     period: document.getElementById('cc-period').value,
-    semester: document.getElementById('cc-sem') ? document.getElementById('cc-sem').value : schoolSem()
+    semester: document.getElementById('cc-sem') ? document.getElementById('cc-sem').value : schoolSem(),
+    currentGrade: '', targetGrade: ''
   });
   inp.value = '';
   document.getElementById('cc-room').value = '';
@@ -3835,6 +4327,7 @@ function saveClassEdit(id){
   const n = document.getElementById('cc-e-name').value.trim();
   if (!n){ toast('Class name is required', 'error'); return; }
   c.label = n;
+  c.category = classCategory(n);
   c.room = document.getElementById('cc-e-room').value.trim();
   c.teacher = document.getElementById('cc-e-teacher').value.trim();
   c.period = document.getElementById('cc-e-period').value;
@@ -3857,21 +4350,102 @@ function deleteClassCat(id){
 /* ---------- School sub-views: Assignments | Timetable ---------- */
 function setSchoolView(v){
   state.settings.schoolView = v;
+  if (v !== 'class-detail') state.settings.schoolClassId = '';
   save();
   applySchoolView();
   if (v === 'tt') renderSchoolTT();
+  if (v === 'classes') renderSchoolClasses();
+  if (v === 'class-detail') renderClassDetail();
 }
 function applySchoolView(){
   const v = state.settings.schoolView || 'assign';
+  const showAssign = v === 'assign';
   const showTT = v === 'tt';
+  const showClasses = v === 'classes';
+  const showDetail = v === 'class-detail';
   const a = document.getElementById('sview-assign');
   const t = document.getElementById('sview-tt');
-  if (a) a.style.display = showTT ? 'none' : '';
+  const c = document.getElementById('sview-classes');
+  const d = document.getElementById('sview-class-detail');
+  if (a) a.style.display = showAssign ? '' : 'none';
   if (t) t.style.display = showTT ? '' : 'none';
+  if (c) c.style.display = showClasses ? '' : 'none';
+  if (d) d.style.display = showDetail ? '' : 'none';
   const ba = document.getElementById('sview-btn-assign');
   const bt = document.getElementById('sview-btn-tt');
-  if (ba) ba.classList.toggle('active', !showTT);
+  const bc = document.getElementById('sview-btn-classes');
+  if (ba) ba.classList.toggle('active', showAssign);
   if (bt) bt.classList.toggle('active', showTT);
+  if (bc) bc.classList.toggle('active', showClasses || showDetail);
+}
+function classById(id){ return (state.classCats || []).find(c => c.id === id) || null; }
+function classByLabel(label){
+  const wanted = String(label || '').trim().toLowerCase();
+  return (state.classCats || []).find(c => String(c.label || '').trim().toLowerCase() === wanted) || null;
+}
+function openClassDetail(idOrLabel){
+  const c = classById(idOrLabel) || classByLabel(idOrLabel);
+  if (!c) return;
+  state.settings.schoolClassId = c.id;
+  state.settings.schoolView = 'class-detail';
+  save();
+  switchTab('school');
+}
+function classGrade(c){
+  const scored = (state.school || []).filter(a => String(a.course || '').trim().toLowerCase() === String(c.label || '').trim().toLowerCase() && a.score !== '' && a.score !== undefined && a.score !== null && Number.isFinite(parseFloat(a.score)));
+  if (c.currentGrade !== '' && c.currentGrade !== undefined && c.currentGrade !== null) return parseFloat(c.currentGrade) || 0;
+  if (!scored.length) return null;
+  let weightTotal = 0, weighted = 0;
+  scored.forEach(a => {
+    const score = parseFloat(a.score) || 0, weight = parseFloat(a.weight);
+    if (Number.isFinite(weight) && weight > 0){ weighted += score * weight; weightTotal += weight; }
+  });
+  return weightTotal ? weighted / weightTotal : scored.reduce((sum, a) => sum + (parseFloat(a.score) || 0), 0) / scored.length;
+}
+function saveClassDetail(id){
+  const c = classById(id);
+  if (!c) return;
+  snapshot();
+  const cur = document.getElementById('class-current-grade');
+  const target = document.getElementById('class-target-grade');
+  c.currentGrade = cur && cur.value.trim() !== '' ? optNum(cur.value) : '';
+  c.targetGrade = target && target.value.trim() !== '' ? optNum(target.value) : '';
+  save();
+  renderClassDetail();
+  toast('✓ Class grade targets updated');
+}
+function renderSchoolClasses(){
+  const el = document.getElementById('school-classes');
+  if (!el) return;
+  const cats = (state.classCats || []).filter(c => (c.semester || 's1') === schoolSem());
+  const count = document.getElementById('classes-count');
+  if (count) count.textContent = cats.length + ' class' + (cats.length === 1 ? '' : 'es');
+  el.innerHTML = cats.length ? '<div class="class-cards">' + cats.map(c => {
+    const t = classTheme(c.label);
+    const grade = classGrade(c);
+    return '<div class="cc-item class-card" onclick="openClassDetail(\'' + c.id + '\')" style="border-left:3px solid ' + t.color + ';background:linear-gradient(90deg,' + t.bg + ',var(--bg2) 38%)">' +
+      '<span class="cc-swatch" style="background:' + t.color + ';color:' + t.color + '"></span>' +
+      '<div style="flex:1;min-width:0"><b>' + esc(c.label) + '</b><div class="class-detail-meta">' + classCategoryHtml(c.label) + chip('#45a29e', (c.semester || 's1').toUpperCase()) + classMetaHtml(c) + '</div></div>' +
+      '<span class="class-card-grade">' + (grade === null ? '—' : fmtNum(grade) + '%') + '</span><span class="icon-btn">›</span>' +
+    '</div>';
+  }).join('') + '</div>' : empty('No classes registered for ' + schoolSem().toUpperCase() + ' yet.');
+}
+function renderClassDetail(){
+  const el = document.getElementById('school-class-detail');
+  if (!el) return;
+  const c = classById(state.settings.schoolClassId);
+  if (!c){ el.innerHTML = empty('Class not found.') + '<button class="btn sm" onclick="setSchoolView(\'classes\')">← Back to Classes</button>'; return; }
+  const t = classTheme(c.label);
+  const grade = classGrade(c);
+  const assignments = (state.school || []).filter(a => String(a.course || '').trim().toLowerCase() === String(c.label || '').trim().toLowerCase()).sort((a, b) => (b.dueDate || '').localeCompare(a.dueDate || ''));
+  const history = assignments.length ? '<table class="class-history"><thead><tr><th>Date</th><th>Type</th><th>Assignment / Test / Quiz</th><th>Score</th><th>Weight</th></tr></thead><tbody>' + assignments.map(a =>
+    '<tr onclick="editSchool(\'' + a.id + '\')"><td>' + (a.dueDate ? fmtDate(a.dueDate) : '—') + '</td><td>' + esc(a.category || 'Other') + '</td><td>' + esc(a.assignment || '—') + '</td><td>' + (a.score !== '' && a.score !== undefined && a.score !== null ? esc(a.score) + '%' : '—') + '</td><td>' + (a.weight !== '' && a.weight !== undefined && a.weight !== null ? esc(a.weight) + '%' : '—') + '</td></tr>'
+  ).join('') + '</tbody></table>' : empty('No assignment history for this class yet.');
+  el.innerHTML = '<div class="class-detail-head"><div><button class="chip-btn" onclick="setSchoolView(\'classes\')">← Classes</button><h2 class="page-title" style="margin-top:12px">' + esc(c.label) + '</h2><div class="class-detail-meta">' + classCategoryHtml(c.label) + chip('#45a29e', (c.semester || 's1').toUpperCase()) + classMetaHtml(c) + '</div></div><span class="kicker">CLASS DETAIL</span></div>' +
+    '<div class="class-detail-grid"><div class="class-kpi"><span class="ck-label">Current Grade</span><span class="ck-value">' + (grade === null ? '—' : fmtNum(grade) + '%') + '</span></div><div class="class-kpi"><span class="ck-label">Target Grade</span><span class="ck-value">' + (c.targetGrade !== '' && c.targetGrade !== undefined ? fmtNum(c.targetGrade) + '%' : '—') + '</span></div><div class="class-kpi"><span class="ck-label">History Items</span><span class="ck-value">' + assignments.length + '</span></div></div>' +
+    '<div class="school-form-row" style="max-width:560px"><div class="field"><label>Current Grade (%) <span class="hint">optional override</span></label><input id="class-current-grade" type="number" min="0" max="100" step="0.1" value="' + (c.currentGrade !== '' && c.currentGrade !== undefined ? esc(c.currentGrade) : '') + '"></div><div class="field"><label>Target Grade (%)</label><input id="class-target-grade" type="number" min="0" max="100" step="0.1" value="' + (c.targetGrade !== '' && c.targetGrade !== undefined ? esc(c.targetGrade) : '') + '"></div></div>' +
+    '<button class="btn sm" onclick="saveClassDetail(\'' + c.id + '\')">Save Grade Targets</button>' +
+    '<div class="log-label" style="margin-top:22px">HISTORY LOG <span class="hint">Assignments · Tests · Quizzes</span></div>' + history;
 }
 function renderSchoolTT(){
   const el = document.getElementById('school-timetable');
@@ -3881,12 +4455,15 @@ function renderSchoolTT(){
   const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
   const cell = p =>
     '<td>' + (cats.filter(c => (c.period || 'p1') === p).length
-      ? cats.filter(c => (c.period || 'p1') === p).map(c =>
-          '<div class="tt-class' + (p === 'off' ? ' off' : '') + '">' +
-            '<b>' + esc(c.label) + '</b>' +
-            (c.room ? '<i>Rm ' + esc(c.room) + '</i>' : '') +
-            (c.teacher ? '<i>' + esc(c.teacher) + '</i>' : '') +
-          '</div>').join('')
+      ?          cats.filter(c => (c.period || 'p1') === p).map(c => {
+            const t = classTheme(c.label);
+            return '<div class="tt-class' + (p === 'off' ? ' off' : '') + '" onclick="openClassDetail(\'' + c.id + '\')" title="Open ' + esc(c.label) + ' details" style="--class-color:' + t.color + ';--class-bg:' + t.bg + '">' +
+              '<b>' + esc(c.label) + '</b>' +
+              classCategoryHtml(c.label) +
+              (c.room ? '<i>Rm ' + esc(c.room) + '</i>' : '') +
+              (c.teacher ? '<i>' + esc(c.teacher) + '</i>' : '') +
+            '</div>';
+          }).join('')
       : '<span style="color:var(--muted);font-size:11px">—</span>') + '</td>';
   const weekStart = new Date();
   const dow = (weekStart.getDay() + 6) % 7;         // Monday = 0
@@ -3925,8 +4502,12 @@ function renderSchool(){
   const fcat = document.getElementById('filter-cat') ? document.getElementById('filter-cat').value : '';
   const fprio = document.getElementById('filter-prio') ? document.getElementById('filter-prio').value : '';
   const fdue = document.getElementById('filter-due') ? document.getElementById('filter-due').value : 'asc';
+  const fview = state.settings.schoolFilter || 'all';
   const todayS = todayKey();
+  applySchoolFilterButtons();
   let list = state.school.filter(a => (a.semester || sem) === sem);
+  if (fview === 'active')        list = list.filter(a => !assignmentArchived(a));
+  else if (fview === 'archived') list = list.filter(a => assignmentArchived(a));
   if (fcat) list = list.filter(a => a.course === fcat);
   if (fprio) list = list.filter(a => (a.priority || 'Medium') === fprio);
   if (q) list = list.filter(a => (a.course + ' ' + a.assignment + ' ' + a.category + ' ' + a.status).toLowerCase().includes(q));
@@ -3943,8 +4524,8 @@ function renderSchool(){
         if (a.dueDate === todayS && !done) cls = 'due-today';
         else if (a.dueDate && a.dueDate < todayS && !done) cls = 'overdue';
         const hasScore = a.score !== '' && a.score !== undefined && a.score !== null && a.score !== 0;
-        return '<tr class="' + cls + '">' +
-          '<td class="school-course">' + esc(a.course) + '</td>' +
+        return '<tr class="' + cls + '" onclick="openClassDetail(\'' + esc(a.course || '') + '\')" title="Open class details">' +
+          '<td class="school-course" onclick="openClassDetail(\'' + esc(a.course || '') + '\')" title="Open class details">' + esc(a.course) + '</td>' +
           '<td>' + esc(a.assignment) + '</td>' +
           '<td style="font-family:var(--mono);font-size:11px">' + (a.dueDate ? fmtDate(a.dueDate) : '—') + '</td>' +
           '<td style="color:var(--text)">' + esc(a.category) + '</td>' +
@@ -3953,12 +4534,31 @@ function renderSchool(){
           '<td>' + (hasScore ? '<span class="' + (parseFloat(a.score) >= 60 ? 'score-good' : 'score-bad') + '">' + fmtNum(a.score) + '</span>' : '<span style="color:var(--muted)">—</span>') + '</td>' +
           '<td>' + (a.weight !== '' && a.weight !== undefined && a.weight !== null && a.weight !== 0 ? fmtNum(a.weight) + '%' : '—') + '</td>' +
           '<td style="white-space:nowrap">' +
-            '<button class="icon-btn" onclick="editSchool(\'' + a.id + '\')" title="Edit">✎</button>' +
-            '<button class="icon-btn danger" onclick="deleteSchool(\'' + a.id + '\')" title="Delete">✕</button>' +
+            '<button class="icon-btn" onclick="event.stopPropagation();editSchool(\'' + a.id + '\')" title="Edit">✎</button>' +
+            '<button class="icon-btn danger" onclick="event.stopPropagation();deleteSchool(\'' + a.id + '\')" title="Delete">✕</button>' +
           '</td>' +
         '</tr>';
       }).join('') + '</tbody></table>'
-    : empty(q || fcat || fprio ? 'No assignments match your filters.' : 'No assignments in ' + sem.toUpperCase() + ' yet — add your first one on the left.');
+    : empty(q || fcat || fprio || fview !== 'all' ? 'No assignments match your filters.' : 'No assignments in ' + sem.toUpperCase() + ' yet — add your first one on the left.');
+}
+/* ---------- Assignment buckets: Active (pending / in progress) vs Archived
+   (Completed, Handed In, or past its due date) ---------- */
+function assignmentArchived(a){
+  if (!a) return false;
+  if (['Completed', 'Handed In'].includes(a.status)) return true;
+  return !!a.dueDate && a.dueDate < todayKey();
+}
+function setSchoolFilter(view){
+  state.settings.schoolFilter = ['all', 'active', 'archived'].includes(view) ? view : 'all';
+  save();
+  renderSchool();
+}
+function applySchoolFilterButtons(){
+  const cur = state.settings.schoolFilter || 'all';
+  ['all', 'active', 'archived'].forEach(v => {
+    const b = document.getElementById('sfilter-' + v);
+    if (b) b.classList.toggle('active', cur === v);
+  });
 }
 function saveSchool(){
   snapshot();
@@ -5109,7 +5709,8 @@ function goalCardHtml(g){
         ? ms.map(m =>
             '<li class="' + (m.done ? 'done' : '') + '">' +
               '<input type="checkbox" ' + (m.done ? 'checked' : '') + ' onchange="toggleMilestone(\'' + g.id + '\',\'' + m.id + '\')">' +
-              '<span>' + esc(m.text) + '</span>' +
+              '<span>' + esc(m.text) + (m.curriculum ? ' <i class="h-desc">📝 curriculum</i>' : '') + '</span>' +
+              '<button class="icon-btn" onclick="openMilestoneCurriculum(\'' + g.id + '\',\'' + m.id + '\')" title="Curriculum / description">📝</button>' +
               '<button class="icon-btn" onclick="deleteMilestone(\'' + g.id + '\',\'' + m.id + '\')" title="Remove milestone">✕</button>' +
             '</li>').join('')
         : '<li class="empty sm">No milestones yet.</li>') + '</ul>' +
@@ -5154,7 +5755,7 @@ function addMilestone(gid){
   const g = state.goals.find(x => x.id === gid);
   if (!g) return;
   g.milestones = g.milestones || [];
-  g.milestones.push({ id: uid(), text, done: false });
+  g.milestones.push({ id: uid(), text, done: false, curriculum: '' });
   save();
   renderGoals();
 }
@@ -5220,19 +5821,21 @@ function goalRoadmapHtml(g){
     const seg = pts.slice(0, reached + 1);
     overlay = '<path d="' + trailD(seg, null) + '" stroke="' + cat.color + '" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round" style="filter:drop-shadow(0 0 6px ' + cat.color + '88)"/>';
   }
-  const nodeAt = (x, y, cls, badge, label, sub, onclick) =>
-    '<div class="roadmap-node ' + cls + (x >= 50 ? ' flip' : '') + '" style="left:' + x + '%;top:' + (y / total * 100) + '%"' + (onclick ? ' onclick="' + onclick + '"' : '') + ' title="' + (onclick ? 'Click to toggle this milestone' : '') + '">' +
-      '<span class="rn-badge">' + badge + '</span>' +
-      '<span class="rn-label"><b>' + label + '</b><i>' + sub + '</i></span>' +
+  const nodeAt = (x, y, cls, badge, label, sub, toggleFn, currFn) =>
+    '<div class="roadmap-node ' + cls + (x >= 50 ? ' flip' : '') + '" style="left:' + x + '%;top:' + (y / total * 100) + '%">' +
+      '<span class="rn-badge"' + (toggleFn ? ' onclick="' + toggleFn + '" title="Toggle this level\'s completion"' : '') + '>' + badge + '</span>' +
+      '<span class="rn-label"' + (currFn ? ' onclick="' + currFn + '" title="Open curriculum / description"' : '') + '><b>' + label + '</b><i>' + sub + '</i></span>' +
     '</div>';
   let nodesHtml = '';
   ms.forEach((m, i) => {
     nodesHtml += nodeAt(pts[i].x, pts[i].y, m.done ? 'on' : 'off', m.done ? '✓' : '🔒',
-      'Level ' + (i + 1), esc(m.text || 'Milestone'),
-      "toggleMilestoneFromRoadmap('" + g.id + "','" + m.id + "')");
+      'Level ' + (i + 1) + (m.curriculum ? ' 📝' : ''), esc(m.text || 'Milestone'),
+      "toggleMilestoneFromRoadmap('" + g.id + "','" + m.id + "')",
+      "openMilestoneCurriculum('" + g.id + "','" + m.id + "')");
   });
   nodesHtml += nodeAt(pts[n - 1].x, pts[n - 1].y, allDone ? 'goal on' : 'goal off', '🏆',
-    'GOAL', esc(g.title || 'Final goal'), '');
+    'GOAL', esc(g.title || 'Final goal'), '',
+    "openGoalCurriculum('" + g.id + "')");
   return '<div class="roadmap-meta">' +
       '<span class="kicker">LEVEL ROADMAP — ' + doneN + '/' + (ms.length || 0) + ' MILESTONES COMPLETE</span>' +
       '<span class="roadmap-pct">' + (ms.length ? Math.round(doneN / ms.length * 100) : 0) + '%</span>' +
@@ -5244,7 +5847,7 @@ function goalRoadmapHtml(g){
       '</svg>' +
       nodesHtml +
     '</div>' +
-    '<div class="paste-hint" style="margin-top:12px">Click a 🔒 node to complete that level in the goal card; completed levels glow ' + cat.label + '. Unlock every level to light up the 🏆 GOAL node.</div>';
+    '<div class="paste-hint" style="margin-top:12px">Click the <b>badge</b> to toggle a level complete (the trail glows ' + cat.label + '); click the <b>label</b> to open that level\'s curriculum / description. Unlock every level to light up the 🏆 GOAL node.</div>';
 }
 function addGoal(){
   snapshot();
@@ -5261,6 +5864,195 @@ function deleteGoal(id){
   state.goals = state.goals.filter(g => g.id !== id);
   save();
   renderGoals();
+}
+
+/* ============================================================
+   GOAL CURRICULUM / DESCRIPTION PANELS
+   ============================================================ */
+function openMilestoneCurriculum(gid, mid){
+  const g = state.goals.find(x => x.id === gid);
+  if (!g) return;
+  const ms = g.milestones || [];
+  const m = ms.find(x => x.id === mid);
+  if (!m) return;
+  const idx = ms.indexOf(m);
+  openModal('Curriculum — ' + (g.title || 'Goal'));
+  modalBody.innerHTML =
+    '<div class="curr-head"><span class="kicker">LEVEL ' + (idx + 1) + '</span><span class="rec-role">' + esc(g.title || '') + '</span></div>' +
+    '<div class="field"><label>Level / Milestone Name</label><input id="mc-text" value="' + esc(m.text || '') + '"></div>' +
+    '<div class="field"><label>Curriculum / Step-by-step Notes</label>' +
+      '<textarea id="mc-notes" class="curr-note" placeholder="Step 1: ...&#10;Step 2: ...&#10;Step 3: ...">' + esc(m.curriculum || '') + '</textarea>' +
+      '<span class="hint">Rich notes per level — drills, social skills curriculum steps, tactical work, training milestones.</span></div>' +
+    '<label class="curr-toggle"><input type="checkbox" id="mc-done" ' + (m.done ? 'checked' : '') + '> Mark this level complete</label>' +
+    '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">' +
+      '<button class="btn sm danger-ghost" onclick="deleteMilestoneFromCurriculum(\'' + g.id + '\',\'' + m.id + '\')">Delete Level</button>' +
+      '<button class="btn" onclick="saveMilestoneCurriculum(\'' + g.id + '\',\'' + m.id + '\')">Save Level</button>' +
+    '</div>';
+}
+function saveMilestoneCurriculum(gid, mid){
+  snapshot();
+  const g = state.goals.find(x => x.id === gid);
+  if (!g) return;
+  const m = (g.milestones || []).find(x => x.id === mid);
+  if (!m) return;
+  const name = (document.getElementById('mc-text').value || '').trim();
+  if (name) m.text = name;
+  m.curriculum = document.getElementById('mc-notes').value || '';
+  m.done = document.getElementById('mc-done').checked;
+  save();
+  closeModal();
+  renderGoals();
+  toast(m.done ? '✓ Level complete — curriculum saved' : '✓ Level curriculum saved');
+}
+function deleteMilestoneFromCurriculum(gid, mid){
+  deleteMilestone(gid, mid);
+  closeModal();
+}
+function openGoalCurriculum(gid){
+  const g = state.goals.find(x => x.id === gid);
+  if (!g) return;
+  openModal('Goal — ' + (g.title || 'Goal'));
+  modalBody.innerHTML =
+    '<div class="curr-head"><span class="kicker">' + esc((GOAL_CATS[g.category] || GOAL_CATS.athletic).label.toUpperCase()) + '</span><span class="rec-role">' + esc(g.title || '') + '</span></div>' +
+    '<div class="field"><label>Goal Description / Strategy</label>' +
+      '<textarea id="gc-notes" class="curr-note" placeholder="Overall description, strategy and curriculum for this goal...">' + esc(g.desc || '') + '</textarea></div>' +
+    '<div class="paste-hint">Each milestone node in the roadmap holds its own per-level curriculum. Click a node label to edit that level.</div>' +
+    '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">' +
+      '<button class="btn" onclick="saveGoalCurriculum(\'' + g.id + '\')">Save Description</button>' +
+    '</div>';
+}
+function saveGoalCurriculum(gid){
+  snapshot();
+  const g = state.goals.find(x => x.id === gid);
+  if (!g) return;
+  g.desc = document.getElementById('gc-notes').value || '';
+  save();
+  closeModal();
+  renderGoals();
+  toast('✓ Goal description saved');
+}
+
+/* ============================================================
+   TAB 7 — RECRUITING CRM (kanban pipeline)
+   ============================================================ */
+let coachModalId = null;
+function recruitFilter(){ return state.settings.recruitFilter || 'all'; }
+function setRecruitFilter(v){
+  state.settings.recruitFilter = (v === 'all' || RECRUIT_STATUSES.includes(v)) ? v : 'all';
+  save();
+  renderRecruiting();
+}
+function recruitFilterChips(){
+  const cur = recruitFilter();
+  const parts = ['<span class="kicker">FILTER BY STATUS</span>'];
+  parts.push('<button class="chip-btn' + (cur === 'all' ? ' active' : '') + '" onclick="setRecruitFilter(\'all\')">All (' + state.recruiting.length + ')</button>');
+  RECRUIT_STATUSES.forEach(st => {
+    const n = state.recruiting.filter(c => c.status === st).length;
+    parts.push('<button class="chip-btn' + (cur === st ? ' active' : '') + '" onclick="setRecruitFilter(\'' + st + '\')">' + esc(st) + ' (' + n + ')</button>');
+  });
+  return parts.join('');
+}
+function renderRecruiting(){
+  const filterEl = document.getElementById('rec-filter');
+  const board = document.getElementById('recruiting-board');
+  if (!filterEl || !board) return;
+  if (!Array.isArray(state.recruiting)) state.recruiting = [];
+  const cur = recruitFilter();
+  filterEl.innerHTML = recruitFilterChips();
+  board.innerHTML = RECRUIT_STATUSES.map(st => {
+    const list = state.recruiting.filter(c => c.status === st && (cur === 'all' || cur === st));
+    const cards = list.length ? list.map(recruitCardHtml).join('') : '<div class="rec-empty">No schools here yet.</div>';
+    return '<div class="rec-col">' +
+      '<div class="rec-col-head"><h3>' + esc(st) + '</h3><span class="rec-count">' + list.length + '</span></div>' +
+      cards +
+    '</div>';
+  }).join('');
+}
+function recruitCardHtml(c){
+  const statusOpts = RECRUIT_STATUSES.map(s => '<option value="' + s + '"' + (c.status === s ? ' selected' : '') + '>' + s + '</option>').join('');
+  const contact = [c.email, c.phone].filter(Boolean).join(' · ');
+  return '<div class="rec-card">' +
+    '<h4>' + esc(c.school || 'Unnamed school') + '</h4>' +
+    ((c.coach || c.role) ? '<div class="rc-sub">' + esc(c.coach || '—') + (c.role ? ' · <span class="rec-role">' + esc(c.role) + '</span>' : '') + '</div>' : '') +
+    (c.lead ? '<div class="rc-row"><b>Assignee / Lead</b>' + esc(c.lead) + '</div>' : '') +
+    (contact ? '<div class="rc-row"><b>Contact Info</b>' + esc(contact) + '</div>' : '') +
+    (c.lastContact ? '<div class="rc-row"><b>Last Contact</b>' + fmtDate(c.lastContact) + '</div>' : '') +
+    (c.filmLink ? '<div class="rc-row"><b>Highlights / Film Sent</b><a class="rec-link" href="' + esc(c.filmLink) + '" target="_blank" rel="noopener">' + esc(c.filmLink) + '</a></div>' : '') +
+    (c.notes ? '<div class="rc-notes"><b>Feedback / Notes</b> ' + esc(c.notes) + '</div>' : '') +
+    '<div class="rc-actions">' +
+      '<select class="rec-move" onchange="moveCoach(\'' + c.id + '\',this.value)" title="Move to status">' + statusOpts + '</select>' +
+      '<button class="icon-btn" onclick="openCoachModal(\'' + c.id + '\')" title="Edit">✎</button>' +
+      '<button class="icon-btn danger" onclick="deleteCoach(\'' + c.id + '\')" title="Delete">✕</button>' +
+    '</div>' +
+  '</div>';
+}
+function moveCoach(id, status){
+  const c = state.recruiting.find(x => x.id === id);
+  if (!c || !RECRUIT_STATUSES.includes(status)) return;
+  snapshot();
+  c.status = status;
+  save();
+  renderRecruiting();
+  toast('Moved to ' + status);
+}
+function openCoachModal(id){
+  const c = id ? state.recruiting.find(x => x.id === id) : null;
+  coachModalId = c ? c.id : null;
+  openModal(c ? 'School / Coach — ' + (c.school || '') : 'New Coach / School');
+  const roleOpts = RECRUIT_ROLES.map(r => '<option value="' + r + '"' + (c && c.role === r ? ' selected' : '') + '>' + r + '</option>').join('');
+  const statusOpts = RECRUIT_STATUSES.map(s => '<option value="' + s + '"' + (c && c.status === s ? ' selected' : '') + '>' + s + '</option>').join('');
+  modalBody.innerHTML =
+    '<div class="school-form-row">' +
+      '<div class="field full"><label>School Name</label><input id="c-school" value="' + esc(c ? c.school : '') + '" placeholder="e.g. Simon Fraser University"></div>' +
+      '<div class="field"><label>Assignee / Lead</label><input id="c-lead" value="' + esc(c ? c.lead : '') + '" placeholder="Who owns this lead"></div>' +
+      '<div class="field"><label>Coach Name</label><input id="c-coach" value="' + esc(c ? c.coach : '') + '"></div>' +
+      '<div class="field"><label>Coach Role</label><select id="c-role">' + roleOpts + '</select></div>' +
+      '<div class="field"><label>Email</label><input id="c-email" type="email" value="' + esc(c ? c.email : '') + '"></div>' +
+      '<div class="field"><label>Phone</label><input id="c-phone" value="' + esc(c ? c.phone : '') + '"></div>' +
+      '<div class="field"><label>Last Contact Date</label><input id="c-last" type="date" value="' + esc(c ? c.lastContact : '') + '"></div>' +
+      '<div class="field"><label>Status / Career Phase</label><select id="c-status">' + statusOpts + '</select></div>' +
+      '<div class="field full"><label>Highlights / Film Link Sent</label><input id="c-film" value="' + esc(c ? c.filmLink : '') + '" placeholder="https://..."></div>' +
+      '<div class="field full"><label>Feedback Received / Notes</label><textarea id="c-notes" placeholder="Coach feedback, interest level, next steps...">' + esc(c ? c.notes : '') + '</textarea></div>' +
+    '</div>' +
+    '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">' +
+      (c ? '<button class="btn sm danger-ghost" onclick="deleteCoach(\'' + c.id + '\')">Delete</button>' : '') +
+      '<button class="btn" onclick="saveCoach()">Save</button>' +
+    '</div>';
+}
+function saveCoach(){
+  const v = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  const school = v('c-school');
+  if (!school){ toast('School name is required', 'error'); return; }
+  snapshot();
+  const data = {
+    school, lead: v('c-lead'), coach: v('c-coach'), role: v('c-role'),
+    email: v('c-email'), phone: v('c-phone'), lastContact: v('c-last'),
+    status: v('c-status'), filmLink: v('c-film'), notes: v('c-notes')
+  };
+  if (!RECRUIT_STATUSES.includes(data.status)) data.status = 'Uncontacted';
+  if (coachModalId){
+    const c = state.recruiting.find(x => x.id === coachModalId);
+    if (c) Object.assign(c, data);
+  } else {
+    state.recruiting.push({ id: uid(), ...data });
+  }
+  coachModalId = null;
+  save();
+  closeModal();
+  renderRecruiting();
+  toast('✓ Saved ' + school);
+}
+function deleteCoach(id){
+  const cid = id || coachModalId;
+  const c = state.recruiting.find(x => x.id === cid);
+  if (!c) return;
+  snapshot();
+  state.recruiting = state.recruiting.filter(x => x.id !== cid);
+  coachModalId = null;
+  save();
+  closeModal();
+  renderRecruiting();
+  toast('Removed ' + (c.school || 'entry'));
 }
 
 /* ============================================================
@@ -5337,7 +6129,14 @@ function tickClock(){
   const el = document.getElementById('clock');
   if (!el) return;
   const d = new Date();
-  el.textContent = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  el.textContent = pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+}
+
+let clockTimer = null;
+function startClock(){
+  if (clockTimer) clearInterval(clockTimer);
+  tickClock();
+  clockTimer = setInterval(tickClock, 1000);
 }
 
 /* ---------- Boot ---------- */
@@ -5346,8 +6145,7 @@ pmType = state.settings.pmType || 'basketball';
 bindEvents();
 applyTab();
 renderAll();
-tickClock();
-setInterval(tickClock, 1000);
+startClock();
 cloudStart();
 </script>
 </body>
