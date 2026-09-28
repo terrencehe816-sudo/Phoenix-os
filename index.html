@@ -1179,6 +1179,186 @@ input[type=range]:focus{ box-shadow:none; }
   .journal-entry{ border-left:2px solid var(--accent); padding:6px 0 6px 10px; margin-bottom:9px; }
   .journal-entry b{ font-size:12px; }
   .journal-entry p{ font-size:12px; color:var(--text); margin-top:3px; line-height:1.45; }
+
+  /* ---------- BETA V2.0 — category badges, Daily Routine ---------- */
+  .cat-badge{ display:inline-block; font-size:9.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; padding:2px 6px; border-radius:999px; border:1px solid; margin-left:6px; vertical-align:middle; }
+  .todo-desc{ min-width:180px; }
+  .todo-desc-line{ display:block; font-size:11px; color:var(--muted); margin-top:2px; line-height:1.4; }
+  .quad-task .qt-desc{ display:block; font-size:11px; color:var(--text); margin-top:4px; line-height:1.4; }
+  .quad-task .qt-dates{ display:block; margin-top:2px; }
+  .routine-grid{ display:grid; grid-template-columns:1.15fr 1fr; gap:16px; align-items:start; }
+  .sleep-window-card{ border-color:rgba(102,252,241,.35); }
+  .sleep-window-row{ display:flex; align-items:center; gap:16px; flex-wrap:wrap; padding:6px 0 2px; }
+  .sw-block,.sw-net{ display:flex; flex-direction:column; gap:2px; }
+  .sw-l{ font-size:9.5px; letter-spacing:.16em; color:var(--muted); font-weight:700; }
+  .sw-v{ font-family:var(--mono); font-size:22px; color:var(--bright); }
+  .sw-arrow{ color:var(--accent); font-size:20px; }
+  .sw-net .sw-v{ color:#2ecc71; }
+  .rt-slot{ display:flex; gap:12px; align-items:flex-start; padding:8px 0; border-bottom:1px dashed var(--line); }
+  .rt-period{ flex:0 0 120px; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); font-weight:700; }
+  .rt-slot-classes{ display:flex; flex-wrap:wrap; gap:6px; flex:1; }
+  .rt-none{ color:var(--muted); font-size:11px; }
+  .rt-class{ border-left:3px solid var(--accent); background:var(--bg2); border-radius:var(--r); padding:4px 8px; font-size:11.5px; }
+  .rt-class i{ color:var(--muted); font-style:normal; font-size:10.5px; }
+  .rt-add{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px; }
+  .rt-add input[type=time]{ flex:0 0 110px; } .rt-add #rt-label{ flex:1 1 140px; } .rt-add select{ flex:0 0 120px; }
+  .rt-blocks{ display:flex; flex-direction:column; gap:6px; }
+  .rt-block{ display:flex; align-items:center; gap:10px; border-left:3px solid var(--accent); background:var(--bg2); border-radius:var(--r); padding:7px 10px; }
+  .rt-time{ font-family:var(--mono); font-size:12px; color:var(--bright); flex:0 0 84px; }
+  .rt-label{ flex:1; font-size:12.5px; }
+  .rc-good-list{ margin-top:12px; }
+
+  /* ---------- Shot heatmap ---------- */
+  .heat-wrap{ display:grid; grid-template-columns:1.3fr 1fr; gap:16px; align-items:start; }
+  .heat-court{ width:100%; height:auto; border-radius:var(--r); }
+  .heat-court .hz{ cursor:pointer; }
+  .heat-court .hz:hover rect,.heat-court .hz:hover circle{ fill-opacity:.5; }
+  .hz-l{ font-size:8.5px; fill:#c8d2dc; letter-spacing:.02em; }
+  .hz-sm .hz-l{ font-size:7.2px; }
+  .hz-sm .hz-s{ font-size:8px; }
+  .hz-v{ font-family:var(--mono); font-size:14px; font-weight:700; fill:#fff; }
+  .hz-s{ font-family:var(--mono); font-size:9px; fill:#9fb0bf; }
+  .zone-table{ width:100%; border-collapse:collapse; font-size:12px; }
+  .zone-table th{ text-align:left; font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); padding:7px; border-bottom:1px solid var(--line); }
+  .zone-table td{ padding:7px; border-bottom:1px solid var(--line); }
+  .zone-table tr:hover td{ background:var(--bg3); }
+  .zone-log-stats{ display:flex; flex-direction:column; gap:4px; margin-bottom:14px; }
+  .zl-pct{ font-family:var(--mono); font-size:30px; font-weight:800; }
+  .zl-sub{ font-size:11.5px; color:var(--muted); }
+  .zone-log-btns{ display:flex; gap:10px; }
+  .zone-log-btns .btn{ flex:1; }
+
+  /* ---------- Scouting + Matchup cards ---------- */
+  .scout-video{ margin:12px 0; border-radius:var(--r); overflow:hidden; border:1px solid var(--line); }
+  .scout-video iframe{ width:100%; aspect-ratio:16/9; display:block; border:0; background:#000; }
+  .scout-note-add{ display:flex; gap:6px; margin-bottom:12px; }
+  .scout-note-add #scout-stamp{ flex:0 0 76px; font-family:var(--mono); }
+  .scout-note-add #scout-text{ flex:1; }
+  .scout-notes{ display:flex; flex-direction:column; gap:6px; max-height:280px; overflow:auto; }
+  .scout-note{ display:flex; gap:10px; align-items:center; background:var(--bg2); border:1px solid var(--line); border-radius:var(--r); padding:7px 10px; }
+  .scout-note b{ font-family:var(--mono); color:var(--bright); font-size:11.5px; flex:0 0 54px; }
+  .scout-note span{ flex:1; font-size:12px; }
+  .matchup-card{ border:1px solid var(--line); border-radius:var(--r); background:var(--bg2); padding:12px; margin-bottom:10px; }
+  .mc-top{ display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+  .mc-top b{ font-size:14px; color:var(--hi); }
+  .mc-num{ font-family:var(--mono); color:var(--bright); font-size:12px; }
+  .mc-team{ flex:1; font-size:11px; color:var(--muted); }
+  .mc-meta{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; }
+  .mc-meta span{ font-size:10.5px; padding:2px 7px; border-radius:999px; background:rgba(69,162,158,.12); color:var(--accent); border:1px solid rgba(69,162,158,.3); }
+  .mc-row{ font-size:12px; color:var(--text); margin-top:6px; line-height:1.45; }
+  .mc-row i{ display:block; font-style:normal; font-size:9.5px; letter-spacing:.12em; color:var(--muted); margin-bottom:2px; }
+
+  /* ---------- Playbook library ---------- */
+  .pb-list{ display:flex; flex-direction:column; gap:6px; }
+  .pb-item{ display:flex; align-items:center; gap:10px; background:var(--bg2); border:1px solid var(--line); border-radius:var(--r); padding:8px 10px; }
+  .pb-main{ flex:1; min-width:0; }
+  .pb-main b{ font-size:12.5px; color:var(--hi); }
+  .pb-main i{ display:block; font-style:normal; font-size:11px; color:var(--muted); margin-top:3px; }
+  .mastery-chip{ font-size:10px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; padding:4px 9px; border-radius:999px; cursor:pointer; border:1px solid; background:transparent; font-family:inherit; }
+  .mastery-chip.m-learning{ color:#f0a500; border-color:rgba(240,165,0,.5); }
+  .mastery-chip.m-reps{ color:#66a3ff; border-color:rgba(102,163,255,.5); }
+  .mastery-chip.m-mastered{ color:#2ecc71; border-color:rgba(46,204,113,.55); background:rgba(46,204,113,.12); }
+
+  /* ---------- BC -> NCAA mind map ---------- */
+  .ncaa-layout{ display:grid; grid-template-columns:1.6fr 1fr; gap:16px; align-items:start; }
+  .ncaa-flow-wrap{ display:flex; align-items:flex-start; gap:8px; min-width:640px; }
+  .ncaa-col{ flex:1; display:flex; flex-direction:column; gap:7px; min-width:150px; }
+  .ncaa-col-head{ font-size:10px; letter-spacing:.16em; color:var(--accent); font-weight:700; text-align:center; padding-bottom:4px; border-bottom:1px solid var(--line); }
+  .ncaa-node{ border:1px solid var(--line); border-left:3px solid var(--accent); border-radius:var(--r); background:var(--bg2); padding:7px 9px; cursor:pointer; transition:.12s; }
+  .ncaa-node:hover{ border-color:var(--bright); }
+  .ncaa-node.sel{ border-color:var(--bright); box-shadow:0 0 0 1px var(--bright),0 0 12px rgba(102,252,241,.25); background:rgba(102,252,241,.07); }
+  .ncaa-node b{ display:block; font-size:11.5px; color:var(--hi); }
+  .ncaa-node .nn-cat{ display:block; font-size:9.5px; color:var(--muted); margin-top:2px; }
+  .ncaa-arrow{ color:var(--accent); font-size:18px; align-self:center; padding-top:24px; }
+  .ncaa-col.core .ncaa-core{ border:1px solid var(--line); border-radius:var(--r); background:var(--bg2); padding:6px 8px; }
+  .ncaa-col.core .ncaa-core.ok{ border-color:rgba(46,204,113,.6); background:rgba(46,204,113,.08); }
+  .ncaa-core b{ display:block; font-size:11px; color:var(--text); }
+  .ncaa-core span{ font-size:10px; color:var(--muted); }
+  .ncaa-detail h4{ font-size:15px; color:var(--hi); margin-bottom:8px; }
+  .nd-tags{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+  .ncaa-detail p{ font-size:12px; line-height:1.5; color:var(--text); }
+  .nd-ncaa{ margin-top:12px; padding-top:10px; border-top:1px dashed var(--line); display:flex; flex-direction:column; gap:3px; }
+  .nd-ncaa b{ color:var(--bright); font-size:13px; }
+  .ncaa-path{ border:1px solid var(--line); border-radius:var(--r); background:var(--bg2); padding:10px; margin-bottom:10px; }
+  .np-head{ display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+  .np-head b{ flex:1; font-size:12.5px; color:var(--hi); }
+  .np-chain,.ncaa-draft{ display:flex; flex-wrap:wrap; align-items:center; gap:6px; }
+  .np-step{ display:inline-flex; align-items:center; gap:4px; font-size:11px; background:rgba(69,162,158,.13); border:1px solid rgba(69,162,158,.35); border-radius:999px; padding:3px 9px; color:var(--text); }
+  .np-arrow{ color:var(--accent); font-size:13px; }
+  .ncaa-draft{ margin-top:12px; padding:10px; border:1px dashed var(--line); border-radius:var(--r); }
+
+  /* ---------- Life Maxx ---------- */
+  .sprint-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:16px; }
+  .sprint-card{ display:flex; flex-direction:column; }
+  .sprint-progress{ display:flex; flex-direction:column; gap:6px; margin-bottom:6px; }
+  .sprint-progress .bar-pct{ font-size:11px; color:var(--muted); }
+  .sprint-fields{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .sprint-field{ display:flex; flex-direction:column; gap:3px; font-size:11px; color:var(--muted); }
+  .sprint-field input{ padding:6px 8px; font-size:12px; }
+  .sprint-durs{ display:flex; flex-wrap:wrap; gap:6px; }
+  .sprint-durs .durb.active{ background:var(--accent); color:#081114; border-color:var(--accent); }
+  .tree-wrap{ display:flex; flex-direction:column; gap:4px; max-width:760px; }
+  .tree-node{ border:1px solid var(--line); border-left:3px solid #2ec4b6; border-radius:var(--r); background:var(--bg2); padding:14px 16px; }
+  .tree-node.locked{ opacity:.5; }
+  .tn-head{ display:flex; align-items:center; gap:10px; margin-bottom:6px; }
+  .tn-head b{ font-size:14px; color:var(--hi); }
+  .tree-node p{ font-size:12px; color:var(--muted); line-height:1.45; margin-bottom:10px; }
+  .tn-bar{ display:flex; flex-direction:column; gap:5px; margin-bottom:10px; }
+  .tn-bar .bar-pct{ font-size:11px; color:var(--muted); }
+  .tree-conn{ text-align:center; color:var(--accent); font-size:16px; }
+  .tree-conn.locked{ color:var(--line); }
+  /* ---------- BETA V2.0.1 — time window, 12-zone chart, school, tree, combine ---------- */
+  .time-window-settings{ display:flex; align-items:flex-end; gap:10px; flex-wrap:wrap; margin-top:10px; padding-top:10px; border-top:1px dashed var(--line); }
+  .tw-field{ display:flex; flex-direction:column; gap:4px; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); font-weight:700; }
+  .tw-field input{ font-family:var(--mono); font-size:12.5px; }
+  .tw-presets{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:10px; }
+  .reflect-block{ border-top:1px dashed var(--line); padding-top:12px; }
+  .reflect-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:10px; }
+  .reflect-grid textarea{ font-size:12px; }
+  .heat-legend{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-top:10px; font-size:11px; color:var(--text); }
+  .heat-legend span{ display:inline-flex; align-items:center; gap:6px; }
+  .heat-legend i{ width:12px; height:12px; border-radius:3px; display:inline-block; }
+  .rich-toolbar{ display:flex; gap:6px; margin-bottom:6px; }
+  .rich-toolbar .chip-btn{ min-width:34px; }
+  .assign-desc{ margin-top:6px; }
+  .assign-desc summary{ cursor:pointer; font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--accent); }
+  .rich-text{ font-size:11.5px; color:var(--text); line-height:1.5; margin-top:6px; padding:8px 10px; border-left:2px solid var(--accent); background:var(--bg2); border-radius:var(--r); }
+  .rich-text .rt-li{ display:block; padding-left:8px; }
+  .rich-text .rt-quote{ display:block; color:var(--muted); font-style:italic; }
+  .star-btn{ background:transparent; border:0; cursor:pointer; font-size:15px; line-height:1; margin-right:6px; color:var(--muted); padding:0; }
+  .star-btn.on{ color:#f0a500; text-shadow:0 0 8px rgba(240,165,0,.6); }
+  .chip-btn.star.active{ color:#f0a500; border-color:rgba(240,165,0,.55); }
+  .rec-card.starred{ box-shadow:inset 0 0 0 1px rgba(240,165,0,.4); }
+  .tree-tiers{ display:flex; flex-direction:column; gap:6px; }
+  .tree-tier{ border:1px solid var(--line); border-top:3px solid var(--tier,#2ec4b6); border-radius:var(--r); background:var(--bg2); padding:14px; }
+  .tree-tier.locked{ opacity:.55; }
+  .tree-tier-head{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px; }
+  .tree-tier-head b{ font-size:14px; color:var(--hi); }
+  .tier-prog{ margin-left:auto; font-family:var(--mono); font-size:11px; color:var(--muted); }
+  .tier-lock{ font-size:11px; color:var(--amber); }
+  .tree-skills{ display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin-bottom:10px; }
+  .skill-card{ display:flex; flex-direction:column; gap:8px; border:1px solid var(--line); border-left:3px solid var(--tier,#2ec4b6); border-radius:var(--r); background:var(--bg3); padding:10px; }
+  .skill-card.locked{ opacity:.6; }
+  .sk-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+  .sk-top b{ font-size:12px; color:var(--hi); line-height:1.3; }
+  .skill-card p{ font-size:11px; color:var(--muted); line-height:1.4; flex:1; }
+  .sk-actions{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+  .sk-actions .btn.dec{ color:var(--amber); border-color:rgba(240,165,0,.4); }
+  .sk-actions .btn.dec:disabled{ color:var(--muted); border-color:var(--line); opacity:.5; }
+  .tier-conn{ text-align:center; color:var(--accent); font-size:15px; line-height:1; }
+  .tier-conn.locked{ color:var(--line); }
+  .combine-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:12px; }
+  .cb-metric{ display:flex; flex-direction:column; gap:5px; border:1px solid var(--line); border-radius:var(--r); background:var(--bg2); padding:10px 12px; }
+  .cb-l{ font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); font-weight:700; }
+  .cb-in{ display:flex; align-items:baseline; gap:6px; }
+  .cb-in input{ font-family:var(--mono); font-size:18px; color:var(--bright); background:transparent; border:0; border-bottom:1px solid var(--line); padding:2px 0; width:100%; }
+  .cb-u{ font-size:11px; color:var(--muted); font-style:normal; }
+  .cb-sub{ font-size:10.5px; color:var(--muted); }
+  @media (max-width:1100px){
+    .routine-grid,.heat-wrap,.ncaa-layout,.mental-grid{ grid-template-columns:1fr; }
+    .ncaa-flow-wrap{ min-width:0; flex-wrap:wrap; }
+    .tree-skills{ grid-template-columns:repeat(2,minmax(0,1fr)); }
+  }
 </style>
 </head>
 <body>
@@ -1214,13 +1394,15 @@ input[type=range]:focus{ box-shadow:none; }
 
     <nav id="nav">
       <button class="nav-btn active" data-tab="dashboard" onclick="switchTab('dashboard')"><span class="nav-num">01</span><span>Dashboard</span></button>
-      <button class="nav-btn" data-tab="log" onclick="switchTab('log')"><span class="nav-num">02</span><span>Daily Log &amp; Workouts</span></button>
-      <button class="nav-btn" data-tab="school" onclick="switchTab('school')"><span class="nav-num">03</span><span>School</span></button>
-      <button class="nav-btn" data-tab="goals" onclick="switchTab('goals')"><span class="nav-num">04</span><span>Goal Matrix</span></button>
-      <button class="nav-btn" data-tab="film" onclick="switchTab('film')"><span class="nav-num">05</span><span>Film Study</span></button>
-      <button class="nav-btn" data-tab="finance" onclick="switchTab('finance')"><span class="nav-num">06</span><span>Finance Tracker</span></button>
-      <button class="nav-btn" data-tab="recruiting" onclick="switchTab('recruiting')"><span class="nav-num">07</span><span>Recruiting CRM</span></button>
-      <button class="nav-btn" data-tab="mental" onclick="switchTab('mental')"><span class="nav-num">08</span><span>Mental Game</span></button>
+      <button class="nav-btn" data-tab="routine" onclick="switchTab('routine')"><span class="nav-num">02</span><span>Daily Routine</span></button>
+      <button class="nav-btn" data-tab="log" onclick="switchTab('log')"><span class="nav-num">03</span><span>Daily Log &amp; Workouts</span></button>
+      <button class="nav-btn" data-tab="school" onclick="switchTab('school')"><span class="nav-num">04</span><span>School</span></button>
+      <button class="nav-btn" data-tab="goals" onclick="switchTab('goals')"><span class="nav-num">05</span><span>Goal Matrix</span></button>
+      <button class="nav-btn" data-tab="film" onclick="switchTab('film')"><span class="nav-num">06</span><span>Film Study</span></button>
+      <button class="nav-btn" data-tab="finance" onclick="switchTab('finance')"><span class="nav-num">07</span><span>Finance Tracker</span></button>
+      <button class="nav-btn" data-tab="recruiting" onclick="switchTab('recruiting')"><span class="nav-num">08</span><span>Recruiting CRM</span></button>
+      <button class="nav-btn" data-tab="mental" onclick="switchTab('mental')"><span class="nav-num">09</span><span>Mental Game</span></button>
+      <button class="nav-btn" data-tab="life" onclick="switchTab('life')"><span class="nav-num">10</span><span>Life Maxx</span></button>
     </nav>
 
     <div class="side-util">
@@ -1243,7 +1425,7 @@ input[type=range]:focus{ box-shadow:none; }
         <p id="topbar-date"></p>
       </div>
       <div class="clock-shell">
-        <span class="beta-label">BETA V1.2</span>
+        <span class="beta-label">BETA V2.0</span>
         <div class="clock" id="clock" aria-label="Live digital clock">--:--:--</div>
       </div>
     </header>
@@ -1304,6 +1486,10 @@ input[type=range]:focus{ box-shadow:none; }
               <input type="date" id="todo-date" title="Scheduled date">
               <label class="todo-sel"><span>Priority (Impact)</span><select id="todo-priority"><option>Low</option><option selected>Medium</option><option>High</option></select></label>
               <label class="todo-sel"><span>Urgency (Time)</span><select id="todo-urgency"><option>Low</option><option selected>Medium</option><option>High</option></select></label>
+              <label class="todo-sel"><span>Category</span><select id="todo-category"></select></label>
+              <input id="todo-desc" class="todo-desc" placeholder="Description / sub-steps (optional)">
+              <label class="todo-sel"><span>Target Date</span><input type="date" id="todo-target" title="Intended completion date"></label>
+              <label class="todo-sel"><span>Cut-off Date</span><input type="date" id="todo-cutoff" title="Hard deadline"></label>
               <button class="btn sm" type="submit">+ Add</button>
             </form>
             <ul class="todo-list" id="todo-list"></ul>
@@ -1328,12 +1514,33 @@ input[type=range]:focus{ box-shadow:none; }
         </div>
       </section>
 
-      <!-- ============ TAB 2: DAILY LOG & WORKOUTS ============ -->
+      <!-- ============ TAB 2: DAILY ROUTINE ============ -->
+      <section id="tab-routine" class="tab">
+        <div class="card-head-row">
+          <div>
+            <h2 class="page-title">Daily Routine</h2>
+            <p class="page-sub">Your fixed timetable, sleep window, habit tracker, and banned list — the operational backbone of every day.</p>
+          </div>
+        </div>
+        <div id="routine-sleep"></div>
+        <div class="card" style="margin-top:16px">
+          <div class="card-head"><h3>Daily Timetable</h3><span class="kicker" id="routine-tt-kicker"></span></div>
+          <div id="routine-schedule"></div>
+        </div>
+        <div class="card" style="margin-top:16px">
+          <div class="card-head"><h3>Habit Tracker</h3><span class="kicker" id="routine-habit-kicker"></span></div>
+          <div id="routine-habits"></div>
+        </div>
+        <div id="routine-banned" style="margin-top:16px"></div>
+      </section>
+
+      <!-- ============ TAB 3: DAILY LOG & WORKOUTS ============ -->
       <section id="tab-log" class="tab">
         <div id="log-subtabs" class="sub-tabs">
           <button class="sub-tab" data-lv="session" onclick="setLogView('session')">Workout Sessions</button>
           <button class="sub-tab" data-lv="entry" onclick="setLogView('entry')">Daily Log Entry</button>
           <button class="sub-tab" data-lv="records" onclick="setLogView('records')">Records</button>
+          <button class="sub-tab" data-lv="shots" onclick="setLogView('shots')">🔥 Shot Chart</button>
         </div>
 
         <!-- VIEW: WORKOUT SESSIONS -->
@@ -1369,11 +1576,6 @@ input[type=range]:focus{ box-shadow:none; }
               <div id="log-form">
                 <div class="draft-banner" id="log-draft-banner"></div>
                 <div class="ws-attached" style="display:none" id="log-workout-line"></div>
-
-                <div class="log-section">
-                  <div class="log-label">HABITS TRACKER <span id="habit-ratio" class="ratio"></span></div>
-                  <div class="habit-grid" id="log-habits"></div>
-                </div>
 
                 <div class="log-grid-2">
                   <div class="field compact-field sleep-field">
@@ -1412,9 +1614,22 @@ input[type=range]:focus{ box-shadow:none; }
                   <textarea id="log-meal" rows="3" placeholder="Daily nutrition tracking..."></textarea>
                 </div>
 
-                <div class="field">
-                  <label for="log-win">Daily Win</label>
-                  <input type="text" id="log-win" placeholder="One win from today...">
+                <div class="log-section reflect-block">
+                  <div class="log-label">DAILY REFLECTION / WINS LOG <span class="hint">Night shutdown routine</span></div>
+                  <div class="reflect-grid">
+                    <div class="field">
+                      <label for="log-win">1 · What went well?</label>
+                      <textarea id="log-win" rows="2" placeholder="The win worth remembering..."></textarea>
+                    </div>
+                    <div class="field">
+                      <label for="log-adjust">2 · What needs adjustment?</label>
+                      <textarea id="log-adjust" rows="2" placeholder="One thing to fix tomorrow..."></textarea>
+                    </div>
+                    <div class="field">
+                      <label for="log-notes">3 · Notes</label>
+                      <textarea id="log-notes" rows="2" placeholder="Anything else on your mind..."></textarea>
+                    </div>
+                  </div>
                 </div>
 
                 <div class="log-meta">
@@ -1441,6 +1656,26 @@ input[type=range]:focus{ box-shadow:none; }
         <div class="log-sub" id="log-view-records">
           <div id="records-view"></div>
         </div>
+
+        <!-- VIEW: MULTI-ZONE SHOT HEATMAP -->
+        <div class="log-sub" id="log-view-shots">
+          <div class="card-head-row">
+            <div>
+              <h2 class="page-title">Multi-Zone Shot Chart</h2>
+              <p class="page-sub">Lifetime makes / attempts across 14 analytical zones — hot-hand colors update automatically, click any zone to log shots.</p>
+            </div>
+          </div>
+          <div class="heat-wrap">
+            <div class="card">
+              <div class="card-head"><h3>Shot Heatmap</h3><span class="kicker" id="heat-kicker"></span></div>
+              <div id="shot-heatmap"></div>
+            </div>
+            <div class="card">
+              <div class="card-head"><h3>Zone Breakdown</h3><span class="kicker">Green = Hot · Yellow = Neutral · Red = Cold</span></div>
+              <div id="shot-zone-table"></div>
+            </div>
+          </div>
+        </div>
       </section>
 
       <!-- ============ TAB 3: SCHOOL ============ -->
@@ -1450,6 +1685,7 @@ input[type=range]:focus{ box-shadow:none; }
           <button class="chip-btn" id="sview-btn-tt" onclick="setSchoolView('tt')">🗓 Timetable</button>
           <button class="chip-btn" id="sview-btn-classes" onclick="setSchoolView('classes')">▦ Classes</button>
           <button class="chip-btn" id="sview-btn-xc" onclick="setSchoolView('xc')">🎖 Extracurricular</button>
+          <button class="chip-btn" id="sview-btn-ncaa" onclick="setSchoolView('ncaa')">🧭 BC→NCAA Map</button>
         </div>
         <div class="school-toolbar" style="margin-bottom:14px">
           <span class="kicker">SEMESTER VIEW</span>
@@ -1457,6 +1693,10 @@ input[type=range]:focus{ box-shadow:none; }
           <button class="chip-btn" id="sem-s2" onclick="setSchoolSem('s2')">Semester 2 (S2)</button>
         </div>
         <div id="sview-assign">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-head"><h3>Academic GPA / Grade Calculator</h3><span class="kicker" id="school-gpa-kicker"></span></div>
+          <div id="school-gpa"></div>
+        </div>
         <div class="school-layout">
 
           <div class="card">
@@ -1468,7 +1708,7 @@ input[type=range]:focus{ box-shadow:none; }
             <div class="school-form-row">
               <div class="field"><label>Due Date</label><input type="date" id="s-due"></div>
               <div class="field"><label>Category</label>
-                <select id="s-cat"><option>Homework</option><option>Project</option><option>Exam</option><option>Quiz</option><option>Other</option></select>
+                <select id="s-cat"><option>Homework</option><option>Quiz</option><option>Test</option><option>Project</option><option>Presentation</option><option>Other</option></select>
               </div>
             </div>
             <div class="school-form-row">
@@ -1484,6 +1724,16 @@ input[type=range]:focus{ box-shadow:none; }
             <div class="school-form-row">
               <div class="field"><label>Weight (% final)</label><input type="number" id="s-weight" min="0" max="100" placeholder="e.g. 20"></div>
               <div class="field"><label>Score / Grade</label><input type="number" id="s-score" min="0" max="100" placeholder="e.g. 87 (optional)"></div>
+            </div>
+            <div class="field">
+              <label>Description / Expanded Notes <span class="hint">**bold** · _italic_ · - bullets</span></label>
+              <div class="rich-toolbar">
+                <button type="button" class="chip-btn" onclick="richWrap('s-desc','**')"><b>B</b></button>
+                <button type="button" class="chip-btn" onclick="richWrap('s-desc','_')"><i>I</i></button>
+                <button type="button" class="chip-btn" onclick="richWrap('s-desc','- ')">• List</button>
+                <button type="button" class="chip-btn" onclick="richWrap('s-desc','> ')">❝ Quote</button>
+              </div>
+              <textarea id="s-desc" rows="3" placeholder="Rubric, page numbers, sub-steps, what a strong answer looks like..."></textarea>
             </div>
             <button class="btn" style="width:100%" onclick="saveSchool()">Save Assignment</button>
             <div class="school-toolbar" id="school-editbar" style="display:none">
@@ -1520,6 +1770,16 @@ input[type=range]:focus{ box-shadow:none; }
               <div class="school-toolbar">
                 <input type="search" class="school-search" id="school-search" placeholder="Search course / assignment...">
               </div>
+            </div>
+            <div class="school-toolbar" style="margin-bottom:8px">
+              <span class="kicker">TYPE</span>
+              <button class="chip-btn" id="scat-all" onclick="setSchoolCat('all')">All Types</button>
+              <button class="chip-btn" id="scat-Homework" onclick="setSchoolCat('Homework')">Homework</button>
+              <button class="chip-btn" id="scat-Quiz" onclick="setSchoolCat('Quiz')">Quiz</button>
+              <button class="chip-btn" id="scat-Test" onclick="setSchoolCat('Test')">Test</button>
+              <button class="chip-btn" id="scat-Project" onclick="setSchoolCat('Project')">Project</button>
+              <button class="chip-btn" id="scat-Presentation" onclick="setSchoolCat('Presentation')">Presentation</button>
+              <button class="chip-btn" id="scat-Other" onclick="setSchoolCat('Other')">Other</button>
             </div>
             <div class="school-toolbar" style="margin-bottom:12px">
               <button class="chip-btn" id="sfilter-all" onclick="setSchoolFilter('all')">All</button>
@@ -1586,6 +1846,32 @@ input[type=range]:focus{ box-shadow:none; }
             </div>
           </div>
         </div>
+
+        <!-- BC → NCAA 1-DIRECTION FLOW MIND MAP -->
+        <div id="sview-ncaa" style="display:none">
+          <div class="card-head-row">
+            <div>
+              <h2 class="page-title">BC → NCAA 1-Direction Flow Map</h2>
+              <p class="page-sub">Directed path from Grade 10–12 BC Ministry courses into the NCAA D1/D2 16-core requirements. Build your own sequential path below.</p>
+            </div>
+          </div>
+          <div class="ncaa-layout">
+            <div class="card" style="overflow:auto">
+              <div class="card-head"><h3>Course → Core Flow</h3><span class="kicker" id="ncaa-kicker"></span></div>
+              <div id="ncaa-flow"></div>
+            </div>
+            <div>
+              <div class="card" style="margin-bottom:16px">
+                <div class="card-head"><h3>Node Details</h3><span class="kicker">Click a course node</span></div>
+                <div id="ncaa-detail"></div>
+              </div>
+              <div class="card">
+                <div class="card-head"><h3>Custom Path Builder</h3><button class="btn sm" onclick="openNcaaPathModal()">+ New Path</button></div>
+                <div id="ncaa-paths"></div>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
       <!-- ============ TAB 4: GOAL MATRIX ============ -->
@@ -1632,6 +1918,8 @@ input[type=range]:focus{ box-shadow:none; }
           <button class="sub-tab" data-fview="games" onclick="setFilmView('games')">My Games</button>
           <button class="sub-tab" data-fview="plays" onclick="setFilmView('plays')">Team Plays</button>
           <button class="sub-tab" data-fview="study" onclick="setFilmView('study')">Film Study</button>
+          <button class="sub-tab" data-fview="scouting" onclick="setFilmView('scouting')">Scouting Reports</button>
+          <button class="sub-tab" data-fview="playbook" onclick="setFilmView('playbook')">Playbook</button>
         </div>
 
         <!-- VIEW 5A: MY GAMES -->
@@ -1665,6 +1953,39 @@ input[type=range]:focus{ box-shadow:none; }
             <button class="sub-tab" data-sview="team" onclick="setStudyView('team')">Team Study</button>
           </div>
           <div id="film-study"></div>
+        </div>
+
+        <!-- VIEW 5D: SCOUTING REPORTS (consolidated into Film Study) -->
+        <div class="log-sub" id="fview-scouting">
+          <div class="card-head-row">
+            <div>
+              <h2 class="page-title">Film Study &amp; Opponent Scouting</h2>
+              <p class="page-sub">Break down video with timestamped notes and build opponent matchup cards.</p>
+            </div>
+            <button class="btn" onclick="openMatchupModal()">+ New Matchup Card</button>
+          </div>
+          <div class="mental-grid">
+            <div class="card">
+              <div class="card-head"><h3>Video &amp; Timestamped Notes</h3><span class="kicker" id="scout-kicker"></span></div>
+              <div id="scout-panel"></div>
+            </div>
+            <div class="card">
+              <div class="card-head"><h3>Opponent Matchup Cards</h3><span class="kicker" id="matchup-kicker"></span></div>
+              <div id="matchup-list"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEW 5E: MASTER PLAYBOOK LIBRARY (consolidated into Film Study) -->
+        <div class="log-sub" id="fview-playbook">
+          <div class="card-head-row">
+            <div>
+              <h2 class="page-title">Master Playbook Library</h2>
+              <p class="page-sub">Categorized repository of offenses, defenses &amp; presses, SLOB/BLOB and fast breaks.</p>
+            </div>
+            <button class="btn" onclick="openPlaybookModal()">+ Add Play</button>
+          </div>
+          <div id="playbook-panel"></div>
         </div>
       </section>
 
@@ -1774,7 +2095,6 @@ input[type=range]:focus{ box-shadow:none; }
       <section id="tab-mental" class="tab">
         <div class="sub-tabs" id="mental-subtabs">
           <button class="sub-tab" data-mview="journal" onclick="setMentalView('journal')">Journaling</button>
-          <button class="sub-tab" data-mview="decisions" onclick="setMentalView('decisions')">Decision Archive</button>
         </div>
 
         <!-- VIEW 8A: JOURNALING -->
@@ -1798,16 +2118,76 @@ input[type=range]:focus{ box-shadow:none; }
           </div>
         </div>
 
-        <!-- VIEW 8B: DECISION ARCHIVE -->
-        <div class="log-sub" id="mview-decisions">
+        <p class="paste-hint">Scouting reports and the Master Playbook now live under <b>Film Study</b> — use the tab strip on the left.</p>
+      </section>
+
+      <!-- ============ TAB 10: LIFE MAXX ============ -->
+      <section id="tab-life" class="tab">
+        <div class="sub-tabs" id="life-subtabs">
+          <button class="sub-tab" data-lview="sprints" onclick="setLifeView('sprints')">Skill Sprints</button>
+          <button class="sub-tab" data-lview="stats" onclick="setLifeView('stats')">Stats · Physical Combine</button>
+          <button class="sub-tab" data-lview="tree" onclick="setLifeView('tree')">Social Skills Tree</button>
+          <button class="sub-tab" data-lview="debrief" onclick="setLifeView('debrief')">Debriefs</button>
+          <button class="sub-tab" data-lview="crm" onclick="setLifeView('crm')">Life CRM</button>
+        </div>
+
+        <!-- VIEW 10A: SKILL SPRINTS -->
+        <div class="log-sub" id="lview-sprints">
           <div class="card-head-row">
             <div>
-              <h2 class="page-title">Decision Archive</h2>
-              <p class="page-sub">Log the calls you make, the framework behind them, and how confident you felt.</p>
+              <h2 class="page-title">Custom-Duration Skill Sprints</h2>
+              <p class="page-sub">Commit to a focused sprint (21 / 30 / 45 / 60 / 90 / 120 days) and log the daily field inputs that match the sprint theme.</p>
             </div>
-            <button class="btn" onclick="openDecisionModal()">+ Log Decision</button>
+            <button class="btn" onclick="openSprintModal()">+ New Sprint</button>
           </div>
-          <div class="card"><div id="decision-table"></div></div>
+          <div id="life-sprints"></div>
+        </div>
+
+        <!-- VIEW 10B: PHYSICAL COMBINE -->
+        <div class="log-sub" id="lview-stats">
+          <div class="card-head-row">
+            <div>
+              <h2 class="page-title">Physical Combine</h2>
+              <p class="page-sub">Biometric baseline — height, weight, wingspan, reach and vertical. Measured, not estimated.</p>
+            </div>
+            <button class="btn sm" onclick="saveCombine()">Save Measurements</button>
+          </div>
+          <div id="life-combine"></div>
+        </div>
+
+        <!-- VIEW 10C: SOCIAL SKILLS LEVELING TREE -->
+        <div class="log-sub" id="lview-tree">
+          <div class="card-head-row">
+            <div>
+              <h2 class="page-title">Social Skills Leveling Tree</h2>
+              <p class="page-sub">Grow through Foundation, Connection, Leadership and High-Stakes Networking.</p>
+            </div>
+          </div>
+          <div id="life-tree"></div>
+        </div>
+
+        <!-- VIEW 10C: POST-INTERACTION DEBRIEF -->
+        <div class="log-sub" id="lview-debrief">
+          <div class="card-head-row">
+            <div>
+              <h2 class="page-title">Post-Interaction Debrief</h2>
+              <p class="page-sub">After each meaningful interaction, log the quick win, the hesitation or mistake, and the next adjustment.</p>
+            </div>
+            <button class="btn" onclick="openDebriefModal()">+ Log Debrief</button>
+          </div>
+          <div class="card"><div id="life-debriefs"></div></div>
+        </div>
+
+        <!-- VIEW 10D: LIFE CRM -->
+        <div class="log-sub" id="lview-crm">
+          <div class="card-head-row">
+            <div>
+              <h2 class="page-title">Life CRM</h2>
+              <p class="page-sub">Permanent network contact manager — the people who matter, and when you last reach out.</p>
+            </div>
+            <button class="btn" onclick="openContactModal()">+ New Contact</button>
+          </div>
+          <div class="card"><div id="life-contacts"></div></div>
         </div>
       </section>
 
@@ -1858,21 +2238,160 @@ const CATEGORIES = {
   skiing:     { label: 'Skiing / Coaching',  color: '#9d4edd' },
   life:       { label: 'Life / Recovery',    color: '#e63946' }
 };
-const TITLES = { dashboard: 'Dashboard', log: 'Daily Log & Workouts', school: 'School', goals: 'Goal Matrix', film: 'Film Study', finance: 'Finance Tracker', recruiting: 'Recruiting CRM', mental: 'Mental Game' };
-const DECISION_TYPES = ['Small', 'Medium', 'Big'];
-const DECISION_FRAMEWORKS = ['10-10-10', 'Values Compass', 'Gut Check', 'Pros & Cons', 'Regret Minimization', 'Other'];
+const TITLES = { dashboard: 'Dashboard', routine: 'Daily Routine', log: 'Daily Log & Workouts', school: 'School', goals: 'Goal Matrix', film: 'Film Study', finance: 'Finance Tracker', recruiting: 'Recruiting CRM', mental: 'Mental Game', life: 'Life Maxx' };
 const WEEKLY_PROMPTS = [
   'What did I do this week that moved my goals forward?',
   'Where did I lose focus, and what will I change next week?',
   'What is the hardest thing I am avoiding right now?',
   'What am I grateful for, and who deserves a thank-you?'
 ];
-const RECRUIT_STATUSES = ['Uncontacted', 'Contacted', 'Active Dialogue', 'Offer Extended', 'Committed / Archived'];
+const RECRUIT_STATUSES = ['Not Contacted', 'Email Sent', 'Video Sent', 'Coach Follow-up', 'Visit Scheduled'];
+/* V2.0 pipeline rename — legacy saves are mapped forward, never dropped. */
+const LEGACY_RECRUIT_STATUS = {
+  'Uncontacted': 'Not Contacted', 'Contacted': 'Email Sent',
+  'Active Dialogue': 'Coach Follow-up', 'Offer Extended': 'Visit Scheduled',
+  'Committed / Archived': 'Visit Scheduled'
+};
+function recruitStatus(status){
+  if (RECRUIT_STATUSES.includes(status)) return status;
+  return LEGACY_RECRUIT_STATUS[status] || 'Not Contacted';
+}
 const RECRUIT_ROLES = ['Head Coach', 'Assistant Coach', 'Lead Recruiter', 'Recruiting Coordinator', 'Other'];
 const RECRUIT_DIVISIONS = ['NCAA D1', 'NCAA D2', 'NCAA D3', 'NAIA', 'U Sports', 'JUCO', 'Other'];
 const RECRUIT_TIERS = ['Tier 1 Target', 'Tier 2 Backup', 'Safety'];
 const INTERACTION_TYPES = ['Call', 'Email', 'Campus Visit', 'Camp', 'Official Visit', 'Unofficial Visit', 'Offer'];
 const CONTACT_STALE_DAYS = 14;   // days without contact before the badge goes red
+
+/* ---------- BETA V2.0 additions ---------- */
+const TODO_CATEGORIES = { Basketball: '#45a29e', School: '#f0a500', 'Life Maxx': '#2ec4b6', Finance: '#9d4edd', Personal: '#e63946', Recruiting: '#66a3ff', Other: '#7c8b9a' };
+/* Fixed Time Window — configurable sleep/wake anchor. Default: 9:15 PM lights out → 5:40 AM wake. */
+const DEFAULT_TIME_WINDOW = { bed: '21:15', wake: '05:40', label: 'Target protocol' };
+const TIME_WINDOW_PRESETS = [
+  { label: 'Target protocol', bed: '21:15', wake: '05:40' },
+  { label: 'Earlier wind-down', bed: '20:45', wake: '05:15' },
+  { label: 'Previous protocol', bed: '21:40', wake: '05:45' }
+];
+function timeWindowFrom(tw){
+  const s = tw && typeof tw === 'object' ? tw : {};
+  const ok = v => /^\d{1,2}:\d{2}$/.test(String(v || ''));
+  return {
+    bed:   ok(s.bed)  ? s.bed  : DEFAULT_TIME_WINDOW.bed,
+    wake:  ok(s.wake) ? s.wake : DEFAULT_TIME_WINDOW.wake,
+    label: s.label || DEFAULT_TIME_WINDOW.label
+  };
+}
+function timeWindow(){ return timeWindowFrom(state && state.settings && state.settings.timeWindow); }
+const SHOT_ZONES = [
+  { id: 'c3-left',    label: 'Corner 3 Left',        tag: 'CORNER 3 L',   pts: 3 },
+  { id: 'w3-left',    label: 'Wing 3 Left',          tag: 'WING 3 L',     pts: 3 },
+  { id: 'top3',       label: 'Top of Key 3',         tag: 'TOP KEY 3',    pts: 3 },
+  { id: 'w3-right',   label: 'Wing 3 Right',         tag: 'WING 3 R',     pts: 3 },
+  { id: 'c3-right',   label: 'Corner 3 Right',       tag: 'CORNER 3 R',   pts: 3 },
+  { id: 'wm-left',    label: 'Wing Mid-Range Left',  tag: 'WING MID L',   pts: 2 },
+  { id: 'wm-right',   label: 'Wing Mid-Range Right', tag: 'WING MID R',   pts: 2 },
+  { id: 'sc-left',    label: 'Mid-Range Corner L (Short Corner)', tag: 'SHORT CORNER L', pts: 2 },
+  { id: 'sc-right',   label: 'Mid-Range Corner R (Short Corner)', tag: 'SHORT CORNER R', pts: 2 },
+  { id: 'el-left',    label: 'Elbow Left',           tag: 'ELBOW L',      pts: 2 },
+  { id: 'el-right',   label: 'Elbow Right',          tag: 'ELBOW R',      pts: 2 },
+  { id: 'ft',         label: 'Free Throw',           tag: 'FREE THROW',   pts: 1 },
+  { id: 'mid-center', label: 'Mid-Range Center',     tag: 'MID-RANGE C',  pts: 2 },
+  { id: 'ra',         label: 'Paint (RA)',           tag: 'PAINT · RA',   pts: 2 }
+];
+/* Zones retired from the chart keep feeding the closest surviving zone, so no
+   historically logged makes/attempts disappear from the totals. */
+const SHOT_ZONE_ALIASES = {
+  'ra':       ['ra', 'paint'],
+  'wm-left':  ['wm-left', 'mid-left'],
+  'wm-right': ['wm-right', 'mid-right'],
+  'w3-left':  ['w3-left', 'backcourt']
+};
+const SPRINT_DURATIONS = [21, 30, 45, 60, 90, 120];
+/* Physical Combine — biometric baseline for the Life Maxx > Stats sub-section. */
+const COMBINE_METRICS = [
+  { id: 'height',  label: 'Height',          unit: 'cm', baseline: 172, note: "5'8\" baseline" },
+  { id: 'weight',  label: 'Weight (lbs)',    unit: 'lbs', baseline: '', note: 'Morning, fasted' },
+  { id: 'wingspan',label: 'Wingspan',        unit: 'cm', baseline: '',  note: 'Fingertip to fingertip' },
+  { id: 'reach',   label: 'Standing Reach',  unit: 'cm', baseline: '',  note: 'Both arms up, heels down' },
+  { id: 'maxvert', label: 'Max Vertical',    unit: 'cm', baseline: '',  note: 'Approach jump' },
+  { id: 'standvert', label: 'Standing Vertical', unit: 'cm', baseline: '', note: 'No step, no run-up' }
+];
+function cmToFeet(cm){
+  const v = parseFloat(cm);
+  if (!Number.isFinite(v)) return '';
+  const totalIn = v / 2.54, ft = Math.floor(totalIn / 12), inch = Math.round(totalIn - ft * 12);
+  return ft + "'" + pad(inch) + '"';
+}
+const LIFE_SKILLS = {
+  'Social Skills':    ['Conversations started', 'New people met', 'Compliments given', 'Names remembered'],
+  'Vocal Tonality':   ['Tonality drills (min)', 'Recordings reviewed', 'Pitch-range reps', 'Pace / pause reps'],
+  'Sleep / Recovery': ['Wind-down minutes', 'Screens off by', 'Recovery score (1-10)', 'Naps (min)'],
+  'Focus / Deep Work':['Deep-work blocks', 'Distraction pulls', 'Minutes focused', 'Breaks taken'],
+  'Fitness / Body':   ['Training minutes', 'Protein (g)', 'Steps', 'Mobility (min)']
+};
+const PLAYBOOK_CATS = ['Offenses', 'Defenses / Presses', 'SLOB / BLOB', 'Fast Breaks'];
+const PLAYBOOK_MASTERY = ['Learning', 'Reps', 'Mastered'];
+const ASSIGNMENT_CATEGORIES = ['Homework', 'Quiz', 'Test', 'Project', 'Presentation', 'Other'];
+/* Social Skills tree — 4 tiers, 4 skills per tier, rendered as a clean vertical progression. */
+const SOCIAL_TIERS = [
+  { id: 'tier1', label: 'Tier 1 · Beginner',     color: '#2ecc71' },
+  { id: 'tier2', label: 'Tier 2 · Intermediate', color: '#3b82f6' },
+  { id: 'tier3', label: 'Tier 3 · Expert',       color: '#f0a500' },
+  { id: 'tier4', label: 'Tier 4 · Advanced',     color: '#e63946' }
+];
+const SOCIAL_TREE = [
+  { id: 't1-eye',    tier: 'tier1', label: 'Eye Contact & Vocal Pace', desc: 'Hold steady eye contact and speak at a relaxed, deliberate pace.' },
+  { id: 't1-listen', tier: 'tier1', label: 'Active Listening',          desc: 'Listen to understand, then reflect the key point back.' },
+  { id: 't1-open',   tier: 'tier1', label: 'Asking Open-Ended Questions', desc: 'Questions that open a story instead of a yes/no dead end.' },
+  { id: 't1-thread', tier: 'tier1', label: 'Keeping Conversations Going (Threading)', desc: 'Follow the last detail someone gives you into the next question.' },
+  { id: 't2-group',  tier: 'tier2', label: 'Being Comfortable in Groups', desc: 'Enter a group mid-conversation and contribute without shrinking.' },
+  { id: 't2-story',  tier: 'tier2', label: 'Storytelling',               desc: 'Set-up, tension, punchline — short stories with a point.' },
+  { id: 't2-humor',  tier: 'tier2', label: 'Humor & Playful Banter',    desc: 'Read the tone and add lightness without forcing it.' },
+  { id: 't2-exit',   tier: 'tier2', label: 'Graceful Exits',             desc: 'Leave a conversation on a high note with a clear closer.' },
+  { id: 't3-body',   tier: 'tier3', label: 'Reading Body Language & Subtext', desc: 'Notice what is unsaid — comfort, boredom, interest, tension.' },
+  { id: 't3-room',   tier: 'tier3', label: 'Reading the Room & Inclusion', desc: 'Track the group mood and pull quiet people into the circle.' },
+  { id: 't3-vuln',   tier: 'tier3', label: 'Strategic Vulnerability',   desc: 'Share something real at the right depth and moment.' },
+  { id: 't3-silence',tier: 'tier3', label: 'Comfortable Silence',        desc: 'Let a pause sit without filling it with nervous noise.' },
+  { id: 't4-speak',  tier: 'tier4', label: 'Public Speaking',            desc: 'Command a room — structure, projection, timing, presence.' },
+  { id: 't4-conflict',tier: 'tier4',label: 'Conflict Resolution',        desc: 'Address tension directly, keep the relationship, solve the issue.' },
+  { id: 't4-bound',  tier: 'tier4', label: 'Setting & Enforcing Boundaries', desc: 'Say no clearly and hold the line without apology.' },
+  { id: 't4-compose',tier: 'tier4', label: 'Holding Your Own (Composure / Gravitas)', desc: 'Stay composed under pressure, scrutiny or a direct challenge.' }
+];
+function socialTierMembers(tierId){ return SOCIAL_TREE.filter(n => n.tier === tierId); }
+/* Carry pre-V2.0 XP (foundation / connection / leadership / networking) into the
+   first skill of the matching tier so no earned progress is lost in the redesign. */
+const LEGACY_TREE_XP = { foundation: 't1-eye', connection: 't2-group', leadership: 't3-room', networking: 't4-speak' };
+function socialXpFrom(src){
+  const out = {};
+  SOCIAL_TREE.forEach(n => { out[n.id] = num(src && src[n.id]); });
+  Object.entries(LEGACY_TREE_XP).forEach(([old, nid]) => {
+    if (src && src[old] !== undefined && !out[nid]) out[nid] = num(src[old]);
+  });
+  return out;
+}
+const TREE_LEVELS = [
+  { name: 'Locked',    min: 0 },
+  { name: 'Novice',    min: 1 },
+  { name: 'Practiced', min: 4 },
+  { name: 'Skilled',   min: 8 },
+  { name: 'Mastered',  min: 15 }
+];
+const NCAA_CORE = { english: 'English', math: 'Math', science: 'Natural / Physical Science', social: 'Social Science', extra: 'Additional Core' };
+const NCAA_COURSES = [
+  { id: 'eng10',      label: 'English 10',               grade: '10', credits: 4, cat: 'english', desc: 'BC English Language Arts 10 — foundational reading, writing and oral communication.' },
+  { id: 'foundmath10',label: 'Foundations of Math 10',   grade: '10', credits: 4, cat: 'math',    desc: 'Core algebra, geometry and data — prerequisite track toward Pre-Calculus 11.' },
+  { id: 'sci10',      label: 'Science 10',               grade: '10', credits: 4, cat: 'science', desc: 'Integrated biology, chemistry, physics and earth science foundations.' },
+  { id: 'soc10',      label: 'Social Studies 10',        grade: '10', credits: 4, cat: 'social',  desc: 'Canadian and world history, geography and civic literacy.' },
+  { id: 'precalc11',  label: 'Pre-Calculus 11',          grade: '11', credits: 4, cat: 'math',    desc: 'Advanced algebra, trigonometry and functions — NCAA Math core.' },
+  { id: 'eng11',      label: 'English 11',               grade: '11', credits: 4, cat: 'english', desc: 'Literary analysis and composition — NCAA English core.' },
+  { id: 'chem11',     label: 'Chemistry 11',             grade: '11', credits: 4, cat: 'science', desc: 'Atomic theory, stoichiometry and lab work — NCAA Science core.' },
+  { id: 'bio11',      label: 'Life Sciences 11',         grade: '11', credits: 4, cat: 'science', desc: 'Biology of living systems — NCAA Science core option.' },
+  { id: 'cs11',       label: 'Computer Science 11',      grade: '11', credits: 4, cat: 'extra',   desc: 'Programming and computational thinking — Additional core or elective.' },
+  { id: 'metal11',    label: 'Metalwork 11',             grade: '11', credits: 4, cat: 'extra',   desc: 'Applied design, skills and technology — elective, not an NCAA core.' },
+  { id: 'precalc12',  label: 'Pre-Calculus 12',          grade: '12', credits: 4, cat: 'math',    desc: 'Functions, transformations and calculus readiness — NCAA Math core.' },
+  { id: 'eng12',      label: 'English Studies 12',       grade: '12', credits: 4, cat: 'english', desc: 'Senior English — NCAA English core.' },
+  { id: 'phys12',     label: 'Physics 12',               grade: '12', credits: 4, cat: 'science', desc: 'Mechanics, fields and energy — NCAA Science core.' },
+  { id: 'soc12',      label: '20th Century World History 12', grade: '12', credits: 4, cat: 'social', desc: 'Modern world history — NCAA Social Science core.' }
+];
 const TYPE_META = {
   basketball: { label: 'Basketball', color: '#45a29e' },
   lift:       { label: 'Lift',       color: '#f0a500' },
@@ -1904,12 +2423,19 @@ function drillCategory(dr, setType){
   return 'Other';
 }
 const DEFAULT_CLASS_SLOTS = [
-  { label: 'Pre-Calculus 11', period: 'p1' },
-  { label: 'EPP & New Media 10', period: 'p2' },
-  { label: 'Computer Science 11', period: 'p3' },
-  { label: 'Metalwork 11', period: 'p4' },
-  { label: 'Career Life Ed 10', period: 'off' }
+  /* Semester 1 */
+  { label: 'Pre-Calculus 11',              period: 'p1',  semester: 's1', room: '225', teacher: 'Greg Henderson', credits: 4 },
+  { label: 'EFP New Media 10 + EFP Literary Studies 10', period: 'p2', semester: 's1', room: '240', teacher: 'Erin Tarbuck', credits: 8, multi: true },
+  { label: 'Computer Science 11',          period: 'p3',  semester: 's1', room: '305', teacher: 'Lawrence Duong',   credits: 4 },
+  { label: 'Metalwork 11',                 period: 'p4',  semester: 's1', room: '226', teacher: 'Justine Lee',      credits: 4 },
+  { label: 'Career Life Education',        period: 'off', semester: 's1', room: '',    teacher: 'Kelly Egilsson',   credits: 4, days: ['Thu'], note: 'Thursdays Only', volunteerHours: 48, earnedCredits: 10 },
+  /* Semester 2 */
+  { label: 'Science 10',                   period: 'p1',  semester: 's2', room: '216', teacher: 'Alex Plattner',    credits: 4 },
+  { label: 'Marketing & Promotion 11',     period: 'p2',  semester: 's2', room: '307', teacher: 'Bernice Khong',    credits: 4 },
+  { label: 'PHE 10 NFL',                   period: 'p3',  semester: 's2', room: '260', teacher: 'Leah Wong-Moon',   credits: 4 },
+  { label: 'Social Studies 10',            period: 'p4',  semester: 's2', room: '103', teacher: 'Dan Vellescig',    credits: 4 }
 ];
+
 const safeUrl = value => /^https?:\/\//i.test(String(value || '').trim()) ? String(value).trim() : '';
 
 const LS_KEY = 'phoenix-os-v2';
@@ -1935,7 +2461,7 @@ const DEFAULT_HABITS = [
    backup, and a cloud pull all receive the same baseline. A stored seedVersion
    marks the seed as applied, so anything the user later deletes stays deleted
    and no existing metric is ever overwritten.                                 */
-const SEED_VERSION = 1;
+const SEED_VERSION = 4;
 const SEED_CLASSES = [
   { label: 'Pre-Calculus 11', period: 'p1', currentGrade: 100, targetGrade: 95 }
 ];
@@ -1963,11 +2489,53 @@ const SEED_PRESETS = {
   lift: [],
   strength: []
 };
+/* ---------- V2.0 curriculum cleanup ----------
+   Runs once per save (guarded by seedVersion). It removes the retired
+   single-block EFP media course and folds duplicate Career Life Ed entries into
+   one, carrying their assignments and metadata across instead of dropping them. */
+const RETIRED_CLASS_KEYS = ['eppnewmedia10', 'efpnewmedia10', 'newmedia10', 'eppandnewmedia10'];
+const CLE_CLASS_KEYS = ['careerlifeeducation', 'careerlifeed', 'careerlifeeducation10', 'cle'];       // Career Life Education
+const normalizeClassKey = label => String(label || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+function migrateCurriculum(s){
+  if (!Array.isArray(s.classCats)) s.classCats = [];
+  /* 1. Drop the single-block EFP / New Media 10 entry — the combined 8-credit
+        block (EFP New Media 10 + EFP Literary Studies 10) replaces it. */
+  const retired = s.classCats.filter(c => RETIRED_CLASS_KEYS.includes(normalizeClassKey(c.label)));
+  if (retired.length){
+    s.classCats = s.classCats.filter(c => !retired.includes(c));
+    (s.school || []).forEach(a => {
+      if (retired.some(r => normalizeClassKey(r.label) === normalizeClassKey(a.course)))
+        a.course = 'EFP New Media 10 + EFP Literary Studies 10';
+    });
+  }
+  /* 2. Merge redundant Career Life Ed rows into a single Kelly Egilsson class. */
+  const cleRows = s.classCats.filter(c => CLE_CLASS_KEYS.includes(normalizeClassKey(c.label)));
+  if (cleRows.length){
+    const keep = cleRows.find(c => /egilsson/i.test(String(c.teacher || ''))) || cleRows[0];
+    const dropped = cleRows.filter(c => c !== keep);
+    /* Every spelling of the old rows (including the one being kept) so their
+       assignments can be re-pointed at the surviving class. */
+    const cleKeys = cleRows.map(r => normalizeClassKey(r.label));
+    keep.label = 'Career Life Education';
+    if (!keep.teacher) keep.teacher = 'Kelly Egilsson';
+    if (!keep.period) keep.period = 'off';
+    keep.days = ['Thu'];
+    keep.note = 'Thursdays Only';
+    keep.volunteerHours = num(keep.volunteerHours) || 48;
+    keep.earnedCredits  = num(keep.earnedCredits)  || 10;
+    (s.school || []).forEach(a => {
+      if (cleKeys.includes(normalizeClassKey(a.course))) a.course = keep.label;
+    });
+    if (dropped.length) s.classCats = s.classCats.filter(c => !dropped.includes(c));
+  }
+  return s;
+}
 function seedDefaults(s){
   if (!s || typeof s !== 'object') return s;
   if ((Number(s.seedVersion) || 0) >= SEED_VERSION) return s;
   if (!Array.isArray(s.school))    s.school = [];
   if (!Array.isArray(s.classCats)) s.classCats = [];
+  migrateCurriculum(s);
   SEED_CLASSES.forEach(seed => {
     let c = s.classCats.find(x => String(x.label || '').trim().toLowerCase() === seed.label.toLowerCase());
     if (!c){
@@ -1982,6 +2550,32 @@ function seedDefaults(s){
                                && String(a.assignment || '').trim().toLowerCase() === seed.assignment.toLowerCase());
     if (!dup) s.school.push({ ...seed, id: 'school-' + uid() });
   });
+  /* Pre-load the full Semester 1 + Semester 2 timetable (Phase 2 curriculum seed).
+     Existing classes are never duplicated or overwritten — only blank meta is filled. */
+  DEFAULT_CLASS_SLOTS.forEach(slot => {
+    const sem = slot.semester || 's1';
+    const match = s.classCats.find(c => String(c.label || '').trim().toLowerCase() === slot.label.toLowerCase() && (c.semester || 's1') === sem);
+    if (match){
+      if (!match.room && slot.room) match.room = slot.room;
+      if (!match.teacher && slot.teacher) match.teacher = slot.teacher;
+      if (slot.multi) match.multi = true;
+      if (slot.note) match.note = slot.note;
+      if (Array.isArray(slot.days) && slot.days.length) match.days = slot.days.slice();
+      if (slot.volunteerHours) match.volunteerHours = slot.volunteerHours;
+      if (slot.earnedCredits)  match.earnedCredits  = slot.earnedCredits;
+      if ((match.credits === undefined || match.credits === null || match.credits === '' || match.credits === 4) && slot.credits) match.credits = slot.credits;
+    } else {
+      s.classCats.push({ id: 'class-' + uid(), label: slot.label, category: classCategory(slot.label), room: slot.room || '', teacher: slot.teacher || '', credits: slot.credits || 4, multi: !!slot.multi, period: slot.period, semester: sem, note: slot.note || '', days: Array.isArray(slot.days) ? slot.days.slice() : [], volunteerHours: slot.volunteerHours || '', earnedCredits: slot.earnedCredits || '', currentGrade: '', targetGrade: '' });
+    }
+  });
+  /* Career Life Education metadata: 48 logged volunteer hours, 10 earned credits. */
+  s.extracurricular = s.extracurricular && typeof s.extracurricular === 'object' ? s.extracurricular : {};
+  if (!Array.isArray(s.extracurricular.volunteerHours)) s.extracurricular.volunteerHours = [];
+  if (s.extracurricular.volunteerGoal === undefined || s.extracurricular.volunteerGoal === null || s.extracurricular.volunteerGoal === '') s.extracurricular.volunteerGoal = 48;
+  if (s.extracurricular.xcCredits === undefined || s.extracurricular.xcCredits === null || s.extracurricular.xcCredits === '') s.extracurricular.xcCredits = 10;
+  if (!s.extracurricular.volunteerHours.length){
+    s.extracurricular.volunteerHours.push({ id: 'vol-' + uid(), date: '', org: 'Community service (logged total)', hours: 48, notes: 'Carried over from the Career Life Education record.' });
+  }
   s.presets = s.presets && typeof s.presets === 'object' ? s.presets : { basketball: [], lift: [], strength: [] };
   ['basketball', 'lift', 'strength'].forEach(type => {
     if (!Array.isArray(s.presets[type])) s.presets[type] = [];
@@ -2071,11 +2665,13 @@ function defaultState(){
     seedVersion: 0,     // marks the automatic seed data as applied (see seedDefaults)
     habits: DEFAULT_HABITS.map(h => ({ ...h })),
     school: [],         // academic assignment database
-    classCats: DEFAULT_CLASS_SLOTS.map(c => ({ id: 'class-' + uid(), label: c.label, category: classCategory(c.label), room: '', teacher: '', credits: 4, period: c.period, semester: 's1', currentGrade: '', targetGrade: '' })),      // registered classes (e.g. Pre-Calculus 11)
+    classCats: DEFAULT_CLASS_SLOTS.map(c => ({ id: 'class-' + uid(), label: c.label, category: classCategory(c.label), room: c.room || '', teacher: c.teacher || '', credits: c.credits || 4, multi: !!c.multi, period: c.period, semester: c.semester || 's1', note: c.note || '', days: Array.isArray(c.days) ? c.days.slice() : [], volunteerHours: c.volunteerHours || '', earnedCredits: c.earnedCredits || '', currentGrade: '', targetGrade: '' })),      // registered classes (e.g. Pre-Calculus 11)
     extracurricular: { volunteerGoal: '', xcCredits: '', volunteerHours: [] },  // volunteer hours + graduation credits
     mental: {
       weekly: {},        // weekStartKey -> { prompts: {q: a}, notes }
-      decisions: []      // { id, name, type, framework, confidence, reviewed, notes, date }
+      decisions: [],     // { id, name, type, framework, confidence, reviewed, notes, date }
+      scouting: { videoUrl: '', title: '', notes: [], matchups: [] },
+      playbook: []       // { id, cat, name, url, notes, mastery }
     },
     live: {              // LIVE WORKOUT MODE (in-progress session buffer)
       active: false, dateKey: '', location: 'DT', note: '', drill: '',
@@ -2103,8 +2699,18 @@ function defaultState(){
       investPlan: { start: '', monthly: '', rate: 7 }   // compound calculator inputs
     },
     recruiting: [],     // { id, school, lead, coach, role, email, phone, lastContact, notes, filmLink, status }
+    routine: { blocks: [] },   // editable daily routine time-blocks
+    shotMap: {},               // zoneId -> { m, a } lifetime multi-zone shot chart
+    ncaa: { paths: [], selectedNode: 'precalc11' },   // BC -> NCAA mind map
+    life: {                    // LIFE MAXX skill sprints, physical combine, leveling, debriefs & network
+      sprints: [], debriefs: [], contacts: [],
+      combine: { height: 172, weight: '', wingspan: '', reach: '', maxvert: '', standvert: '', updated: '' },
+      levelXp: socialXpFrom(null)
+    },
     settings: {
       activeTab: 'dashboard', logDate: yesterdayKey(), pmType: 'basketball',
+      timeWindow: { ...DEFAULT_TIME_WINDOW },
+      schoolCatFilter: 'all',  // Assignments category filter: all | Homework | Quiz | Test | Project | Presentation | Other
       schoolSem: 's1',        // Semester 1 / Semester 2 view filter
       schoolClassId: '',      // selected class detail page
       logView: 'session',     // Workout Sessions | Daily Log Entry | Records
@@ -2115,7 +2721,9 @@ function defaultState(){
       schoolFilter: 'all',    // Assignments filter: all | active | archived
       recruitFilter: 'all',   // Recruiting CRM filter: all | one of RECRUIT_STATUSES
       recruitDivFilter: 'all', // Recruiting CRM division filter: all | one of RECRUIT_DIVISIONS
-      mentalView: 'journal'   // Mental sub-view: Journaling | Decision Archive
+      recruitWishOnly: false,  // Recruiting CRM: show only starred wishlist targets
+      mentalView: 'journal',  // Mental sub-view: Journaling | Decision Archive | Scouting | Playbook
+      lifeView: 'sprints'     // Life Maxx sub-view: sprints | tree | debrief | crm
     }
   };
 }
@@ -2126,7 +2734,7 @@ function mergeState(p){
     version: 2,
     seedVersion: Number(p.seedVersion) || 0,
     habits:   Array.isArray(p.habits)   && p.habits.length   ? p.habits.map(h => ({ ...h, type: h.type || 'good', desc: h.desc || '', target: h.target ?? '' })) : d.habits,
-    school:   Array.isArray(p.school)   ? p.school.map(a => ({ ...a, semester: a.semester || 's1', status: a.status || 'Not Started' })) : d.school,
+    school:   Array.isArray(p.school)   ? p.school.map(a => ({ ...a, semester: a.semester || 's1', status: a.status || 'Not Started', desc: a.desc || '', category: ASSIGNMENT_CATEGORIES.includes(a.category) ? a.category : (a.category === 'Exam' ? 'Test' : (a.category || 'Homework')) })) : d.school,
     classCats: Array.isArray(p.classCats) && p.classCats.length ? p.classCats.map(c => ({ ...c, category: c.category || classCategory(c.label), room: c.room || '', teacher: c.teacher || '', credits: (c.credits === undefined || c.credits === null || c.credits === '') ? 4 : c.credits, period: c.period || 'p1', semester: c.semester || 's1', targetGrade: c.targetGrade ?? '', currentGrade: c.currentGrade ?? '' })) : d.classCats,
     extracurricular: p.extracurricular && typeof p.extracurricular === 'object'
       ? {
@@ -2176,7 +2784,21 @@ function mergeState(p){
                 framework: x.framework || 'Gut Check', confidence: x.confidence ?? 3,
                 reviewed: !!x.reviewed, notes: x.notes || '', date: x.date || ''
               }))
-            : []
+            : [],
+          scouting: (p.mental.scouting && typeof p.mental.scouting === 'object')
+            ? {
+                videoUrl: p.mental.scouting.videoUrl || '', title: p.mental.scouting.title || '',
+                notes: Array.isArray(p.mental.scouting.notes) ? p.mental.scouting.notes.map(n => ({ id: n.id || uid(), stamp: n.stamp || '', text: n.text || '' })) : [],
+                matchups: Array.isArray(p.mental.scouting.matchups) ? p.mental.scouting.matchups.map(x => ({
+                  id: x.id || uid(), team: x.team || '', number: x.number || '', name: x.name || '', position: x.position || '',
+                  height: x.height || '', weight: x.weight || '', hand: x.hand || 'Right', tendencies: x.tendencies || '', defense: x.defense || ''
+                })) : []
+              }
+            : { videoUrl: '', title: '', notes: [], matchups: [] },
+          playbook: Array.isArray(p.mental.playbook) ? p.mental.playbook.map(x => ({
+            id: x.id || uid(), cat: PLAYBOOK_CATS.includes(x.cat) ? x.cat : 'Offenses',
+            name: x.name || '', url: x.url || '', notes: x.notes || '', mastery: PLAYBOOK_MASTERY.includes(x.mastery) ? x.mastery : 'Learning'
+          })) : []
         }
       : d.mental,
     presets: mergePresetCollections({
@@ -2193,7 +2815,9 @@ function mergeState(p){
           id: t.id || uid(), text: t.text || '', done: !!t.done,
           scheduledDate: t.scheduledDate || '',
           priority: TODO_LEVELS.includes(t.priority) ? t.priority : 'Medium',
-          urgency: TODO_LEVELS.includes(t.urgency) ? t.urgency : 'Medium'
+          urgency: TODO_LEVELS.includes(t.urgency) ? t.urgency : 'Medium',
+          desc: t.desc || '', targetDate: t.targetDate || '', cutoffDate: t.cutoffDate || '',
+          category: t.category && TODO_CATEGORIES[t.category] ? t.category : 'Personal'
         }))]))
       : {},
     goals:        Array.isArray(p.goals)        ? p.goals.map(g => ({ ...g, desc: g.desc || '', milestones: (g.milestones || []).map(m => ({ ...m, curriculum: m.curriculum || '' })) })) : d.goals,
@@ -2241,14 +2865,42 @@ function mergeState(p){
           lastContact: c.lastContact || '', notes: c.notes || '', filmLink: c.filmLink || '',
           division: RECRUIT_DIVISIONS.includes(c.division) ? c.division : 'Other',
           priorityRank: RECRUIT_TIERS.includes(c.priorityRank) ? c.priorityRank : 'Tier 2 Backup',
-          status: RECRUIT_STATUSES.includes(c.status) ? c.status : 'Uncontacted',
+          status: recruitStatus(c.status),
+          starred: !!c.starred,
           interactions: Array.isArray(c.interactions)
             ? c.interactions.map(i => ({ id: i.id || uid(), type: INTERACTION_TYPES.includes(i.type) ? i.type : 'Call', date: i.date || '', notes: i.notes || '' }))
             : []
         }))
       : [],
-    settings: { ...d.settings, ...(p.settings || {}), schoolClassId: (p.settings && p.settings.schoolClassId) || '', schoolFilter: ['all', 'active', 'archived'].includes(p.settings && p.settings.schoolFilter) ? p.settings.schoolFilter : 'all', recruitFilter: ['all', ...RECRUIT_STATUSES].includes(p.settings && p.settings.recruitFilter) ? p.settings.recruitFilter : 'all', recruitDivFilter: ['all', ...RECRUIT_DIVISIONS].includes(p.settings && p.settings.recruitDivFilter) ? p.settings.recruitDivFilter : 'all', mentalView: ['journal', 'decisions'].includes(p.settings && p.settings.mentalView) ? p.settings.mentalView : 'journal' }
+    routine: p.routine && typeof p.routine === 'object'
+      ? { blocks: Array.isArray(p.routine.blocks) ? p.routine.blocks.map(b => ({ id: b.id || uid(), time: b.time || '', label: b.label || '', cat: b.cat || 'Personal' })) : [] }
+      : { blocks: [] },
+    shotMap: p.shotMap && typeof p.shotMap === 'object'
+      ? Object.fromEntries(Object.entries(p.shotMap).map(([k, v]) => [k, { m: num(v && v.m), a: num(v && v.a) }]))
+      : {},
+    ncaa: p.ncaa && typeof p.ncaa === 'object'
+      ? {
+          selectedNode: p.ncaa.selectedNode || 'precalc11',
+          paths: Array.isArray(p.ncaa.paths) ? p.ncaa.paths.map(x => ({ id: x.id || uid(), name: x.name || 'Path', target: x.target || 'NCAA D1', nodeIds: Array.isArray(x.nodeIds) ? x.nodeIds.slice() : [] })) : []
+        }
+      : { paths: [], selectedNode: 'precalc11' },
+    life: p.life && typeof p.life === 'object'
+      ? {
+          sprints: Array.isArray(p.life.sprints) ? p.life.sprints.map(s => ({
+            id: s.id || uid(), skill: LIFE_SKILLS[s.skill] ? s.skill : 'Social Skills',
+            days: clamp(parseInt(s.days, 10) || 30, 1, 365),
+            startDate: s.startDate || todayKey(), endDate: s.endDate || '', notes: s.notes || '',
+            logs: s.logs && typeof s.logs === 'object' ? s.logs : {}
+          })) : [],
+          debriefs: Array.isArray(p.life.debriefs) ? p.life.debriefs.map(d2 => ({ id: d2.id || uid(), date: d2.date || '', person: d2.person || '', win: d2.win || '', mistake: d2.mistake || '', adjust: d2.adjust || '' })) : [],
+          contacts: Array.isArray(p.life.contacts) ? p.life.contacts.map(c => ({ id: c.id || uid(), name: c.name || '', relation: c.relation || '', lastContact: c.lastContact || '', notes: c.notes || '' })) : [],
+          levelXp: socialXpFrom(p.life.levelXp),
+          combine: p.life.combine && typeof p.life.combine === 'object' ? { ...p.life.combine } : {}
+        }
+      : d.life,
+    settings: { ...d.settings, ...(p.settings || {}), schoolClassId: (p.settings && p.settings.schoolClassId) || '', schoolFilter: ['all', 'active', 'archived'].includes(p.settings && p.settings.schoolFilter) ? p.settings.schoolFilter : 'all', recruitFilter: ['all', ...RECRUIT_STATUSES].includes(p.settings && p.settings.recruitFilter) ? p.settings.recruitFilter : 'all', recruitDivFilter: ['all', ...RECRUIT_DIVISIONS].includes(p.settings && p.settings.recruitDivFilter) ? p.settings.recruitDivFilter : 'all',    mentalView: ['journal'].includes(p.settings && p.settings.mentalView) ? p.settings.mentalView : 'journal', filmView: ['games', 'plays', 'study', 'scouting', 'playbook'].includes(p.settings && p.settings.filmView) ? p.settings.filmView : 'games', lifeView: ['sprints', 'stats', 'tree', 'debrief', 'crm'].includes(p.settings && p.settings.lifeView) ? p.settings.lifeView : 'sprints' }
   };
+  merged.settings.timeWindow = timeWindowFrom(p.settings && p.settings.timeWindow);
   // Baseline data is merged in exactly once, then respected as user-owned.
   return seedDefaults(merged);
 }
@@ -2404,12 +3056,14 @@ function renderAll(){
   applyGoalView();
   applySchoolView();
   renderDashboard();
+  renderRoutine();
   renderLogFields();
   renderWorkoutSession(state.settings.logDate);
   renderLogHistory();
   renderGoals();
   renderTodoMatrix();
   renderRecords();
+  renderShots();
   renderHabitsPanel();
   renderClassCats();
   renderSchool();
@@ -2425,11 +3079,17 @@ function renderAll(){
   if (state.settings.filmView === 'games') renderFilmGames();
   if (state.settings.filmView === 'plays') renderFilmPlays();
   if (state.settings.filmView === 'study') renderFilmStudy();
+  if (state.settings.filmView === 'scouting') renderScouting();
+  if (state.settings.filmView === 'playbook') renderPlaybook();
+  renderSchoolGpa();
+  renderCombine();
   renderFinance();
   renderRecruiting();
   applyMentalView();
   renderMental();
   renderExtracurricular();
+  applyLifeView();
+  renderLife();
   if (liveState().active) renderLive();
 }
 
@@ -3368,11 +4028,25 @@ function todoLocation(id){
   }
   return null;
 }
+function ensureTodoCategoryOptions(){
+  const el = document.getElementById('todo-category');
+  if (!el || el.dataset.ready === '1') return;
+  el.innerHTML = Object.keys(TODO_CATEGORIES).map(c => '<option value="' + c + '"' + (c === 'Personal' ? ' selected' : '') + '>' + c + '</option>').join('');
+  el.dataset.ready = '1';
+  el.value = 'Personal';
+}
+function todoMetaLine(t){
+  const bits = [];
+  if (t.targetDate) bits.push('🎯 Target ' + fmtDate(t.targetDate));
+  if (t.cutoffDate) bits.push('⛔ Cut-off ' + fmtDate(t.cutoffDate));
+  return bits.length ? '<small class="todo-scheduled">' + bits.join(' · ') + '</small>' : '';
+}
 function renderTodos(){
   const key = todayKey();
   const list = todoEntriesForDate(key);
   const done = list.filter(t => t.done).length;
   document.getElementById('todo-counter').textContent = done + ' / ' + list.length + ' done';
+  ensureTodoCategoryOptions();
   document.getElementById('todo-bar').style.width = list.length ? (done / list.length * 100) + '%' : '0%';
   /* completed items sink to the bottom */
   const ordered = [...list].sort((a, b) => (a.done ? 1 : 0) - (b.done ? 1 : 0));
@@ -3381,8 +4055,11 @@ function renderTodos(){
         '<li class="todo-item' + (t.done ? ' done' : '') + '">' +
           '<input type="checkbox" class="t-check" ' + (t.done ? 'checked' : '') + ' onchange="toggleTodo(\'' + t.id + '\')">' +
           '<span class="t-text">' + esc(t.text) +
+            catBadge(t.category || 'Personal') +
             todoPill(t) +
-            (t.scheduledDate ? '<small class="todo-scheduled">Scheduled · ' + esc(fmtDate(t.scheduledDate)) + '</small>' : '') + '</span>' +
+            (t.desc ? '<small class="todo-desc-line">' + esc(t.desc) + '</small>' : '') +
+            ((t.scheduledDate || t.targetDate || t.cutoffDate) ? '<small class="todo-scheduled">' + (t.scheduledDate ? 'Scheduled · ' + esc(fmtDate(t.scheduledDate)) : '') + '</small>' : '') +
+            todoMetaLine(t) + '</span>' +
           '<button class="icon-btn" onclick="deleteTodo(\'' + t.id + '\')" title="Delete">✕</button>' +
         '</li>').join('')
     : '<li class="empty">No tasks yet — add one above.</li>';
@@ -3420,12 +4097,15 @@ function renderTodoMatrix(){
       '<div class="quad-task' + (t.done ? ' done' : '') + '">' +
         '<div class="qt-top">' +
           '<input type="checkbox" class="t-check" ' + (t.done ? 'checked' : '') + ' onchange="toggleTodo(\'' + t.id + '\')">' +
-          '<span class="qt-text">' + esc(t.text) + '<span class="qt-date">' + esc(fmtDate(t._scheduled)) + '</span></span>' +
+          '<span class="qt-text">' + esc(t.text) + catBadge(t.category || 'Personal') + '<span class="qt-date">' + esc(fmtDate(t._scheduled)) + '</span>' +
+            (t.desc ? '<span class="qt-desc">' + esc(t.desc) + '</span>' : '') +
+            (todoMetaLine(t) ? '<span class="qt-dates">' + todoMetaLine(t) + '</span>' : '') + '</span>' +
           '<button class="icon-btn danger" onclick="deleteTodo(\'' + t.id + '\')" title="Delete">✕</button>' +
         '</div>' +
         '<div class="qt-selects">' +
           '<select class="mini-sel" onchange="setTodoField(\'' + t.id + '\',\'priority\',this.value)" title="Priority (Impact)">' + opts(todoPriority(t), 'Impact') + '</select>' +
           '<select class="mini-sel" onchange="setTodoField(\'' + t.id + '\',\'urgency\',this.value)" title="Urgency (Time)">' + opts(todoUrgency(t), 'Time') + '</select>' +
+          '<select class="mini-sel" onchange="setTodoField(\'' + t.id + '\',\'category\',this.value)" title="Category tag">' + Object.keys(TODO_CATEGORIES).map(c => '<option value="' + c + '"' + ((t.category || 'Personal') === c ? ' selected' : '') + '>' + c + '</option>').join('') + '</select>' +
         '</div>' +
       '</div>').join('')
       : '<div class="empty sm">Nothing here.</div>';
@@ -3444,16 +4124,28 @@ function addTodo(){
   const scheduledDate = document.getElementById('todo-date').value || key;
   const pEl = document.getElementById('todo-priority');
   const uEl = document.getElementById('todo-urgency');
+  const cEl = document.getElementById('todo-category');
+  const dEl = document.getElementById('todo-desc');
+  const tgEl = document.getElementById('todo-target');
+  const coEl = document.getElementById('todo-cutoff');
   state.todos[key] = state.todos[key] || [];
   state.todos[key].push({
     id: uid(), text: val, done: false, scheduledDate,
     priority: pEl ? pEl.value : 'Medium',
-    urgency: uEl ? uEl.value : 'Medium'
+    urgency: uEl ? uEl.value : 'Medium',
+    desc: dEl ? dEl.value.trim() : '',
+    targetDate: tgEl ? tgEl.value : '',
+    cutoffDate: coEl ? coEl.value : '',
+    category: cEl && cEl.value ? cEl.value : 'Personal'
   });
   document.getElementById('todo-input').value = '';
   document.getElementById('todo-date').value = '';
+  if (dEl) dEl.value = '';
+  if (tgEl) tgEl.value = '';
+  if (coEl) coEl.value = '';
   if (pEl) pEl.value = 'Medium';
   if (uEl) uEl.value = 'Medium';
+  if (cEl) cEl.value = 'Personal';
   save();
   renderTodos();
   renderTodoMatrix();
@@ -3485,6 +4177,8 @@ const LOG_FIELD_MAP = {
   'log-film':     { key: 'film',     parse: v => v },
   'log-meal':     { key: 'meal',     parse: v => v },
   'log-win':      { key: 'win',      parse: v => v },
+  'log-adjust':   { key: 'adjust',   parse: v => v },
+  'log-notes':    { key: 'notes',    parse: v => v },
   'log-weighin':  { key: 'weighIn',  parse: v => v === '' ? null : parseFloat(v) }
 };
 
@@ -3555,7 +4249,11 @@ function renderLogFields(){
   document.getElementById('log-score-val').textContent = score;
   document.getElementById('log-film').value = entry.film || '';
   document.getElementById('log-meal').value = entry.meal || '';
+  /* Daily Reflection / Wins Log — 3 night-shutdown prompts. */
   document.getElementById('log-win').value = entry.win || '';
+  const adjEl = document.getElementById('log-adjust'), noteEl = document.getElementById('log-notes');
+  if (adjEl) adjEl.value = entry.adjust || '';
+  if (noteEl) noteEl.value = entry.notes || '';
 
   /* Sunday Weigh-In — shown only when the log date is a Sunday */
   const wiWrap = document.getElementById('weighin-wrap');
@@ -3574,25 +4272,13 @@ function renderLogFields(){
     } else { wl.style.display = 'none'; wl.innerHTML = ''; }
   }
 
-  renderHabits();
   renderDraftBanner(key);
 }
 
-function renderHabits(){
-  const key = state.settings.logDate;
-  const entry = state.logs[key] || {};
-  document.getElementById('log-habits').innerHTML = state.habits.map(h => {
-    const done = !!(entry.habits && entry.habits[h.id]);
-    return '<label class="habit' + (done ? ' done' : '') + '">' +
-      '<input type="checkbox" onchange="toggleHabit(\'' + h.id + '\')" ' + (done ? 'checked' : '') + '>' +
-      '<span>' + esc(h.label) + '</span>' +
-    '</label>';
-  }).join('');
-  const done = state.habits.filter(h => entry.habits && entry.habits[h.id]).length;
-  const ratio = document.getElementById('habit-ratio');
-  ratio.textContent = done + ' / ' + state.habits.length + ' habits completed';
-  ratio.classList.toggle('full', done === state.habits.length);
-}
+/* V2.0: habits were pulled out of the Daily Log — tracking now lives in the
+   Goal Matrix and the Daily Routine tab. This keeps both in sync after any
+   habit definition change instead of writing into the retired log grid. */
+function renderHabits(){ renderRoutine(); renderHabitsPanel(); }
 function toggleHabit(id){
   snapshot();
   const key = state.settings.logDate;
@@ -3626,7 +4312,7 @@ function hasLogData(v){
   if (!v) return false;
   if (v.sleep !== undefined && v.sleep !== null) return true;
   if (v.weighIn !== undefined && v.weighIn !== null) return true;
-  if (v.score || v.win || v.film || v.meal || v.workoutLabel) return true;
+  if (v.score || v.win || v.adjust || v.notes || v.film || v.meal || v.workoutLabel) return true;
   return !!(v.habits && Object.keys(v.habits).some(k => v.habits[k]));
 }
 function renderLogHistory(){
@@ -3647,7 +4333,6 @@ function renderLogHistory(){
 }
 function logEntryHtml(k, v){
   v = v || {};
-  const habitsDone = state.habits.filter(h => v.habits && v.habits[h.id]).map(h => h.label);
   const s = state.workouts[k];
   const row = (label, val) => val ? '<div class="le-row"><span class="le-row-label">' + label + '</span><span>' + esc(val) + '</span></div>' : '';
   return '<details class="log-entry">' +
@@ -3659,11 +4344,12 @@ function logEntryHtml(k, v){
     '<div class="le-body">' +
       row('Sleep', v.sleep !== undefined && v.sleep !== null ? (v.bedTime ? fmtSleepDur(Math.round(v.sleep * 60)) + ' (bed ' + v.bedTime + ' → wake ' + (v.wakeTime || '?') + ')' : v.sleep + ' hrs') : '') +
       row('Weigh-In', v.weighIn !== undefined && v.weighIn !== null ? v.weighIn + ' lbs' : '') +
-      row('Habits', habitsDone.length ? habitsDone.join(', ') : '') +
       row('Workout', v.workoutLabel || (s ? workoutSummaryLine(s) : '')) +
       row('Film Study', v.film) +
       row('Meals', v.meal) +
-      row('Daily Win', v.win) +
+      row('What went well', v.win) +
+      row('Needs adjustment', v.adjust) +
+      row('Notes', v.notes) +
     '</div>' +
   '</details>';
 }
@@ -3802,11 +4488,12 @@ function setLogView(v){
   save();
   applyLogView();
   if (v === 'records') renderRecords();
+  if (v === 'shots') renderShots();
 }
 function applyLogView(){
   const v = state.settings.logView || 'session';
   $$('#log-subtabs .sub-tab').forEach(b => b.classList.toggle('active', b.dataset.lv === v));
-  const map = { session: 'log-view-session', entry: 'log-view-entry', records: 'log-view-records' };
+  const map = { session: 'log-view-session', entry: 'log-view-entry', records: 'log-view-records', shots: 'log-view-shots' };
   Object.entries(map).forEach(([k, id]) => {
     const el = document.getElementById(id);
     if (el) el.classList.toggle('active', k === v);
@@ -4272,7 +4959,7 @@ function habitMonthBase(){
   d.setMonth(d.getMonth() + habitMonthOffset);
   return d;
 }
-function setHabitMonth(delta){ habitMonthOffset += delta; renderHabitsPanel(); }
+function setHabitMonth(delta){ habitMonthOffset += delta; renderHabitsPanel(); renderRoutine(); }
 function habitMonthCompletionPct(){
   // Average completion across every habit × day in the visible month (up to today for the current month).
   const base = habitMonthBase();
@@ -4414,6 +5101,7 @@ function toggleHabitDate(id, key){
   state.logs[key].habits[id] = !state.logs[key].habits[id];
   save();
   renderHabitsPanel();
+  renderRoutine();
   if (key === state.settings.logDate) renderHabits();
 }
 function renderHabitsPanel(){
@@ -4441,10 +5129,12 @@ function renderHabitsPanel(){
       (badList.length ? badList.map(h => habitRowHtml(h, entry).row).join('') : '<div class="empty sm">None yet.</div>') +
     '</div>' +
     '<div class="paste-hint" style="margin-top:12px">Streak = consecutive days completed (good) or kept clean (banned). Checkboxes reflect <b>' + fmtDate(key) + '</b>. Use <b>Description / Target</b> to set a monthly goal.</div>';
+  renderRoutine();
 }
 function toggleHabitPanel(id){
   toggleHabit(id);
   renderHabitsPanel();
+  renderRoutine();
 }
 function habitRowHtml(h, entry){
   const done = !!(entry.habits && entry.habits[h.id]);
@@ -4586,9 +5276,9 @@ const CLASS_CATEGORIES = {
 };
 function classCategory(label){
   const name = String(label || '').trim().toLowerCase();
-  if (['pre-calculus 11', 'computer science 11', 'metalwork 11'].includes(name)) return 'stem';
-  if (['epp & new media 10', 'social studies'].includes(name)) return 'literature';
-  if (['career life ed 10', 'marketing & promotion', 'physical education'].includes(name)) return 'electives';
+  if (name.includes('pre-calculus') || name.includes('computer science') || name.includes('metalwork') || name.includes('science 10') || name.includes('chemistry') || name.includes('physics')) return 'stem';
+  if (name.includes('efp') || name.includes('epp') || name.includes('new media') || name.includes('literary') || name.includes('social studies') || name.includes('english')) return 'literature';
+  if (name.includes('career life') || name.includes('marketing') || name.includes('physical education') || name.includes('phe')) return 'electives';
   return 'other';
 }
 function classTheme(label){
@@ -4606,9 +5296,11 @@ let ccEditId = null;
 function classMetaHtml(c, compact){
   const bits = [];
   if (c.period) bits.push(periodLabel(c.period));
+  if (Array.isArray(c.days) && c.days.length) bits.push(c.days.join(' / ') + ' only');
   if (c.room) bits.push('Rm ' + c.room);
   if (c.teacher) bits.push(c.teacher);
   bits.push(classCredits(c) + ' cr');
+  if (c.note && !bits.includes(c.note)) bits.push(c.note);
   return (bits.length ? ' <span class="cc-meta">' + esc(bits.join(' · ')) + '</span>' : '');
 }
 /* Every class carries a credit weight (defaults to 4). */
@@ -4761,6 +5453,7 @@ function setSchoolView(v){
   if (v === 'tt') renderSchoolTT();
   if (v === 'classes') renderSchoolClasses();
   if (v === 'class-detail') renderClassDetail();
+  if (v === 'ncaa') renderNcaa();
 }
 function applySchoolView(){
   const v = state.settings.schoolView || 'assign';
@@ -4769,25 +5462,31 @@ function applySchoolView(){
   const showClasses = v === 'classes';
   const showDetail = v === 'class-detail';
   const showXc = v === 'xc';
+  const showNcaa = v === 'ncaa';
   const a = document.getElementById('sview-assign');
   const t = document.getElementById('sview-tt');
   const c = document.getElementById('sview-classes');
   const d = document.getElementById('sview-class-detail');
   const x = document.getElementById('sview-xc');
+  const n = document.getElementById('sview-ncaa');
   if (a) a.style.display = showAssign ? '' : 'none';
   if (t) t.style.display = showTT ? '' : 'none';
   if (c) c.style.display = showClasses ? '' : 'none';
   if (d) d.style.display = showDetail ? '' : 'none';
   if (x) x.style.display = showXc ? '' : 'none';
+  if (n) n.style.display = showNcaa ? '' : 'none';
   const ba = document.getElementById('sview-btn-assign');
   const bt = document.getElementById('sview-btn-tt');
   const bc = document.getElementById('sview-btn-classes');
   const bx = document.getElementById('sview-btn-xc');
+  const bn = document.getElementById('sview-btn-ncaa');
   if (ba) ba.classList.toggle('active', showAssign);
   if (bt) bt.classList.toggle('active', showTT);
   if (bc) bc.classList.toggle('active', showClasses || showDetail);
   if (bx) bx.classList.toggle('active', showXc);
+  if (bn) bn.classList.toggle('active', showNcaa);
   if (showXc) renderExtracurricular();
+  if (showNcaa) renderNcaa();
 }
 
 /* ---------- Automated GPA tracker (all semesters, credit-weighted) ---------- */
@@ -4820,15 +5519,30 @@ function gpaSummary(){
     total: (state.classCats || []).length
   };
 }
+function gpaKickerText(){
+  const s = gpaSummary();
+  return s.graded + ' of ' + s.total + ' classes graded · ' + fmtNum(s.credits) + ' credits';
+}
+/* Real-time GPA / average module — rendered on the School dashboard and the
+   Extracurricular sub-tab from the same credit-weighted calculation. */
+function renderSchoolGpa(){
+  const el = document.getElementById('school-gpa');
+  if (!el) return;
+  const kick = document.getElementById('school-gpa-kicker');
+  if (kick) kick.textContent = gpaKickerText();
+  el.innerHTML = gpaWidgetHtml();
+}
 function renderGpaWidget(){
   const el = document.getElementById('xc-gpa');
   if (!el) return;
-  const s = gpaSummary();
   const kick = document.getElementById('gpa-kicker');
-  if (kick) kick.textContent = s.graded + ' of ' + s.total + ' classes graded · ' + fmtNum(s.credits) + ' credits';
+  if (kick) kick.textContent = gpaKickerText();
+  el.innerHTML = gpaWidgetHtml();
+}
+function gpaWidgetHtml(){
+  const s = gpaSummary();
   if (!s.graded){
-    el.innerHTML = empty('No graded classes yet — add a Current Grade on a class or log a scored assignment, then your GPA appears here automatically.');
-    return;
+    return empty('No graded classes yet — add a Current Grade on a class or log a scored assignment, then your GPA appears here automatically.');
   }
   const R = 52, CIRC = 2 * Math.PI * R, pctOf4 = clamp(s.gpa / 4 * 100, 0, 100);
   const ring =
@@ -4841,7 +5555,7 @@ function renderGpaWidget(){
   const semRow = (b, label) => b.graded
     ? row(label, (b.pts / b.credits).toFixed(2) + ' GPA · ' + (b.pct / b.credits).toFixed(1) + '% · ' + b.graded + ' cls')
     : row(label, 'no graded classes');
-  el.innerHTML = '<div class="gpa-grid">' + ring +
+  return '<div class="gpa-grid">' + ring +
     '<div class="gpa-rows">' +
       row('Weighted Average', s.pct.toFixed(1) + '%') +
       row('Letter Grade Equivalent', s.letter) +
@@ -5048,7 +5762,11 @@ function renderClassDetail(){
     '<tr onclick="editSchool(\'' + a.id + '\')"><td>' + (a.dueDate ? fmtDate(a.dueDate) : '—') + '</td><td>' + esc(a.category || 'Other') + '</td><td>' + esc(a.assignment || '—') + '</td><td>' + (a.score !== '' && a.score !== undefined && a.score !== null ? esc(a.score) + '%' : '—') + '</td><td>' + (a.weight !== '' && a.weight !== undefined && a.weight !== null ? esc(a.weight) + '%' : '—') + '</td></tr>'
   ).join('') + '</tbody></table>' : empty('No assignment history for this class yet.');
   el.innerHTML = '<div class="class-detail-head"><div><button class="chip-btn" onclick="setSchoolView(\'classes\')">← Classes</button><h2 class="page-title" style="margin-top:12px">' + esc(c.label) + '</h2><div class="class-detail-meta">' + classCategoryHtml(c.label) + chip('#45a29e', (c.semester || 's1').toUpperCase()) + classMetaHtml(c) + '</div></div><span class="kicker">CLASS DETAIL</span></div>' +
-    '<div class="class-detail-grid"><div class="class-kpi"><span class="ck-label">Current Grade</span><span class="ck-value">' + (grade === null ? '—' : fmtNum(grade) + '%') + '</span></div><div class="class-kpi"><span class="ck-label">Target Grade</span><span class="ck-value">' + (c.targetGrade !== '' && c.targetGrade !== undefined ? fmtNum(c.targetGrade) + '%' : '—') + '</span></div><div class="class-kpi"><span class="ck-label">History Items</span><span class="ck-value">' + assignments.length + '</span></div><div class="class-kpi"><span class="ck-label">Credits</span><span class="ck-value">' + fmtNum(classCredits(c)) + '</span></div></div>' +
+    '<div class="class-detail-grid"><div class="class-kpi"><span class="ck-label">Current Grade</span><span class="ck-value">' + (grade === null ? '—' : fmtNum(grade) + '%') + '</span></div><div class="class-kpi"><span class="ck-label">Target Grade</span><span class="ck-value">' + (c.targetGrade !== '' && c.targetGrade !== undefined ? fmtNum(c.targetGrade) + '%' : '—') + '</span></div><div class="class-kpi"><span class="ck-label">History Items</span><span class="ck-value">' + assignments.length + '</span></div><div class="class-kpi"><span class="ck-label">Credits</span><span class="ck-value">' + fmtNum(classCredits(c)) + '</span></div>' +
+      (num(c.volunteerHours) || c.note ? '<div class="class-kpi"><span class="ck-label">Logged Volunteer Hours</span><span class="ck-value">' + fmtNum(num(c.volunteerHours)) + '</span></div>' : '') +
+      (num(c.earnedCredits) ? '<div class="class-kpi"><span class="ck-label">Earned Credits</span><span class="ck-value">' + fmtNum(num(c.earnedCredits)) + '</span></div>' : '') +
+      (c.note ? '<div class="class-kpi"><span class="ck-label">Schedule</span><span class="ck-value" style="font-size:14px">' + esc(c.note) + '</span></div>' : '') +
+    '</div>' +
     '<div class="school-form-row" style="max-width:560px"><div class="field"><label>Current Grade (%) <span class="hint">optional override</span></label><input id="class-current-grade" type="number" min="0" max="100" step="0.1" value="' + (c.currentGrade !== '' && c.currentGrade !== undefined ? esc(c.currentGrade) : '') + '"></div><div class="field"><label>Target Grade (%)</label><input id="class-target-grade" type="number" min="0" max="100" step="0.1" value="' + (c.targetGrade !== '' && c.targetGrade !== undefined ? esc(c.targetGrade) : '') + '"></div><div class="field"><label>Credits</label><input id="class-credits" type="number" min="0" max="10" step="0.5" value="' + classCredits(c) + '"></div></div>' +
     '<button class="btn sm" onclick="saveClassDetail(\'' + c.id + '\')">Save Class Details</button>' +
     '<div class="log-label" style="margin-top:22px">HISTORY LOG <span class="hint">Assignments · Tests · Quizzes</span></div>' + history;
@@ -5059,9 +5777,10 @@ function renderSchoolTT(){
   const cats = (state.classCats || []).filter(c => (c.semester || 's1') === schoolSem());
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
   const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-  const cell = p =>
-    '<td>' + (cats.filter(c => (c.period || 'p1') === p).length
-      ?          cats.filter(c => (c.period || 'p1') === p).map(c => {
+  const onDay = (c, i) => !(Array.isArray(c.days) && c.days.length) || c.days.includes(days[i]);
+  const cell = (p, i) =>
+    '<td>' + (cats.filter(c => (c.period || 'p1') === p && onDay(c, i)).length
+      ?          cats.filter(c => (c.period || 'p1') === p && onDay(c, i)).map(c => {
             const t = classTheme(c.label);
             return '<div class="tt-class' + (p === 'off' ? ' off' : '') + '" onclick="openClassDetail(\'' + c.id + '\')" title="Open ' + esc(c.label) + ' details" style="--class-color:' + t.color + ';--class-bg:' + t.bg + '">' +
               '<b>' + esc(c.label) + '</b>' +
@@ -5076,10 +5795,7 @@ function renderSchoolTT(){
   weekStart.setDate(weekStart.getDate() - dow);
   const rows = SCHOOL_PERIODS.map(p =>
     '<tr><td class="period-cell">' + periodLabel(p) + '</td>' +
-      days.map((_, i) => {
-        const d = new Date(weekStart); d.setDate(d.getDate() + i);
-        return cell(p);
-      }).join('') +
+      days.map((_, i) => cell(p, i)).join('') +
     '</tr>').join('');
   const offCats = cats.filter(c => (c.period || 'p1') === 'off');
   el.innerHTML =
@@ -5091,8 +5807,8 @@ function renderSchoolTT(){
     (offCats.length
       ? '<div class="card" style="margin-top:14px">' +
           '<div class="card-head"><h3>Off-Time Table</h3><span class="kicker">Free blocks</span></div>' +
-          '<table class="tt-off-table"><thead><tr><th>Class / Block</th><th>Room</th><th>Teacher</th></tr></thead><tbody>' +
-          offCats.map(c => '<tr><td><b>' + esc(c.label) + '</b></td><td>' + esc(c.room || '—') + '</td><td>' + esc(c.teacher || '—') + '</td></tr>').join('') +
+          '<table class="tt-off-table"><thead><tr><th>Class / Block</th><th>Room</th><th>Teacher</th><th>Schedule</th></tr></thead><tbody>' +
+          offCats.map(c => '<tr><td><b>' + esc(c.label) + '</b></td><td>' + esc(c.room || '—') + '</td><td>' + esc(c.teacher || '—') + '</td><td>' + esc(c.note || (Array.isArray(c.days) && c.days.length ? c.days.join(' / ') + ' only' : '—')) + '</td></tr>').join('') +
           '</tbody></table>' +
         '</div>'
       : '') +
@@ -5109,14 +5825,17 @@ function renderSchool(){
   const fprio = document.getElementById('filter-prio') ? document.getElementById('filter-prio').value : '';
   const fdue = document.getElementById('filter-due') ? document.getElementById('filter-due').value : 'asc';
   const fview = state.settings.schoolFilter || 'all';
+  const ftype = state.settings.schoolCatFilter || 'all';
   const todayS = todayKey();
   applySchoolFilterButtons();
+  applySchoolCatButtons();
   let list = state.school.filter(a => (a.semester || sem) === sem);
+  if (ftype !== 'all') list = list.filter(a => (a.category || 'Other') === ftype);
   if (fview === 'active')        list = list.filter(a => !assignmentArchived(a));
   else if (fview === 'archived') list = list.filter(a => assignmentArchived(a));
   if (fcat) list = list.filter(a => a.course === fcat);
   if (fprio) list = list.filter(a => (a.priority || 'Medium') === fprio);
-  if (q) list = list.filter(a => (a.course + ' ' + a.assignment + ' ' + a.category + ' ' + a.status).toLowerCase().includes(q));
+  if (q) list = list.filter(a => (a.course + ' ' + a.assignment + ' ' + (a.desc || '') + ' ' + a.category + ' ' + a.status).toLowerCase().includes(q));
   list = list.slice().sort((a, b) => (fdue === 'desc' ? -1 : 1) * ((a.dueDate || '9999').localeCompare(b.dueDate || '9999')));
   const cnt = document.getElementById('school-count');
   if (cnt) cnt.textContent = list.length + ' assignment' + (list.length === 1 ? '' : 's');
@@ -5132,7 +5851,8 @@ function renderSchool(){
         const hasScore = a.score !== '' && a.score !== undefined && a.score !== null && a.score !== 0;
         return '<tr class="' + cls + '" onclick="openClassDetail(\'' + esc(a.course || '') + '\')" title="Open class details">' +
           '<td class="school-course" onclick="openClassDetail(\'' + esc(a.course || '') + '\')" title="Open class details">' + esc(a.course) + '</td>' +
-          '<td>' + esc(a.assignment) + '</td>' +
+          '<td>' + esc(a.assignment) +
+            (a.desc ? '<details class="assign-desc" onclick="event.stopPropagation()"><summary>Notes</summary><div class="rich-text">' + richText(a.desc) + '</div></details>' : '') + '</td>' +
           '<td style="font-family:var(--mono);font-size:11px">' + (a.dueDate ? fmtDate(a.dueDate) : '—') + '</td>' +
           '<td style="color:var(--text)">' + esc(a.category) + '</td>' +
           '<td><span class="pri-chip ' + schoolPrioClass(a.priority) + '">' + esc(a.priority || 'Medium') + '</span></td>' +
@@ -5145,7 +5865,39 @@ function renderSchool(){
           '</td>' +
         '</tr>';
       }).join('') + '</tbody></table>'
-    : empty(q || fcat || fprio || fview !== 'all' ? 'No assignments match your filters.' : 'No assignments in ' + sem.toUpperCase() + ' yet — add your first one on the left.');
+    : empty(q || fcat || fprio || ftype !== 'all' || fview !== 'all' ? 'No assignments match your filters.' : 'No assignments in ' + sem.toUpperCase() + ' yet — add your first one on the left.');
+}
+/* ---------- Assignment type filters + rich-text helpers ---------- */
+function setSchoolCat(cat){
+  state.settings.schoolCatFilter = cat || 'all';
+  save();
+  renderSchool();
+}
+function applySchoolCatButtons(){
+  const cur = state.settings.schoolCatFilter || 'all';
+  ['all'].concat(ASSIGNMENT_CATEGORIES).forEach(c => {
+    const b = document.getElementById('scat-' + c);
+    if (b) b.classList.toggle('active', cur === c);
+  });
+}
+function richWrap(id, token){
+  const el = document.getElementById(id);
+  if (!el) return;
+  const s = el.selectionStart || 0, e = el.selectionEnd || 0;
+  const v = el.value, sel = v.slice(s, e) || 'text';
+  el.value = v.slice(0, s) + token + sel + token + v.slice(e);
+  try { el.focus(); el.selectionStart = s; el.selectionEnd = s + token.length * 2 + sel.length; } catch (err){}
+}
+function richText(text){
+  let out = esc(String(text || ''));
+  out = out.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').replace(/_([^_]+)_/g, '<i>$1</i>');
+  return out.split(/\n/).map(line => {
+    const t = line.trim();
+    if (!t) return '';
+    if (/^[-•]\s*/.test(t)) return '<span class="rt-li">• ' + t.replace(/^[-•]\s*/, '') + '</span>';
+    if (/^&gt;\s*/.test(t)) return '<span class="rt-quote">' + t.replace(/^&gt;\s*/, '') + '</span>';
+    return t;
+  }).filter(Boolean).join('<br>');
 }
 /* ---------- Assignment buckets: Active (pending / in progress) vs Archived
    (Completed, Handed In, or past its due date) ---------- */
@@ -5179,7 +5931,8 @@ function saveSchool(){
     status: document.getElementById('s-status').value,
     semester: schoolSem(),
     weight: optNum(document.getElementById('s-weight').value),
-    score: optNum(document.getElementById('s-score').value)
+    score: optNum(document.getElementById('s-score').value),
+    desc: (document.getElementById('s-desc') ? document.getElementById('s-desc').value : '')
   };
   const editId = state.settings.editSchool;
   if (editId){
@@ -5190,6 +5943,7 @@ function saveSchool(){
   }
   cancelEditSchool();
   renderSchool();
+  renderSchoolGpa();
   renderSchoolDeadlines();
   toast(editId ? '✓ Assignment updated' : '✓ Assignment added — ' + assignment);
 }
@@ -5205,13 +5959,15 @@ function editSchool(id){
   if (document.getElementById('s-status')) document.getElementById('s-status').value = a.status || 'Not Started';
   document.getElementById('s-weight').value = a.weight !== undefined && a.weight !== null && a.weight !== '' ? a.weight : '';
   document.getElementById('s-score').value = a.score !== undefined && a.score !== null && a.score !== '' ? a.score : '';
+  const descEl = document.getElementById('s-desc');
+  if (descEl) descEl.value = a.desc || '';
   document.getElementById('school-form-head').textContent = 'Edit Assignment';
   document.getElementById('school-editbar').style.display = 'flex';
   toast('Editing assignment — update and hit Save');
 }
 function cancelEditSchool(){
   state.settings.editSchool = null;
-  ['s-course', 's-assign', 's-due', 's-weight', 's-score'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  ['s-course', 's-assign', 's-due', 's-weight', 's-score', 's-desc'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   const hd = document.getElementById('school-form-head'); if (hd) hd.textContent = 'Add Assignment';
   const eb = document.getElementById('school-editbar'); if (eb) eb.style.display = 'none';
   save();
@@ -5223,6 +5979,7 @@ function deleteSchool(id){
   if (state.settings.editSchool === id) state.settings.editSchool = null;
   save();
   renderSchool();
+  renderSchoolGpa();
   renderSchoolDeadlines();
   toast(a ? 'Assignment deleted — ' + a.assignment : 'Assignment deleted');
 }
@@ -5244,11 +6001,14 @@ function setFilmView(v){
   if (v === 'games') renderFilmGames();
   if (v === 'plays') renderFilmPlays();
   if (v === 'study') renderFilmStudy();
+  if (v === 'scouting') renderScouting();
+  if (v === 'playbook') renderPlaybook();
 }
 function applyFilmView(){
   const v = state.settings.filmView || 'games';
   $$('#film-subtabs .sub-tab').forEach(b => b.classList.toggle('active', b.dataset.fview === v));
-  const map = { games: 'fview-games', plays: 'fview-plays', study: 'fview-study' };
+  /* Playbook + Scouting Reports live inside the unified Film Study section. */
+  const map = { games: 'fview-games', plays: 'fview-plays', study: 'fview-study', scouting: 'fview-scouting', playbook: 'fview-playbook' };
   Object.entries(map).forEach(([k, id]) => {
     const el = document.getElementById(id);
     if (el) el.classList.toggle('active', k === v);
@@ -6999,6 +7759,8 @@ function recruitFilterChips(){
     const n = state.recruiting.filter(c => c.status === st).length;
     parts.push('<button class="chip-btn' + (cur === st ? ' active' : '') + '" onclick="setRecruitFilter(\'' + st + '\')">' + esc(st) + ' (' + n + ')</button>');
   });
+  parts.push('<span class="kicker" style="margin-left:12px">WISHLIST</span>');
+  parts.push('<button class="chip-btn star' + (state.settings.recruitWishOnly ? ' active' : '') + '" onclick="toggleRecruitWishFilter()">★ Starred Targets (' + state.recruiting.filter(c => c.starred).length + ')</button>');
   parts.push('<span class="kicker" style="margin-left:12px">TARGET DIVISION</span>');
   parts.push('<button class="chip-btn' + (div === 'all' ? ' active' : '') + '" onclick="setRecruitDivFilter(\'all\')">All Divisions</button>');
   RECRUIT_DIVISIONS.forEach(dv => {
@@ -7014,8 +7776,9 @@ function renderRecruiting(){
   if (!Array.isArray(state.recruiting)) state.recruiting = [];
   const cur = recruitFilter();
   const div = recruitDivFilter();
+  const wishOnly = !!state.settings.recruitWishOnly;
   filterEl.innerHTML = recruitFilterChips();
-  const inView = c => (cur === 'all' || c.status === cur) && (div === 'all' || c.division === div);
+  const inView = c => (cur === 'all' || c.status === cur) && (div === 'all' || c.division === div) && (!wishOnly || c.starred);
   if (div !== 'all'){
     const hits = state.recruiting.filter(inView);
     board.innerHTML = hits.length
@@ -7045,8 +7808,8 @@ function recruitCardHtml(c){
           '<button class="icon-btn danger" onclick="deleteInteraction(\'' + c.id + '\',\'' + i.id + '\')" title="Delete interaction">✕</button></div>').join('') +
       (ints.length > 3 ? '<div class="rc-row" style="color:var(--muted)">+ ' + (ints.length - 3) + ' earlier</div>' : '')
     : '';
-  return '<div class="rec-card">' +
-    '<h4>' + esc(c.school || 'Unnamed school') + '</h4>' +
+  return '<div class="rec-card' + (c.starred ? ' starred' : '') + '">' +
+    '<h4><button class="star-btn' + (c.starred ? ' on' : '') + '" onclick="toggleCoachStar(\'' + c.id + '\')" title="Star as a target wishlist school">' + (c.starred ? '★' : '☆') + '</button>' + esc(c.school || 'Unnamed school') + '</h4>' +
     '<div class="rec-tags">' + contactBadgeHtml(c) +
       '<span class="rec-div">' + esc(c.division || 'Other') + '</span>' +
       '<span class="rec-tier ' + (String(c.priorityRank || '').startsWith('Tier 1') ? 't1' : String(c.priorityRank || '').startsWith('Safety') ? 'safety' : 't2') + '">' + esc(c.priorityRank || 'Tier 2 Backup') + '</span></div>' +
@@ -7105,7 +7868,7 @@ function saveInteraction(){
   c.interactions.push({ id: uid(), type: INTERACTION_TYPES.includes(type) ? type : 'Call', date, notes });
   if (!c.lastContact || date > c.lastContact) c.lastContact = date;
   /* Logging any outreach moves a cold lead off the top of the funnel. */
-  if (c.status === 'Uncontacted') c.status = 'Contacted';
+  if (c.status === 'Not Contacted') c.status = 'Email Sent';
   save(); closeModal(); renderRecruiting();
   toast('✓ ' + type + ' logged for ' + (c.school || 'school'));
 }
@@ -7118,6 +7881,21 @@ function deleteInteraction(coachId, intId){
   renderRecruiting();
   if (document.getElementById('modal-overlay') && !document.getElementById('modal-overlay').classList.contains('hidden')) openInteractionModal(coachId);
   toast('Interaction deleted');
+}
+/* Star a school as a top-priority target — the wishlist filter reads this flag. */
+function toggleRecruitWishFilter(){
+  state.settings.recruitWishOnly = !state.settings.recruitWishOnly;
+  save();
+  renderRecruiting();
+}
+function toggleCoachStar(id){
+  const c = (state.recruiting || []).find(x => x.id === id);
+  if (!c) return;
+  snapshot();
+  c.starred = !c.starred;
+  save();
+  renderRecruiting();
+  toast(c.starred ? '★ ' + (c.school || 'School') + ' added to your target wishlist' : '☆ Removed from the wishlist');
 }
 function moveCoach(id, status){
   const c = state.recruiting.find(x => x.id === id);
@@ -7148,6 +7926,7 @@ function openCoachModal(id){
       '<div class="field"><label>Priority Rank</label><select id="c-tier">' + RECRUIT_TIERS.map(t => '<option value="' + t + '"' + (c && c.priorityRank === t ? ' selected' : '') + '>' + t + '</option>').join('') + '</select></div>' +
       '<div class="field full"><label>Highlights / Film Link Sent</label><input id="c-film" value="' + esc(c ? c.filmLink : '') + '" placeholder="https://..."></div>' +
       '<div class="field full"><label>Feedback Received / Notes</label><textarea id="c-notes" placeholder="Coach feedback, interest level, next steps...">' + esc(c ? c.notes : '') + '</textarea></div>' +
+      '<label class="curr-toggle full"><input type="checkbox" id="c-starred" ' + (c && c.starred ? 'checked' : '') + '> ★ Starred / Target Wishlist — top-priority school</label>' +
     '</div>' +
     '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">' +
       (c ? '<button class="btn sm danger-ghost" onclick="deleteCoach(\'' + c.id + '\')">Delete</button>' : '') +
@@ -7163,9 +7942,10 @@ function saveCoach(){
     school, lead: v('c-lead'), coach: v('c-coach'), role: v('c-role'),
     email: v('c-email'), phone: v('c-phone'), lastContact: v('c-last'),
     status: v('c-status'), filmLink: v('c-film'), notes: v('c-notes'),
-    division: v('c-division'), priorityRank: v('c-tier')
+    division: v('c-division'), priorityRank: v('c-tier'),
+    starred: !!(document.getElementById('c-starred') && document.getElementById('c-starred').checked)
   };
-  if (!RECRUIT_STATUSES.includes(data.status)) data.status = 'Uncontacted';
+  if (!RECRUIT_STATUSES.includes(data.status)) data.status = 'Not Contacted';
   if (!RECRUIT_DIVISIONS.includes(data.division)) data.division = 'Other';
   if (!RECRUIT_TIERS.includes(data.priorityRank)) data.priorityRank = 'Tier 2 Backup';
   if (coachModalId){
@@ -7293,6 +8073,10 @@ function mentalState(){
   const m = state.mental;
   if (!m.weekly || typeof m.weekly !== 'object') m.weekly = {};
   if (!Array.isArray(m.decisions)) m.decisions = [];
+  if (!m.scouting || typeof m.scouting !== 'object') m.scouting = { videoUrl: '', title: '', notes: [], matchups: [] };
+  if (!Array.isArray(m.scouting.notes)) m.scouting.notes = [];
+  if (!Array.isArray(m.scouting.matchups)) m.scouting.matchups = [];
+  if (!Array.isArray(m.playbook)) m.playbook = [];
   return m;
 }
 function weekStartKey(offset){
@@ -7309,7 +8093,25 @@ function setMentalView(v){
 function applyMentalView(){
   const v = state.settings.mentalView || 'journal';
   $$('#mental-subtabs .sub-tab').forEach(b => b.classList.toggle('active', b.dataset.mview === v));
-  const map = { journal: 'mview-journal', decisions: 'mview-decisions' };
+  /* Decision Archive was retired in V2.0; scouting + playbook moved to Film Study. */
+  const map = { journal: 'mview-journal' };
+  Object.entries(map).forEach(([k, id]) => {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('active', k === v);
+  });
+}
+
+/* ---------- Life Maxx sub-views ---------- */
+function setLifeView(v){
+  state.settings.lifeView = v;
+  save();
+  applyLifeView();
+  renderLife();
+}
+function applyLifeView(){
+  const v = (state.settings && state.settings.lifeView) || 'sprints';
+  $$('#life-subtabs .sub-tab').forEach(b => b.classList.toggle('active', b.dataset.lview === v));
+  const map = { sprints: 'lview-sprints', stats: 'lview-stats', tree: 'lview-tree', debrief: 'lview-debrief', crm: 'lview-crm' };
   Object.entries(map).forEach(([k, id]) => {
     const el = document.getElementById(id);
     if (el) el.classList.toggle('active', k === v);
@@ -7318,7 +8120,6 @@ function applyMentalView(){
 function renderMental(){
   renderJournalDaily();
   renderJournalWeekly();
-  renderDecisionTable();
 }
 function renderJournalDaily(){
   const el = document.getElementById('journal-daily');
@@ -7370,88 +8171,8 @@ function saveWeeklyPrompt(i, value){
   save();
 }
 
-/* ---------- 8B: Decision Archive ---------- */
-let decisionModalId = null;
-function starsHtml(n){
-  const v = clamp(Math.round(num(n) || 0), 0, 5);
-  return '<span class="stars" title="' + v + ' / 5 confidence">' + '★'.repeat(v) + '☆'.repeat(5 - v) + '</span>';
-}
-function renderDecisionTable(){
-  const el = document.getElementById('decision-table');
-  if (!el) return;
-  const rows = mentalState().decisions.slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
-  el.innerHTML = rows.length
-    ? '<table class="decision-table"><thead><tr><th>Decision Name</th><th>Type</th><th>Framework Used</th><th>Confidence</th><th>Reviewed</th><th>Notes</th><th></th></tr></thead><tbody>' +
-      rows.map(d => '<tr>' +
-        '<td><b>' + esc(d.name || '—') + '</b>' + (d.date ? '<span class="qt-date">' + esc(fmtDate(d.date)) + '</span>' : '') + '</td>' +
-        '<td>' + esc(d.type || 'Small') + '</td>' +
-        '<td>' + esc(d.framework || '—') + '</td>' +
-        '<td>' + starsHtml(d.confidence) + '</td>' +
-        '<td><input type="checkbox" ' + (d.reviewed ? 'checked' : '') + ' onchange="toggleDecisionReviewed(\'' + d.id + '\')" title="Mark as reviewed"></td>' +
-        '<td style="max-width:280px">' + esc(d.notes || '—') + '</td>' +
-        '<td style="white-space:nowrap"><button class="icon-btn" onclick="openDecisionModal(\'' + d.id + '\')" title="Edit">✎</button>' +
-        '<button class="icon-btn danger" onclick="deleteDecision(\'' + d.id + '\')" title="Delete">✕</button></td></tr>').join('') +
-      '</tbody></table>'
-    : empty('No decisions logged yet — archive your first call.');
-}
-function openDecisionModal(id){
-  const m = mentalState();
-  const d = id ? m.decisions.find(x => x.id === id) : null;
-  decisionModalId = d ? d.id : null;
-  openModal(d ? 'Edit Decision' : 'Log Decision');
-  const data = d || { name: '', type: 'Small', framework: 'Gut Check', confidence: 3, reviewed: false, notes: '', date: todayKey() };
-  const opts = (list, cur) => list.map(v => '<option value="' + esc(v) + '"' + (cur === v ? ' selected' : '') + '>' + esc(v) + '</option>').join('');
-  modalBody.innerHTML =
-    '<div class="field"><label>Decision Name</label><input id="dec-name" value="' + esc(data.name || '') + '" placeholder="e.g. Committed to U16 Selects"></div>' +
-    '<div class="log-grid-2">' +
-      '<div class="field"><label>Type</label><select id="dec-type">' + opts(DECISION_TYPES, data.type) + '</select></div>' +
-      '<div class="field"><label>Framework Used</label><select id="dec-framework">' + opts(DECISION_FRAMEWORKS, data.framework) + '</select></div>' +
-    '</div>' +
-    '<div class="log-grid-2">' +
-      '<div class="field"><label>Confidence Rating (1–5 stars)</label><select id="dec-confidence">' + [1,2,3,4,5].map(n => '<option value="' + n + '"' + (Number(data.confidence) === n ? ' selected' : '') + '>' + '★'.repeat(n) + ' (' + n + ')</option>').join('') + '</select></div>' +
-      '<div class="field"><label>Decision Date</label><input type="date" id="dec-date" value="' + esc(data.date || '') + '"></div>' +
-    '</div>' +
-    '<div class="field"><label>Notes / Review</label><textarea id="dec-notes" rows="4" placeholder="What happened, what you learned, what you would change...">' + esc(data.notes || '') + '</textarea></div>' +
-    '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">' +
-      (d ? '<button class="btn sm danger" onclick="deleteDecision()">Delete</button>' : '') +
-      '<button class="btn" onclick="saveDecision()">Save Decision</button>' +
-    '</div>';
-}
-function saveDecision(){
-  const v = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
-  const data = {
-    name: v('dec-name'), type: v('dec-type'), framework: v('dec-framework'),
-    confidence: num(v('dec-confidence')) || 3, date: v('dec-date'), notes: v('dec-notes')
-  };
-  if (!data.name){ toast('Decision name is required', 'error'); return; }
-  snapshot();
-  const m = mentalState();
-  if (decisionModalId){
-    const d = m.decisions.find(x => x.id === decisionModalId);
-    if (d) Object.assign(d, data);
-  } else {
-    m.decisions.push({ id: uid(), reviewed: false, ...data });
-  }
-  save(); closeModal(); renderDecisionTable();
-  toast('✓ Decision archived');
-}
-function deleteDecision(id){
-  snapshot();
-  const m = mentalState();
-  m.decisions = m.decisions.filter(x => x.id !== (id || decisionModalId));
-  save(); closeModal(); renderDecisionTable();
-  toast('Decision deleted');
-}
-function toggleDecisionReviewed(id){
-  const m = mentalState();
-  const d = m.decisions.find(x => x.id === id);
-  if (!d) return;
-  snapshot();
-  d.reviewed = !d.reviewed;
-  save();
-  renderDecisionTable();
-  toast(d.reviewed ? '✓ Marked reviewed' : 'Marked unreviewed');
-}
+/* The Decision Archive component was retired in V2.0 — existing archived rows are
+   left untouched in state.mental.decisions but no longer rendered anywhere. */
 
 /* ============================================================
    LIVE WORKOUT MODE — focus overlay, tap counters, rest timer
@@ -7947,7 +8668,7 @@ function buildWeeklyMarkdown(){
   L.push('# 🏀 Phoenix OS — Weekly Summary');
   L.push('');
   L.push('**Week of ' + fmtDate(r.startKey, { long: true }) + ' → ' + fmtDate(r.endKey, { long: true }) + '**  ');
-  L.push('_Generated ' + new Date().toLocaleString() + ' · Phoenix OS BETA V1.2_');
+  L.push('_Generated ' + new Date().toLocaleString() + ' · Phoenix OS BETA V2.0_');
   L.push('');
 
   /* ---------- Academics ---------- */
@@ -8036,6 +8757,873 @@ function buildWeeklyMarkdown(){
   L.push('_Phoenix OS · local-first workspace_');
   return L.join('\n');
 }
+/* ============================================================
+   BETA V2.0 — shared helpers + Daily Routine (TAB 2)
+   ============================================================ */
+function catBadge(cat){
+  const c = TODO_CATEGORIES[cat] || TODO_CATEGORIES.Other;
+  return '<span class="cat-badge" style="color:' + c + ';background:' + rgba(c, .13) + ';border-color:' + rgba(c, .45) + '">' + esc(cat) + '</span>';
+}
+function renderRoutine(){
+  const el = document.getElementById('routine-sleep');
+  if (!el) return;
+  const w = timeWindow();
+  const mins = sleepCalc(w.bed, w.wake);
+  el.innerHTML =
+    '<div class="card sleep-window-card">' +
+      '<div class="card-head"><h3>Fixed Time Window</h3><span class="kicker">Recovery protocol · ' + esc(w.label) + '</span></div>' +
+      '<div class="sleep-window-row">' +
+        '<div class="sw-block"><span class="sw-l">LIGHTS OUT</span><span class="sw-v">' + fmtTime(w.bed) + '</span></div>' +
+        '<div class="sw-arrow">→</div>' +
+        '<div class="sw-block"><span class="sw-l">WAKE</span><span class="sw-v">' + fmtTime(w.wake) + '</span></div>' +
+        '<div class="sw-net"><span class="sw-l">NET SLEEP</span><span class="sw-v">' + fmtSleepDur(mins) + '</span></div>' +
+      '</div>' +
+      '<div class="time-window-settings">' +
+        '<label class="tw-field"><span>Lights out</span><input type="time" id="tw-bed" value="' + esc(w.bed) + '"></label>' +
+        '<label class="tw-field"><span>Wake up</span><input type="time" id="tw-wake" value="' + esc(w.wake) + '"></label>' +
+        '<button class="btn sm" onclick="saveTimeWindow()">Save Window</button>' +
+        '<button class="btn sm ghost" onclick="resetTimeWindow()">Reset to 9:15 PM / 5:40 AM</button>' +
+      '</div>' +
+      '<div class="tw-presets"><span class="kicker">PRESETS</span>' + TIME_WINDOW_PRESETS.map(p => '<button class="chip-btn" onclick="applyTimeWindowPreset(\'' + p.label + '\')">' + esc(p.label) + ' · ' + fmtTime(p.bed) + ' → ' + fmtTime(p.wake) + '</button>').join('') + '</div>' +
+      '<p class="paste-hint">Configurable fixed window — default <b>9:15 PM lights out → 5:40 AM wake</b>, with a 15-minute sleep-latency allowance baked into the net figure. Anchor every night here and the recovery score stays comparable day to day.</p>' +
+    '</div>';
+  renderRoutineSchedule();
+  renderRoutineHabits();
+  renderRoutineBanned();
+}
+function saveTimeWindow(){
+  const bed = document.getElementById('tw-bed').value;
+  const wake = document.getElementById('tw-wake').value;
+  if (!bed || !wake){ toast('Set both a lights-out and a wake time', 'error'); return; }
+  snapshot();
+  state.settings.timeWindow = { bed, wake, label: 'Custom window' };
+  save();
+  renderRoutine();
+  toast('✓ Time window updated — ' + fmtTime(bed) + ' → ' + fmtTime(wake));
+}
+function resetTimeWindow(){
+  snapshot();
+  state.settings.timeWindow = { ...DEFAULT_TIME_WINDOW };
+  save();
+  renderRoutine();
+  toast('✓ Reset to 9:15 PM / 5:40 AM');
+}
+function applyTimeWindowPreset(label){
+  const p = TIME_WINDOW_PRESETS.find(x => x.label === label);
+  if (!p) return;
+  const b = document.getElementById('tw-bed'), k = document.getElementById('tw-wake');
+  if (b) b.value = p.bed;
+  if (k) k.value = p.wake;
+}
+function renderRoutineSchedule(){
+  const el = document.getElementById('routine-schedule');
+  if (!el) return;
+  const cats = (state.classCats || []).filter(c => (c.semester || 's1') === schoolSem());
+  const kick = document.getElementById('routine-tt-kicker');
+  if (kick) kick.textContent = cats.length + ' block' + (cats.length === 1 ? '' : 's') + ' · ' + schoolSem().toUpperCase();
+  el.innerHTML = SCHOOL_PERIODS.map(p => {
+    const list = cats.filter(c => (c.period || 'p1') === p);
+    return '<div class="rt-slot"><span class="rt-period">' + esc(periodLabel(p)) + '</span><span class="rt-slot-classes">' +
+      (list.length ? list.map(c => { const t = classTheme(c.label); return '<span class="rt-class" style="border-color:' + t.color + '"><b>' + esc(c.label) + '</b>' +
+        (c.room ? ' <i>Rm ' + esc(c.room) + '</i>' : '') + (c.teacher ? ' <i>· ' + esc(c.teacher) + '</i>' : '') + (c.note ? ' <i>· ' + esc(c.note) + '</i>' : '') + '</span>'; }).join('') : '<span class="rt-none">—</span>') +
+      '</span></div>';
+  }).join('');
+}
+function routineHabitRow(h, entry, isBad){
+  const done = !!(entry.habits && entry.habits[h.id]);
+  const st = habitStreak(h);
+  return '<div class="habit-row' + (done ? ' done' : '') + '">' +
+    '<input type="checkbox" ' + (done ? 'checked' : '') + ' onchange="toggleHabitPanel(\'' + h.id + '\')" title="' + (isBad ? 'Log today as kept clean' : 'Mark today complete') + '">' +
+    '<span class="h-label">' + esc(h.label) + (h.desc ? '<i class="h-desc">' + esc(h.desc) + '</i>' : '') + '</span>' +
+    (habitTarget(h) ? '<span class="habit-target">🎯 ' + habitMonthDoneCount(h) + '/' + habitTarget(h) + ' Days</span>' : '') +
+    '<span class="streak' + (st >= 3 ? ' hot' : '') + '">🔥 ' + st + '</span>' +
+  '</div>';
+}
+function renderRoutineHabits(){
+  const el = document.getElementById('routine-habits');
+  if (!el) return;
+  const key = state.settings.logDate;
+  const entry = state.logs[key] || {};
+  const goodList = state.habits.filter(h => (h.type || 'good') === 'good');
+  const kick = document.getElementById('routine-habit-kicker');
+  if (kick) kick.textContent = goodList.length + ' good habit' + (goodList.length === 1 ? '' : 's');
+  el.innerHTML = monthlyTrackerHtml() +
+    '<div class="rc-good-list">' + (goodList.length ? goodList.map(h => routineHabitRow(h, entry, false)).join('') : '<div class="empty sm">No good habits yet — add some in Goal Matrix → Habits.</div>') + '</div>';
+}
+function renderRoutineBanned(){
+  const el = document.getElementById('routine-banned');
+  if (!el) return;
+  const key = state.settings.logDate;
+  const entry = state.logs[key] || {};
+  const badList = state.habits.filter(h => (h.type || 'good') === 'bad');
+  el.innerHTML = badList.length
+    ? '<div class="card banned-card">' +
+        '<div class="card-head"><h3>Banned List — Clean Streaks</h3><span class="kicker bad">' + badList.length + ' track' + (badList.length === 1 ? '' : 's') + '</span></div>' +
+        '<div class="paste-hint" style="margin-bottom:10px">Tracked as <b>days clean / avoided</b>. A checkmark logs a day you stayed away.</div>' +
+        badList.map(h => routineBannedRow(h, entry)).join('') +
+      '</div>' +
+      bannedTrackerHtml()
+    : '<div class="card banned-card"><div class="card-head"><h3>Banned List</h3><span class="kicker bad">0 habits</span></div><div class="empty sm">No banned habits tracked. Add them in Goal Matrix → Habits (type: Bad Habit).</div></div>';
+}
+function routineBannedRow(h, entry){
+  const clean = !!(entry.habits && entry.habits[h.id]);
+  const st = habitStreak(h);
+  return '<div class="habit-row' + (clean ? ' done' : '') + '">' +
+    '<input type="checkbox" ' + (clean ? 'checked' : '') + ' onchange="toggleHabitPanel(\'' + h.id + '\')" title="Log today as kept clean">' +
+    '<span class="h-label">' + esc(h.label) + (h.desc ? '<i class="h-desc">' + esc(h.desc) + '</i>' : '') + '</span>' +
+    '<span class="habit-target">' + habitMonthDoneCount(h) + ' clean days this month</span>' +
+    '<span class="streak' + (st >= 3 ? ' hot' : '') + '">🔥 ' + st + ' clean streak</span>' +
+  '</div>';
+}
+
+/* ============================================================
+   BETA V2.0 — Multi-Zone Shot Heatmap (Athletics)
+   ============================================================ */
+function shotMapState(){
+  if (!state.shotMap || typeof state.shotMap !== 'object') state.shotMap = {};
+  return state.shotMap;
+}
+function zoneStats(id){
+  const map = shotMapState();
+  const ids = SHOT_ZONE_ALIASES[id] || [id];
+  let m = 0, a = 0;
+  ids.forEach(k => { const s = map[k] || { m: 0, a: 0 }; a += num(s.a); m += Math.min(num(s.m), num(s.a)); });
+  return { m, a, pct: a ? Math.round(m / a * 100) : null };
+}
+/* Hot-hand efficiency bands: green ≥ 60%, yellow 45–59%, red < 45%. */
+function heatColor(pct){
+  if (pct === null) return '#3a4a5a';
+  if (pct >= 60) return '#2ecc71';
+  if (pct >= 45) return '#f0a500';
+  return '#e63946';
+}
+function heatLabel(pct){
+  if (pct === null) return '—';
+  if (pct >= 60) return 'Hot';
+  if (pct >= 45) return 'Neutral';
+  return 'Cold';
+}
+/* Analytical half-court geometry: 12 clickable zones laid out as an
+   overlapping-free map (corner 3s and short corners are L-shaped). */
+const HEAT_GEOM = {
+  /* Deep corner threes run from the baseline to the corner break (y = 190, where
+     the arc meets the sideline); the wing three owns everything beyond the break
+     on that side, so the two hitboxes split exactly on the line. */
+  'c3-left':    { rects: [[0, 15, 70, 175]],                          text: [35, 100] },
+  'w3-left':    { rects: [[0, 190, 70, 70], [0, 260, 130, 130]],     text: [65, 326] },
+  'wm-left':    { rects: [[70, 190, 60, 70]],                         text: [100, 226], small: true },
+  'sc-left':    { rects: [[70, 15, 60, 175]],                         text: [100, 100], small: true },
+  'el-left':    { rects: [[130, 190, 75, 70]],                        text: [167, 226] },
+  'ft':         { rects: [[150, 118, 200, 72]],                       text: [250, 154] },
+  'ra':         { rects: [[130, 15, 76, 103], [294, 15, 76, 103]], circle: [250, 70, 44], text: [250, 74] },
+  'mid-center': { rects: [[205, 190, 90, 70]],                        text: [250, 226] },
+  'el-right':   { rects: [[295, 190, 75, 70]],                        text: [332, 226] },
+  'wm-right':   { rects: [[370, 190, 60, 70]],                        text: [400, 226], small: true },
+  'sc-right':   { rects: [[370, 15, 60, 175]],                        text: [400, 100], small: true },
+  'w3-right':   { rects: [[430, 190, 70, 70], [370, 260, 130, 130]],  text: [435, 326] },
+  'c3-right':   { rects: [[430, 15, 70, 175]],                        text: [465, 100] },
+  'top3':       { rects: [[130, 260, 240, 130]],                      text: [250, 326] }
+};
+function renderShots(){
+  const el = document.getElementById('shot-heatmap');
+  if (!el) return;
+  const totals = SHOT_ZONES.reduce((t, z) => { const s = zoneStats(z.id); t.m += s.m; t.a += s.a; return t; }, { m: 0, a: 0 });
+  const kick = document.getElementById('heat-kicker');
+  if (kick) kick.textContent = totals.a ? totals.m + ' / ' + totals.a + ' · ' + Math.round(totals.m / totals.a * 100) + '% overall' : 'No shots logged yet';
+  const zoneSvg = id => {
+    const g = HEAT_GEOM[id];
+    const z = SHOT_ZONES.find(zz => zz.id === id);
+    if (!g || !z) return '';
+    const s = zoneStats(id), col = heatColor(s.pct);
+    const op = s.a ? '.32' : '.05';
+    const shapes = (g.rects || []).map(r => '<rect x="' + r[0] + '" y="' + r[1] + '" width="' + r[2] + '" height="' + r[3] + '" rx="5" fill="' + col + '" fill-opacity="' + op + '" stroke="' + col + '" stroke-opacity=".6"/>').join('') +
+      (g.circle ? '<circle cx="' + g.circle[0] + '" cy="' + g.circle[1] + '" r="' + g.circle[2] + '" fill="' + col + '" fill-opacity="' + op + '" stroke="' + col + '" stroke-opacity=".7"/>' : '');
+    const tp = g.text || [250, 200];
+    const tx = tp[0], ty = tp[1];
+    return '<g class="hz' + (g.small ? ' hz-sm' : '') + '" onclick="openZoneLogModal(\'' + id + '\')">' + shapes +
+      '<text x="' + tx + '" y="' + (ty - 22) + '" text-anchor="middle" class="hz-l">' + esc(z.tag || z.label) + '</text>' +
+      '<text x="' + tx + '" y="' + (ty - 4) + '" text-anchor="middle" class="hz-v">' + (s.pct === null ? '—' : s.pct + '%') + '</text>' +
+      '<text x="' + tx + '" y="' + (ty + 11) + '" text-anchor="middle" class="hz-s">' + s.m + ' / ' + s.a + (g.small ? '' : ' · ' + z.pts + 'pt') + '</text>' +
+    '</g>';
+  };
+  el.innerHTML =
+    '<svg class="heat-court" viewBox="0 0 500 400" preserveAspectRatio="xMidYMid meet">' +
+      '<rect x="0" y="0" width="500" height="400" fill="#10161d" stroke="#2c3a47"/>' +
+      '<rect x="130" y="15" width="240" height="175" fill="none" stroke="#31414f"/>' +
+      '<circle cx="250" cy="190" r="60" fill="none" stroke="#31414f"/>' +
+      '<circle cx="250" cy="70" r="9" fill="none" stroke="#f0a500" stroke-width="2"/>' +
+      '<line x1="222" y1="54" x2="278" y2="54" stroke="#f0a500" stroke-width="2"/>' +
+      '<path d="M70 15 L70 190 A 216 216 0 0 1 430 190 L430 15" fill="none" stroke="#31414f"/>' +
+      SHOT_ZONES.map(z => zoneSvg(z.id)).join('') +
+    '</svg>' +
+    '<div class="heat-legend">' +
+      '<span><i style="background:#2ecc71"></i>Hot · ≥ 60%</span>' +
+      '<span><i style="background:#f0a500"></i>Neutral · 45–59%</span>' +
+      '<span><i style="background:#e63946"></i>Cold · &lt; 45%</span>' +
+      '<span class="hint">' + SHOT_ZONES.length + ' analytical zones · click any zone to log shots</span>' +
+    '</div>';
+  renderShotZoneTable();
+}
+function renderShotZoneTable(){
+  const el = document.getElementById('shot-zone-table');
+  if (!el) return;
+  el.innerHTML = '<table class="zone-table"><thead><tr><th>Zone</th><th>M / A</th><th>FG%</th><th>Heat</th></tr></thead><tbody>' +
+    SHOT_ZONES.map(z => {
+      const s = zoneStats(z.id), col = heatColor(s.pct);
+      const heat = heatLabel(s.pct);
+      return '<tr onclick="openZoneLogModal(\'' + z.id + '\')" style="cursor:pointer">' +
+        '<td>' + esc(z.label) + ' <i class="hint">' + z.pts + 'pt</i></td>' +
+        '<td>' + s.m + ' / ' + s.a + '</td>' +
+        '<td style="color:' + col + ';font-weight:700">' + (s.pct === null ? '—' : s.pct + '%') + '</td>' +
+        '<td><span class="cat-badge" style="color:' + col + ';background:' + rgba(col, .13) + ';border-color:' + rgba(col, .45) + '">' + heat + '</span></td>' +
+      '</tr>';
+    }).join('') + '</tbody></table>';
+}
+function openZoneLogModal(zoneId){
+  const z = SHOT_ZONES.find(x => x.id === zoneId);
+  if (!z) return;
+  openModal(z.label + ' — Rapid Log');
+  const s = zoneStats(zoneId);
+  modalBody.innerHTML =
+    '<div class="zone-log">' +
+      '<div class="zone-log-stats"><span class="zl-pct" style="color:' + heatColor(s.pct) + '">' + (s.pct === null ? '—' : s.pct + '%') + '</span>' +
+        '<span class="zl-sub">' + s.m + ' makes / ' + s.a + ' attempts lifetime · ' + z.pts + '-point zone</span></div>' +
+      '<div class="zone-log-btns">' +
+        '<button class="btn" onclick="applyZoneLog(\'' + zoneId + '\',\'make\')">+1 Make</button>' +
+        '<button class="btn ghost" onclick="applyZoneLog(\'' + zoneId + '\',\'miss\')">+1 Miss</button>' +
+      '</div>' +
+      '<div class="live-fixrow">' +
+        '<button class="live-fix" onclick="applyZoneLog(\'' + zoneId + '\',\'umake\')">−1 Make</button>' +
+        '<button class="live-fix" onclick="applyZoneLog(\'' + zoneId + '\',\'umiss\')">−1 Miss</button>' +
+      '</div>' +
+      '<div class="compact-row" style="margin-top:12px">' +
+        '<div class="field inline-block"><label>Makes</label><input type="number" min="0" id="zl-m" value="' + s.m + '"></div>' +
+        '<div class="field inline-block"><label>Attempts</label><input type="number" min="0" id="zl-a" value="' + s.a + '"></div>' +
+        '<button class="btn sm" onclick="setZoneLog(\'' + zoneId + '\')">Set</button>' +
+      '</div>' +
+      '<button class="btn sm danger-ghost" style="margin-top:10px" onclick="resetZone(\'' + zoneId + '\')">Reset zone</button>' +
+    '</div>';
+}
+function applyZoneLog(zoneId, kind){
+  const m = shotMapState();
+  const s = m[zoneId] || (m[zoneId] = { m: 0, a: 0 });
+  if (kind === 'make'){ s.m = num(s.m) + 1; s.a = num(s.a) + 1; }
+  else if (kind === 'miss'){ s.a = num(s.a) + 1; }
+  else if (kind === 'umake'){ s.m = Math.max(0, num(s.m) - 1); s.a = Math.max(0, num(s.a) - 1); }
+  else if (kind === 'umiss'){ s.a = Math.max(num(s.m), num(s.a) - 1); }
+  if (num(s.m) > num(s.a)) s.m = num(s.a);
+  save();
+  renderShots();
+  openZoneLogModal(zoneId);
+}
+function setZoneLog(zoneId){
+  const a = num(document.getElementById('zl-a').value);
+  const mk = Math.min(num(document.getElementById('zl-m').value), a);
+  shotMapState()[zoneId] = { m: mk, a };
+  save();
+  renderShots();
+  openZoneLogModal(zoneId);
+  toast('✓ Zone updated');
+}
+function resetZone(zoneId){
+  snapshot();
+  shotMapState()[zoneId] = { m: 0, a: 0 };
+  save();
+  renderShots();
+  openZoneLogModal(zoneId);
+}
+
+/* ============================================================
+   BETA V2.0 — Mental 8C Scouting + 8D Master Playbook
+   ============================================================ */
+function embedVideo(url){
+  const u = safeUrl(url);
+  if (!u) return '<div class="empty sm">Enter a valid http(s) video link.</div>';
+  const yt = u.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([\w-]{6,})/);
+  if (yt) return '<iframe src="https://www.youtube.com/embed/' + yt[1] + '" allowfullscreen loading="lazy" title="Scouting video"></iframe>';
+  return '<a class="btn sm ghost" href="' + esc(u) + '" target="_blank" rel="noopener">▶ Open video (external)</a>';
+}
+function saveScoutField(field, value){
+  snapshot();
+  mentalState().scouting[field] = value;
+  save();
+  renderScouting();
+}
+function renderScouting(){
+  const el = document.getElementById('scout-panel');
+  if (!el) return;
+  const s = mentalState().scouting;
+  const kick = document.getElementById('scout-kicker');
+  if (kick) kick.textContent = s.notes.length + ' note' + (s.notes.length === 1 ? '' : 's');
+  el.innerHTML =
+    '<div class="compact-row">' +
+      '<div class="field inline-block" style="flex:1 1 150px"><label>Video Title</label><input value="' + esc(s.title || '') + '" onchange="saveScoutField(\'title\',this.value)" placeholder="Opponent / game label"></div>' +
+      '<div class="field inline-block" style="flex:2 1 210px"><label>Embedded Video (YouTube / Hudl)</label><input type="url" value="' + esc(s.videoUrl || '') + '" onchange="saveScoutField(\'videoUrl\',this.value)" placeholder="https://youtube.com/watch?v=..."></div>' +
+    '</div>' +
+    (s.videoUrl ? '<div class="scout-video">' + embedVideo(s.videoUrl) + '</div>' : '') +
+    '<div class="scout-note-add">' +
+      '<input id="scout-stamp" placeholder="12:34"><input id="scout-text" placeholder="Timestamped note — e.g. #4 drives left every time"><button class="btn sm" onclick="addScoutNote()">+ Add</button>' +
+    '</div>' +
+    (s.notes.length
+      ? '<div class="scout-notes">' + s.notes.map(n =>
+          '<div class="scout-note"><b>' + esc(n.stamp || '—') + '</b><span>' + esc(n.text) + '</span><button class="icon-btn danger" onclick="deleteScoutNote(\'' + n.id + '\')" title="Delete">✕</button></div>').join('') + '</div>'
+      : '<div class="empty sm">No timestamped notes yet.</div>');
+  renderMatchups();
+}
+function addScoutNote(){
+  const text = (document.getElementById('scout-text').value || '').trim();
+  if (!text){ toast('Enter a note', 'error'); return; }
+  snapshot();
+  mentalState().scouting.notes.push({ id: uid(), stamp: (document.getElementById('scout-stamp').value || '').trim(), text });
+  save();
+  renderScouting();
+}
+function deleteScoutNote(id){
+  snapshot();
+  const s = mentalState().scouting;
+  s.notes = s.notes.filter(n => n.id !== id);
+  save();
+  renderScouting();
+}
+function renderMatchups(){
+  const el = document.getElementById('matchup-list');
+  if (!el) return;
+  const list = mentalState().scouting.matchups;
+  const kick = document.getElementById('matchup-kicker');
+  if (kick) kick.textContent = list.length + ' card' + (list.length === 1 ? '' : 's');
+  el.innerHTML = list.length
+    ? list.map(x =>
+        '<div class="matchup-card">' +
+          '<div class="mc-top"><b>' + esc(x.name || 'Player') + '</b>' + (x.number ? '<span class="mc-num">#' + esc(x.number) + '</span>' : '') +
+            '<span class="mc-team">' + esc(x.team || '') + '</span>' +
+            '<button class="icon-btn" onclick="openMatchupModal(\'' + x.id + '\')" title="Edit">✎</button>' +
+            '<button class="icon-btn danger" onclick="deleteMatchup(\'' + x.id + '\')" title="Delete">✕</button></div>' +
+          '<div class="mc-meta">' + [x.position, x.height, x.weight, x.hand ? x.hand + ' Hand' : ''].filter(Boolean).map(v => '<span>' + esc(v) + '</span>').join('') + '</div>' +
+          (x.tendencies ? '<div class="mc-row"><i>KEY TENDENCIES</i>' + esc(x.tendencies) + '</div>' : '') +
+          (x.defense ? '<div class="mc-row"><i>DEFENSIVE STRATEGY</i>' + esc(x.defense) + '</div>' : '') +
+        '</div>').join('')
+    : empty('No matchup cards yet — scout your next opponent.');
+}
+let matchupModalId = null;
+function openMatchupModal(id){
+  const x = id ? mentalState().scouting.matchups.find(y => y.id === id) : null;
+  matchupModalId = x ? x.id : null;
+  openModal(x ? 'Edit Matchup — ' + x.name : 'Opponent Matchup Card');
+  const d = x || { team: '', number: '', name: '', position: 'PG', height: '', weight: '', hand: 'Right', tendencies: '', defense: '' };
+  const handOpts = ['Right', 'Left'].map(h => '<option' + (d.hand === h ? ' selected' : '') + '>' + h + '</option>').join('');
+  const posOpts = ['PG', 'SG', 'SF', 'PF', 'C'].map(p => '<option' + (d.position === p ? ' selected' : '') + '>' + p + '</option>').join('');
+  modalBody.innerHTML =
+    '<div class="compact-row">' +
+      '<div class="field inline-block" style="flex:1.6 1 150px"><label>Team</label><input id="mu-team" value="' + esc(d.team) + '"></div>' +
+      '<div class="field inline-block"><label>Jersey #</label><input id="mu-number" value="' + esc(d.number) + '"></div>' +
+      '<div class="field inline-block" style="flex:1.6 1 150px"><label>Name</label><input id="mu-name" value="' + esc(d.name) + '"></div>' +
+    '</div>' +
+    '<div class="compact-row">' +
+      '<div class="field inline-block"><label>Position</label><select id="mu-position">' + posOpts + '</select></div>' +
+      '<div class="field inline-block"><label>Height</label><input id="mu-height" value="' + esc(d.height) + '" placeholder="6\'2\""></div>' +
+      '<div class="field inline-block"><label>Weight</label><input id="mu-weight" value="' + esc(d.weight) + '" placeholder="175 lbs"></div>' +
+      '<div class="field inline-block"><label>Dominant Hand</label><select id="mu-hand">' + handOpts + '</select></div>' +
+    '</div>' +
+    '<div class="field"><label>Key Tendencies</label><textarea id="mu-tendencies" rows="3" placeholder="Favourite moves, shot locations, how they attack...">' + esc(d.tendencies) + '</textarea></div>' +
+    '<div class="field"><label>Defensive Strategy</label><textarea id="mu-defense" rows="3" placeholder="How you will guard / attack them...">' + esc(d.defense) + '</textarea></div>' +
+    '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">' +
+      (x ? '<button class="btn sm danger" onclick="deleteMatchup()">Delete</button>' : '') +
+      '<button class="btn" onclick="saveMatchup()">Save Card</button>' +
+    '</div>';
+}
+function saveMatchup(){
+  const v = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  const data = { team: v('mu-team'), number: v('mu-number'), name: v('mu-name'), position: v('mu-position'), height: v('mu-height'), weight: v('mu-weight'), hand: v('mu-hand'), tendencies: v('mu-tendencies'), defense: v('mu-defense') };
+  if (!data.name && !data.team){ toast('Add a team or player name', 'error'); return; }
+  snapshot();
+  const list = mentalState().scouting.matchups;
+  if (matchupModalId){ const x = list.find(y => y.id === matchupModalId); if (x) Object.assign(x, data); }
+  else list.push({ id: uid(), ...data });
+  save();
+  closeModal();
+  renderMatchups();
+  toast('✓ Matchup card saved');
+}
+function deleteMatchup(id){
+  snapshot();
+  const s = mentalState().scouting;
+  s.matchups = s.matchups.filter(y => y.id !== (id || matchupModalId));
+  save();
+  closeModal();
+  renderMatchups();
+}
+const PLAYBOOK_TONE = { 'Offenses': '#2ecc71', 'Defenses / Presses': '#3b82f6', 'SLOB / BLOB': '#f0a500', 'Fast Breaks': '#e63946' };
+function renderPlaybook(){
+  const el = document.getElementById('playbook-panel');
+  if (!el) return;
+  const list = mentalState().playbook;
+  el.innerHTML = PLAYBOOK_CATS.map(cat => {
+    const rows = list.filter(p => p.cat === cat);
+    const tone = PLAYBOOK_TONE[cat] || '#45a29e';
+    const mastered = rows.filter(p => p.mastery === 'Mastered').length;
+    return '<div class="card playbook-cat" style="margin-bottom:16px">' +
+      '<div class="card-head"><h3 style="color:' + tone + '">' + esc(cat) + '</h3><span class="kicker">' + mastered + '/' + rows.length + ' mastered</span></div>' +
+      (rows.length ? '<div class="pb-list">' + rows.map(p =>
+        '<div class="pb-item">' +
+          '<div class="pb-main"><b>' + esc(p.name) + '</b>' + (p.url ? '<a class="game-video-link" href="' + esc(safeUrl(p.url) || '#') + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">▶ Clip</a>' : '') +
+            (p.notes ? '<i>' + esc(p.notes) + '</i>' : '') + '</div>' +
+          '<button class="mastery-chip m-' + esc(p.mastery.toLowerCase()) + '" onclick="cyclePlaybookMastery(\'' + p.id + '\')" title="Cycle mastery">' + esc(p.mastery) + '</button>' +
+          '<button class="icon-btn" onclick="openPlaybookModal(\'' + p.id + '\')" title="Edit">✎</button>' +
+          '<button class="icon-btn danger" onclick="deletePlaybook(\'' + p.id + '\')" title="Delete">✕</button>' +
+        '</div>').join('') + '</div>' : '<div class="empty sm">No plays in this category yet.</div>') +
+    '</div>';
+  }).join('');
+}
+let playbookModalId = null;
+function openPlaybookModal(id){
+  const p = id ? mentalState().playbook.find(y => y.id === id) : null;
+  playbookModalId = p ? p.id : null;
+  openModal(p ? 'Edit Play — ' + p.name : 'Add Play to Library');
+  const d = p || { cat: 'Offenses', name: '', url: '', notes: '', mastery: 'Learning' };
+  modalBody.innerHTML =
+    '<div class="field"><label>Play Name</label><input id="pb-name" value="' + esc(d.name) + '" placeholder="e.g. Horns Set — 1-4 Flex"></div>' +
+    '<div class="compact-row">' +
+      '<div class="field inline-block" style="flex:1 1 150px"><label>Category</label><select id="pb-cat">' + PLAYBOOK_CATS.map(c => '<option' + (d.cat === c ? ' selected' : '') + '>' + c + '</option>').join('') + '</select></div>' +
+      '<div class="field inline-block"><label>Mastery</label><select id="pb-mastery">' + PLAYBOOK_MASTERY.map(mm => '<option' + (d.mastery === mm ? ' selected' : '') + '>' + mm + '</option>').join('') + '</select></div>' +
+    '</div>' +
+    '<div class="field"><label>Clip URL <span class="hint">optional</span></label><input type="url" id="pb-url" value="' + esc(d.url) + '" placeholder="https://..."></div>' +
+    '<div class="field"><label>Notes / Coaching Points</label><textarea id="pb-notes" rows="3">' + esc(d.notes) + '</textarea></div>' +
+    '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">' +
+      (p ? '<button class="btn sm danger" onclick="deletePlaybook()">Delete</button>' : '') +
+      '<button class="btn" onclick="savePlaybook()">Save Play</button>' +
+    '</div>';
+}
+function savePlaybook(){
+  const v = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  const name = v('pb-name');
+  if (!name){ toast('Play name is required', 'error'); return; }
+  snapshot();
+  const data = { name, cat: v('pb-cat') || 'Offenses', url: v('pb-url'), notes: v('pb-notes'), mastery: v('pb-mastery') || 'Learning' };
+  const list = mentalState().playbook;
+  if (playbookModalId){ const p = list.find(y => y.id === playbookModalId); if (p) Object.assign(p, data); }
+  else list.push({ id: uid(), ...data });
+  save();
+  closeModal();
+  renderPlaybook();
+  toast('✓ Playbook updated');
+}
+function deletePlaybook(id){
+  snapshot();
+  const m = mentalState();
+  m.playbook = m.playbook.filter(y => y.id !== (id || playbookModalId));
+  save();
+  closeModal();
+  renderPlaybook();
+}
+function cyclePlaybookMastery(id){
+  snapshot();
+  const p = mentalState().playbook.find(y => y.id === id);
+  if (!p) return;
+  const i = PLAYBOOK_MASTERY.indexOf(p.mastery);
+  p.mastery = PLAYBOOK_MASTERY[(i + 1) % PLAYBOOK_MASTERY.length];
+  save();
+  renderPlaybook();
+}
+
+/* ============================================================
+   BETA V2.0 — BC → NCAA 1-Direction Flow Mind Map
+   ============================================================ */
+const NCAA_REQS = {
+  'NCAA D1': { english: 4, math: 3, science: 2, social: 2, extra: 4 },
+  'NCAA D2': { english: 3, math: 2, science: 2, social: 2, extra: 5 }
+};
+function ncaaState(){
+  if (!state.ncaa || typeof state.ncaa !== 'object') state.ncaa = { paths: [], selectedNode: 'precalc11' };
+  if (!Array.isArray(state.ncaa.paths)) state.ncaa.paths = [];
+  if (!state.ncaa.selectedNode) state.ncaa.selectedNode = 'precalc11';
+  return state.ncaa;
+}
+function ncaaCourse(id){ return NCAA_COURSES.find(c => c.id === id) || null; }
+function ncaaCoreCoverage(target){
+  const req = NCAA_REQS[target] || NCAA_REQS['NCAA D1'];
+  const have = { english: 0, math: 0, science: 0, social: 0, extra: 0 };
+  (state.classCats || []).forEach(c => {
+    const key = String(c.label || '').toLowerCase();
+    const hit = NCAA_COURSES.find(n => n.label.toLowerCase() === key || key.includes(n.label.toLowerCase()));
+    if (hit) have[hit.cat] = (have[hit.cat] || 0) + 1;
+  });
+  return { req, have };
+}
+function renderNcaa(){
+  const flow = document.getElementById('ncaa-flow');
+  if (!flow) return;
+  const st = ncaaState();
+  const kick = document.getElementById('ncaa-kicker');
+  if (kick) kick.textContent = NCAA_COURSES.length + ' BC courses';
+  const grades = ['10', '11', '12'];
+  const cols = grades.map(g =>
+    '<div class="ncaa-col"><div class="ncaa-col-head">GRADE ' + g + '</div>' +
+      NCAA_COURSES.filter(c => c.grade === g).map(c => {
+        const sel = st.selectedNode === c.id ? ' sel' : '';
+        return '<div class="ncaa-node' + sel + '" onclick="selectNcaaNode(\'' + c.id + '\')"><b>' + esc(c.label) + '</b><span class="nn-cat">' + esc(NCAA_CORE[c.cat]) + '</span></div>';
+      }).join('') +
+    '</div>').join('<div class="ncaa-arrow">→</div>');
+  const cov = ncaaCoreCoverage('NCAA D1');
+  const coreCol =
+    '<div class="ncaa-col core"><div class="ncaa-col-head">NCAA 16-CORE (D1)</div>' +
+      Object.keys(NCAA_REQS['NCAA D1']).map(k => {
+        const need = cov.req[k], gv = cov.have[k] || 0;
+        const ok = gv >= need;
+        return '<div class="ncaa-core' + (ok ? ' ok' : '') + '"><b>' + esc(NCAA_CORE[k]) + '</b><span>' + gv + ' / ' + need + ' mapped</span></div>';
+      }).join('') +
+    '</div>';
+  flow.innerHTML = '<div class="ncaa-flow-wrap">' + cols + '<div class="ncaa-arrow">→</div>' + coreCol + '</div>' +
+    '<p class="paste-hint" style="margin-top:10px">Every arrow flows one way — a Grade 10 course feeds a Grade 11 course, which feeds a Grade 12 course and finally an NCAA core slot. Click any node for details; build your own sequential path on the right.</p>';
+  renderNcaaDetail();
+  renderNcaaPaths();
+}
+function selectNcaaNode(id){
+  ncaaState().selectedNode = id;
+  save();
+  renderNcaa();
+}
+function renderNcaaDetail(){
+  const el = document.getElementById('ncaa-detail');
+  if (!el) return;
+  const c = ncaaCourse(ncaaState().selectedNode);
+  if (!c){ el.innerHTML = empty('Select a course node.'); return; }
+  el.innerHTML =
+    '<div class="ncaa-detail">' +
+      '<h4>' + esc(c.label) + '</h4>' +
+      '<div class="nd-tags">' + chip('#45a29e', 'Grade ' + c.grade) + chip('#f0a500', fmtNum(c.credits) + ' credits') + chip('#66a3ff', NCAA_CORE[c.cat]) + '</div>' +
+      '<p>' + esc(c.desc) + '</p>' +
+      '<div class="nd-ncaa"><span class="kicker">NCAA CORE STATUS</span><b>' + esc(NCAA_CORE[c.cat]) + '</b>' +
+        '<span class="hint">' + (c.cat === 'extra' ? 'Counts toward the Additional core block (or as an elective).' : 'Counts directly toward the ' + NCAA_CORE[c.cat] + ' core requirement.') + '</span></div>' +
+    '</div>';
+}
+let ncaaDraft = [];
+function renderNcaaPaths(){
+  const el = document.getElementById('ncaa-paths');
+  if (!el) return;
+  const paths = ncaaState().paths;
+  el.innerHTML = paths.length
+    ? paths.map(p =>
+        '<div class="ncaa-path">' +
+          '<div class="np-head"><b>' + esc(p.name) + '</b>' + chip('#9d4edd', p.target) +
+            '<button class="icon-btn danger" onclick="deleteNcaaPath(\'' + p.id + '\')" title="Delete path">✕</button></div>' +
+          '<div class="np-chain">' + p.nodeIds.map(id => '<span class="np-step">' + esc(ncaaCourse(id) ? ncaaCourse(id).label : id) + '</span>').join('<span class="np-arrow">→</span>') + '</div>' +
+        '</div>').join('')
+    : empty('No custom paths yet — build one with the path builder.');
+}
+function openNcaaPathModal(){
+  ncaaDraft = [];
+  openModal('Custom Sequential Path Builder');
+  renderNcaaPathModal();
+}
+function renderNcaaPathModal(){
+  modalBody.innerHTML =
+    '<div class="field"><label>Path Name</label><input id="np-name" placeholder="e.g. Math Track — NCAA Math core"></div>' +
+    '<div class="compact-row">' +
+      '<div class="field inline-block" style="flex:2 1 150px"><label>Add Course (in sequence)</label><select id="np-course">' + NCAA_COURSES.map(c => '<option value="' + c.id + '">' + esc(c.label) + ' — Gr ' + c.grade + '</option>').join('') + '</select></div>' +
+      '<div class="field inline-block"><label>Target</label><select id="np-target"><option>NCAA D1</option><option>NCAA D2</option></select></div>' +
+    '</div>' +
+    '<button class="btn sm" onclick="ncaaDraftAdd()">+ Add to path</button>' +
+    '<div class="ncaa-draft">' + (ncaaDraft.length
+      ? ncaaDraft.map((id, i) => '<span class="np-step">' + (i + 1) + '. ' + esc(ncaaCourse(id) ? ncaaCourse(id).label : id) + ' <button class="icon-btn danger" onclick="ncaaDraftRemove(' + i + ')" title="Remove">✕</button></span>').join('<span class="np-arrow">→</span>')
+      : '<span class="hint">No courses added yet — e.g. Foundations of Math 10 → Pre-Calculus 11 → Pre-Calculus 12.</span>') + '</div>' +
+    '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px"><button class="btn ghost sm" onclick="closeModal()">Cancel</button><button class="btn" onclick="saveNcaaPath()">Save Path</button></div>';
+}
+function ncaaDraftAdd(){ const id = document.getElementById('np-course').value; if (id){ ncaaDraft.push(id); renderNcaaPathModal(); } }
+function ncaaDraftRemove(i){ ncaaDraft.splice(i, 1); renderNcaaPathModal(); }
+function saveNcaaPath(){
+  const name = (document.getElementById('np-name').value || '').trim();
+  if (!name){ toast('Name the path', 'error'); return; }
+  if (!ncaaDraft.length){ toast('Add at least one course', 'error'); return; }
+  snapshot();
+  ncaaState().paths.push({ id: uid(), name, target: document.getElementById('np-target').value || 'NCAA D1', nodeIds: ncaaDraft.slice() });
+  save();
+  closeModal();
+  renderNcaa();
+  toast('✓ Path saved');
+}
+function deleteNcaaPath(id){
+  snapshot();
+  const st = ncaaState();
+  st.paths = st.paths.filter(p => p.id !== id);
+  save();
+  renderNcaa();
+}
+
+/* ============================================================
+   BETA V2.0 — Life Maxx (TAB 10)
+   ============================================================ */
+function lifeState(){
+  if (!state.life || typeof state.life !== 'object') state.life = { sprints: [], debriefs: [], contacts: [], levelXp: {} };
+  const l = state.life;
+  if (!Array.isArray(l.sprints)) l.sprints = [];
+  if (!Array.isArray(l.debriefs)) l.debriefs = [];
+  if (!Array.isArray(l.contacts)) l.contacts = [];
+  if (!l.levelXp || typeof l.levelXp !== 'object') l.levelXp = {};
+  SOCIAL_TREE.forEach(n => { if (!Number.isFinite(parseFloat(l.levelXp[n.id]))) l.levelXp[n.id] = 0; });
+  return l;
+}
+function lifeDaysSince(key){ if (!key) return null; return Math.max(0, Math.round((keyToDate(todayKey()) - keyToDate(key)) / 86400000)); }
+function renderLife(){ renderSprints(); renderCombine(); renderTree(); renderDebriefs(); renderContacts(); }
+/* ---------- Physical Combine (Life Maxx > Stats) ---------- */
+function combineState(){
+  const l = lifeState();
+  if (!l.combine || typeof l.combine !== 'object') l.combine = {};
+  return l.combine;
+}
+function renderCombine(){
+  const el = document.getElementById('life-combine');
+  if (!el) return;
+  const c = combineState();
+  el.innerHTML =
+    '<div class="card combine-card">' +
+      '<div class="card-head"><h3>Biometric Baseline</h3><span class="kicker">' + (c.updated ? 'measured ' + fmtDate(c.updated) : 'not measured yet') + '</span></div>' +
+      '<div class="combine-grid">' + COMBINE_METRICS.map(m => {
+        const v = (c[m.id] === undefined || c[m.id] === null) ? '' : c[m.id];
+        const conv = m.unit === 'cm' && cmToFeet(v) ? cmToFeet(v) : '';
+        const base = m.baseline !== '' && m.baseline !== undefined ? 'baseline ' + m.baseline : m.note;
+        /* the unit chip is only shown when the label does not already carry it */
+        const unitChip = /\(/.test(m.label) ? '' : '<i class="cb-u">' + esc(m.unit) + '</i>';
+        return '<label class="cb-metric"><span class="cb-l">' + esc(m.label) + '</span>' +
+          '<span class="cb-in"><input type="number" min="0" step="0.1" id="cb-' + m.id + '" value="' + esc(v) + '" placeholder="—">' + unitChip + '</span>' +
+          '<span class="cb-sub">' + (conv ? conv + ' · ' : '') + esc(base) + '</span></label>';
+      }).join('') + '</div>' +
+      '<p class="paste-hint">Height is locked to the <b>172 cm / 5\'8"</b> baseline — the rest are yours to fill in after each testing day. Vertical is the number every college program asks for first: measure it consistently (same shoes, same floor, warm-up identical).</p>' +
+    '</div>';
+}
+function saveCombine(){
+  snapshot();
+  const c = combineState();
+  COMBINE_METRICS.forEach(m => {
+    const el = document.getElementById('cb-' + m.id);
+    if (el) c[m.id] = el.value === '' ? '' : optNum(el.value);
+  });
+  c.updated = todayKey();
+  save();
+  renderCombine();
+  toast('✓ Combine measurements saved');
+}
+function sprintDay(s){
+  const diff = Math.floor((keyToDate(todayKey()) - keyToDate(s.startDate)) / 86400000) + 1;
+  return clamp(diff, 0, s.days);
+}
+function renderSprints(){
+  const el = document.getElementById('life-sprints');
+  if (!el) return;
+  const list = lifeState().sprints;
+  el.innerHTML = list.length
+    ? '<div class="sprint-grid">' + list.map(s => {
+        const day = sprintDay(s), pct = Math.round(clamp(day / s.days * 100, 0, 100));
+        const fields = LIFE_SKILLS[s.skill] || [];
+        const today = todayKey();
+        const log = (s.logs && s.logs[today]) || {};
+        return '<div class="card sprint-card">' +
+          '<div class="card-head"><h3>' + esc(s.skill) + '</h3>' + chip('#2ec4b6', s.days + '-day') +
+            '<button class="icon-btn danger" onclick="deleteSprint(\'' + s.id + '\')" title="Delete sprint">✕</button></div>' +
+          '<div class="sprint-progress"><div class="bar"><div class="bar-fill" style="width:' + pct + '%"></div></div>' +
+            '<span class="bar-pct">Day ' + day + ' / ' + s.days + ' · ends ' + esc(fmtDate(s.endDate)) + '</span></div>' +
+          '<div class="log-label" style="margin-top:12px">TODAY\'S FIELD LOG</div>' +
+          '<div class="sprint-fields">' + fields.map((f, i) =>
+            '<label class="sprint-field"><span>' + esc(f) + '</span><input value="' + esc(log['f' + i] || '') + '" onchange="logSprintField(\'' + s.id + '\',\'f' + i + '\',this.value)" placeholder="—"></label>').join('') + '</div>' +
+          (s.notes ? '<p class="paste-hint" style="margin-top:10px">' + esc(s.notes) + '</p>' : '') +
+        '</div>';
+      }).join('') + '</div>'
+    : empty('No active sprints. Commit to a focused 21 / 30 / 45 / 60 / 90 / 120-day sprint.');
+}
+function logSprintField(id, key, value){
+  const s = lifeState().sprints.find(x => x.id === id);
+  if (!s) return;
+  s.logs = s.logs || {};
+  s.logs[todayKey()] = s.logs[todayKey()] || {};
+  s.logs[todayKey()][key] = value;
+  save();
+}
+function openSprintModal(){
+  openModal('New Skill Sprint');
+  modalBody.innerHTML =
+    '<div class="field"><label>Focus Skill</label><select id="sp-skill">' + Object.keys(LIFE_SKILLS).map(k => '<option>' + k + '</option>').join('') + '</select></div>' +
+    '<div class="field"><label>Duration</label><div class="sprint-durs">' + SPRINT_DURATIONS.map(d => '<button class="chip-btn durb' + (d === 30 ? ' active' : '') + '" data-d="' + d + '" onclick="pickSprintDur(' + d + ')">' + d + 'd</button>').join('') + '</div>' +
+      '<input type="number" id="sp-days" min="1" max="365" value="30" style="margin-top:8px" title="Custom duration in days"></div>' +
+    '<div class="compact-row"><div class="field inline-block"><label>Start Date</label><input type="date" id="sp-start" value="' + todayKey() + '"></div></div>' +
+    '<div class="field"><label>Notes / Commitment</label><textarea id="sp-notes" rows="2" placeholder="Why this sprint, what success looks like..."></textarea></div>' +
+    '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px"><button class="btn ghost sm" onclick="closeModal()">Cancel</button><button class="btn" onclick="saveSprint()">Start Sprint</button></div>';
+}
+function pickSprintDur(d){
+  document.getElementById('sp-days').value = d;
+  $$('.sprint-durs .durb').forEach(b => b.classList.toggle('active', Number(b.dataset.d) === d));
+}
+function saveSprint(){
+  const skill = document.getElementById('sp-skill').value;
+  const days = clamp(parseInt(document.getElementById('sp-days').value, 10) || 30, 1, 365);
+  const start = document.getElementById('sp-start').value || todayKey();
+  const endD = keyToDate(start); endD.setDate(endD.getDate() + days - 1);
+  snapshot();
+  lifeState().sprints.push({ id: uid(), skill, days, startDate: start, endDate: dateKey(endD), notes: (document.getElementById('sp-notes').value || '').trim(), logs: {} });
+  save();
+  closeModal();
+  renderSprints();
+  toast('✓ Sprint started');
+}
+function deleteSprint(id){
+  snapshot();
+  const l = lifeState();
+  l.sprints = l.sprints.filter(s => s.id !== id);
+  save();
+  renderSprints();
+}
+function treeLevel(xp){ let lvl = TREE_LEVELS[0]; TREE_LEVELS.forEach(t => { if (xp >= t.min) lvl = t; }); return lvl; }
+function treeNext(xp){ return TREE_LEVELS.find(t => t.min > xp) || null; }
+function skillCardHtml(n, locked){
+  const xp = num(lifeState().levelXp[n.id]);
+  const lvl = treeLevel(xp), next = treeNext(xp);
+  const pct = next ? Math.round((xp - lvl.min) / (next.min - lvl.min) * 100) : 100;
+  return '<div class="skill-card' + (locked ? ' locked' : '') + '">' +
+    '<div class="sk-top"><b>' + esc(n.label) + '</b>' + chip('#66fcf1', lvl.name) + '</div>' +
+    '<p>' + esc(n.desc) + '</p>' +
+    '<div class="tn-bar"><div class="bar"><div class="bar-fill" style="width:' + pct + '%"></div></div>' +
+      '<span class="bar-pct">' + xp + ' XP' + (next ? ' · ' + next.name + ' @ ' + next.min : ' · maxed') + '</span></div>' +
+    '<div class="sk-actions">' +
+      '<button class="btn sm" ' + (locked ? 'disabled' : '') + ' onclick="addTreeXp(\'' + n.id + '\',1)">+1 Rep</button>' +
+      '<button class="btn sm ghost dec" ' + (locked || !xp ? 'disabled' : '') + ' onclick="addTreeXp(\'' + n.id + '\',-1)" title="Undo a rep / misclick">−1 Rep</button>' +
+    '</div>' +
+  '</div>';
+}
+/* Clean 4-tier vertical progression — 4 skills per tier, no overlapping nodes. */
+function renderTree(){
+  const el = document.getElementById('life-tree');
+  if (!el) return;
+  const l = lifeState();
+  el.innerHTML = '<div class="tree-tiers">' + SOCIAL_TIERS.map((t, ti) => {
+    const members = socialTierMembers(t.id);
+    const prev = ti ? socialTierMembers(SOCIAL_TIERS[ti - 1].id) : null;
+    const prevXp = prev ? prev.reduce((s, n) => s + num(l.levelXp[n.id]), 0) : 0;
+    const need = prev ? prev.length : 0;
+    const locked = !!prev && prevXp < need;
+    const tierXp = members.reduce((s, n) => s + num(l.levelXp[n.id]), 0);
+    const maxXp = members.length * TREE_LEVELS[TREE_LEVELS.length - 1].min;
+    const pct = Math.round(clamp(tierXp / (maxXp || 1) * 100, 0, 100));
+    const avg = Math.floor(tierXp / (members.length || 1));
+    return (ti ? '<div class="tier-conn' + (locked ? ' locked' : '') + '">▼</div>' : '') +
+      '<div class="tree-tier' + (locked ? ' locked' : '') + '" style="--tier:' + t.color + '">' +
+        '<div class="tree-tier-head"><b>' + esc(t.label) + '</b>' +
+          (locked
+            ? '<span class="tier-lock">🔒 Unlocks at ' + need + ' XP in the tier above (' + prevXp + '/' + need + ')</span>'
+            : chip(t.color, treeLevel(avg).name)) +
+          '<span class="tier-prog">' + tierXp + ' / ' + maxXp + ' XP</span></div>' +
+        '<div class="tree-skills">' + members.map(n => skillCardHtml(n, locked)).join('') + '</div>' +
+        '<div class="bar tier-bar"><div class="bar-fill" style="width:' + pct + '%"></div></div>' +
+      '</div>';
+  }).join('') + '</div>';
+}
+function addTreeXp(id, n){
+  snapshot();
+  const l = lifeState();
+  l.levelXp[id] = Math.max(0, num(l.levelXp[id]) + (n || 1));
+  save();
+  renderTree();
+}
+function renderDebriefs(){
+  const el = document.getElementById('life-debriefs');
+  if (!el) return;
+  const rows = lifeState().debriefs.slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+  el.innerHTML = rows.length
+    ? '<table class="decision-table"><thead><tr><th>Date</th><th>Person / Context</th><th>Quick Win</th><th>Hesitation / Mistake</th><th>Next Adjustment</th><th></th></tr></thead><tbody>' +
+      rows.map(d => '<tr><td>' + esc(fmtDate(d.date)) + '</td><td>' + esc(d.person || '—') + '</td><td>' + esc(d.win || '—') + '</td><td>' + esc(d.mistake || '—') + '</td><td>' + esc(d.adjust || '—') + '</td>' +
+        '<td style="white-space:nowrap"><button class="icon-btn" onclick="openDebriefModal(\'' + d.id + '\')" title="Edit">✎</button><button class="icon-btn danger" onclick="deleteDebrief(\'' + d.id + '\')" title="Delete">✕</button></td></tr>').join('') +
+      '</tbody></table>'
+    : empty('No debriefs yet — log a meaningful interaction.');
+}
+let debriefModalId = null;
+function openDebriefModal(id){
+  const d = id ? lifeState().debriefs.find(x => x.id === id) : null;
+  debriefModalId = d ? d.id : null;
+  openModal(d ? 'Edit Debrief' : 'Post-Interaction Debrief');
+  const data = d || { date: todayKey(), person: '', win: '', mistake: '', adjust: '' };
+  modalBody.innerHTML =
+    '<div class="compact-row"><div class="field inline-block"><label>Date</label><input type="date" id="db-date" value="' + esc(data.date) + '"></div>' +
+      '<div class="field inline-block" style="flex:2 1 160px"><label>Person / Context</label><input id="db-person" value="' + esc(data.person) + '" placeholder="Who / where"></div></div>' +
+    '<div class="field"><label>Quick Win</label><textarea id="db-win" rows="2" placeholder="What went well...">' + esc(data.win) + '</textarea></div>' +
+    '<div class="field"><label>Hesitation / Mistake</label><textarea id="db-mistake" rows="2" placeholder="Where you froze or slipped...">' + esc(data.mistake) + '</textarea></div>' +
+    '<div class="field"><label>Next Adjustment</label><textarea id="db-adjust" rows="2" placeholder="One concrete change next time...">' + esc(data.adjust) + '</textarea></div>' +
+    '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">' +
+      (d ? '<button class="btn sm danger" onclick="deleteDebrief()">Delete</button>' : '') +
+      '<button class="btn" onclick="saveDebrief()">Save Debrief</button></div>';
+}
+function saveDebrief(){
+  const v = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  snapshot();
+  const data = { date: v('db-date') || todayKey(), person: v('db-person'), win: v('db-win'), mistake: v('db-mistake'), adjust: v('db-adjust') };
+  const list = lifeState().debriefs;
+  if (debriefModalId){ const d = list.find(x => x.id === debriefModalId); if (d) Object.assign(d, data); }
+  else list.push({ id: uid(), ...data });
+  save();
+  closeModal();
+  renderDebriefs();
+  toast('✓ Debrief logged');
+}
+function deleteDebrief(id){
+  snapshot();
+  const l = lifeState();
+  l.debriefs = l.debriefs.filter(d => d.id !== (id || debriefModalId));
+  save();
+  closeModal();
+  renderDebriefs();
+}
+function renderContacts(){
+  const el = document.getElementById('life-contacts');
+  if (!el) return;
+  const rows = lifeState().contacts.slice().sort((a, b) => String(b.lastContact || '').localeCompare(String(a.lastContact || '')));
+  el.innerHTML = rows.length
+    ? '<table class="decision-table"><thead><tr><th>Name</th><th>Relation</th><th>Last Contact</th><th>Reach Out</th><th>Notes / Interests</th><th></th></tr></thead><tbody>' +
+      rows.map(c => {
+        const since = lifeDaysSince(c.lastContact);
+        const stale = since !== null && since >= CONTACT_STALE_DAYS;
+        return '<tr><td><b>' + esc(c.name || '—') + '</b></td><td>' + esc(c.relation || '—') + '</td><td>' + esc(c.lastContact ? fmtDate(c.lastContact) : '—') + '</td>' +
+          '<td>' + (since === null ? '<span class="hint">—</span>' : '<span class="cat-badge" style="color:' + (stale ? '#e63946' : '#2ecc71') + ';background:' + rgba(stale ? '#e63946' : '#2ecc71', .13) + ';border-color:' + rgba(stale ? '#e63946' : '#2ecc71', .45) + '">' + (stale ? '⚠ ' : '') + since + 'd ago</span>') + '</td>' +
+          '<td style="max-width:260px">' + esc(c.notes || '—') + '</td>' +
+          '<td style="white-space:nowrap"><button class="icon-btn" onclick="openContactModal(\'' + c.id + '\')" title="Edit">✎</button><button class="icon-btn danger" onclick="deleteContact(\'' + c.id + '\')" title="Delete">✕</button></td></tr>';
+      }).join('') + '</tbody></table>'
+    : empty('No contacts yet — build your permanent network.');
+}
+let contactModalId = null;
+function openContactModal(id){
+  const c = id ? lifeState().contacts.find(x => x.id === id) : null;
+  contactModalId = c ? c.id : null;
+  openModal(c ? 'Edit Contact' : 'New Network Contact');
+  const data = c || { name: '', relation: '', lastContact: todayKey(), notes: '' };
+  modalBody.innerHTML =
+    '<div class="compact-row">' +
+      '<div class="field inline-block" style="flex:1.6 1 150px"><label>Name</label><input id="lc-name" value="' + esc(data.name) + '"></div>' +
+      '<div class="field inline-block" style="flex:1.4 1 130px"><label>Relation</label><input id="lc-relation" value="' + esc(data.relation) + '" placeholder="Coach / Mentor / Friend"></div>' +
+      '<div class="field inline-block"><label>Last Contact</label><input type="date" id="lc-last" value="' + esc(data.lastContact) + '"></div>' +
+    '</div>' +
+    '<div class="field"><label>Notes / Interests</label><textarea id="lc-notes" rows="3" placeholder="What they care about, how you met, follow-ups...">' + esc(data.notes) + '</textarea></div>' +
+    '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">' +
+      (c ? '<button class="btn sm danger" onclick="deleteContact()">Delete</button>' : '') +
+      '<button class="btn" onclick="saveContact()">Save Contact</button></div>';
+}
+function saveContact(){
+  const v = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  const name = v('lc-name');
+  if (!name){ toast('Name is required', 'error'); return; }
+  snapshot();
+  const data = { name, relation: v('lc-relation'), lastContact: v('lc-last'), notes: v('lc-notes') };
+  const list = lifeState().contacts;
+  if (contactModalId){ const c = list.find(x => x.id === contactModalId); if (c) Object.assign(c, data); }
+  else list.push({ id: uid(), ...data });
+  save();
+  closeModal();
+  renderContacts();
+  toast('✓ Contact saved');
+}
+function deleteContact(id){
+  snapshot();
+  const l = lifeState();
+  l.contacts = l.contacts.filter(c => c.id !== (id || contactModalId));
+  save();
+  closeModal();
+  renderContacts();
+}
+
 function openNotionExport(){
   const md = buildWeeklyMarkdown();
   const r = weeklyWindow();
