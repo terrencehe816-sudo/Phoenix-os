@@ -1354,6 +1354,25 @@ input[type=range]:focus{ box-shadow:none; }
   .cb-in input{ font-family:var(--mono); font-size:18px; color:var(--bright); background:transparent; border:0; border-bottom:1px solid var(--line); padding:2px 0; width:100%; }
   .cb-u{ font-size:11px; color:var(--muted); font-style:normal; }
   .cb-sub{ font-size:10.5px; color:var(--muted); }
+
+  /* ---------- BETA V2.0 · Patch 2.2 — tactical board ---------- */
+  .board-tools{ display:flex; flex-wrap:wrap; align-items:center; gap:6px; background:var(--bg2); border:1px solid var(--line); border-radius:var(--r); padding:8px 10px; margin-bottom:10px; }
+  .board-tools .grp{ display:flex; align-items:center; gap:5px; padding-right:9px; margin-right:3px; border-right:1px dashed var(--line); }
+  .board-tools .grp:last-child{ border-right:0; padding-right:0; margin-right:0; }
+  .bt-btn{ font-family:inherit; font-size:11px; font-weight:700; letter-spacing:.02em; color:var(--text); background:var(--card); border:1px solid var(--line); border-radius:var(--r); padding:5px 9px; cursor:pointer; white-space:nowrap; }
+  .bt-btn:hover{ border-color:var(--accent); color:var(--hi); }
+  .bt-btn.active{ background:var(--accent); border-color:var(--accent); color:#04121a; }
+  .bt-btn.danger.active{ background:var(--danger); border-color:var(--danger); color:#fff; }
+  .color-swatch{ width:20px; height:20px; border-radius:4px; border:2px solid var(--line); cursor:pointer; padding:0; }
+  .color-swatch:hover{ border-color:var(--accent); }
+  .color-swatch.active{ border-color:var(--bright); box-shadow:0 0 0 2px rgba(102,252,241,.3); }
+  .board-hint{ font-size:11px; color:var(--muted); margin:0 0 10px; }
+  .board-ink .ink{ cursor:crosshair; }
+  .board-ink .ink:hover{ filter:brightness(1.35); }
+  .tag-chips{ display:flex; flex-wrap:wrap; gap:5px; }
+  .tag-chips .chip-btn{ font-size:10.5px; }
+  .play-tagline{ display:flex; flex-wrap:wrap; gap:5px; margin-top:4px; }
+  .play-tagline .t{ font-size:9.5px; letter-spacing:.05em; text-transform:uppercase; padding:2px 6px; border-radius:999px; background:rgba(69,162,158,.14); border:1px solid rgba(69,162,158,.35); color:var(--accent); }
   @media (max-width:1100px){
     .routine-grid,.heat-wrap,.ncaa-layout,.mental-grid{ grid-template-columns:1fr; }
     .ncaa-flow-wrap{ min-width:0; flex-wrap:wrap; }
@@ -3037,6 +3056,7 @@ function importJSON(file){
 /* ---------- Tab navigation ---------- */
 function switchTab(name){
   state.settings.activeTab = name;
+  if (name !== 'film') stopPlayback();
   save();
   applyTab();
   renderAll();
@@ -5996,6 +6016,7 @@ function goFilm(view){
 }
 function setFilmView(v){
   state.settings.filmView = v;
+  if (v !== 'plays') stopPlayback();
   save();
   applyFilmView();
   if (v === 'games') renderFilmGames();
@@ -6177,15 +6198,68 @@ const BRANCH_COLORS = ['#2563ff', '#f0a500', '#4ade80', '#c77dff', '#e63946']; /
 const BRANCH_LETTERS = ['A', 'B', 'C', 'D', 'E'];
 function setPlayFilter(s){ playStatusFilter = s; renderFilmPlays(); }
 const PLAY_TYPES = ['Press', 'Press Break', 'Baseline Play', 'Sideline Play', 'Zone Defense', 'Offense'];
+const PLAY_TAGS = ['BLOB', 'SLOB', 'Zone Offense', 'Pick & Roll', 'Press Break', 'Fast Break', 'Motion', 'Set Play', 'Transition', 'Half-Court'];
+
+/* ============================================================
+   Patch 2.2 — TACTICAL BOARD (drawing toolkit, stamps, playback)
+   Everything is stored in the play's own 100×50 court space, so
+   strokes survive Court View switches and re-loads untouched.
+   ============================================================ */
+let boardTool = 'select';        // select | pen | highlight | pass | dribble | erase | stamp:<kind>
+let boardColor = '#e63946';
+let boardWidth = 0.7;           // court units (~4 px on a 940 px board)
+let boardArrow = true;
+let boardAngle = 0;             // rotation applied to the next stamp
+let liveStroke = null;          // stroke being drawn right now
+const BOARD_TOOLS = [
+  { id: 'select',    label: '↖ Select',      hint: 'Drag player tokens to reposition them.' },
+  { id: 'pen',       label: '✏️ Pen',         hint: 'Freehand solid line — player movement.' },
+  { id: 'highlight', label: '🖍 Highlighter', hint: 'Semi-transparent thick stroke — spaces, mismatches, screens.' },
+  { id: 'pass',      label: '⇢ Pass',        hint: 'Dashed line — passes.' },
+  { id: 'dribble',   label: '〰️ Dribble',     hint: 'Wavy line — dribble drives.' },
+  { id: 'erase',     label: '⌫ Eraser',      hint: 'Click any line or stamp to remove just that element.' }
+];
+const BOARD_STAMPS = [
+  { id: 'screen', label: '⛔ Screen', hint: 'Stamp a pick-and-roll / off-ball screen (T-bar). Rotate it with ⟳.' },
+  { id: 'cone',   label: '🔺 Cone',   hint: 'Stamp a cone or chair for drill setups.' },
+  { id: 'target', label: '◎ Target',  hint: 'Stamp a spot / target marker.' },
+  { id: 'ball',   label: '🏀 Ball',   hint: 'Stamp an extra basketball marker.' }
+];
+const BOARD_COLORS = [
+  { label: 'Red', value: '#e63946' }, { label: 'Blue', value: '#2563ff' },
+  { label: 'White', value: '#ffffff' }, { label: 'Yellow', value: '#f0a500' },
+  { label: 'Black', value: '#0b0c10' }
+];
+const BOARD_WIDTHS = [
+  { label: 'Thin', value: 0.35 }, { label: 'Medium', value: 0.7 }, { label: 'Thick', value: 1.4 }
+];
+const COURT_VIEWS = [
+  { id: 'full', label: 'Full Court',      box: '0 0 100 50' },
+  { id: 'half', label: 'Half Court',      box: '50 0 50 50' },
+  { id: 'key',  label: 'Key / Paint Zoom', box: '72 4 32 32' }
+];
+function boardToolMeta(){
+  return BOARD_TOOLS.concat(BOARD_STAMPS.map(s => ({ id: 'stamp:' + s.id, label: s.label, hint: s.hint, stamp: true })))
+    .find(t => t.id === boardTool) || BOARD_TOOLS[0];
+}
+function isStampTool(t){ return String(t || boardTool).startsWith('stamp:'); }
+function stampKind(t){ return String(t || boardTool).replace('stamp:', ''); }
+function isDrawTool(t){ return ['pen', 'highlight', 'pass', 'dribble'].includes(t || boardTool); }
+/* Half-court default set: the attack runs at the rim on the right (x ≈ 98). */
 function blankTokens(){
-  // normalized 0-100 x, 0-50 y court coords
   return {
-    O1: { x: 48, y: 22 }, O2: { x: 42, y: 30 }, O3: { x: 52, y: 34 },
-    O4: { x: 45, y: 12 }, O5: { x: 56, y: 24 },
-    D1: { x: 44, y: 26 }, D2: { x: 40, y: 34 }, D3: { x: 50, y: 38 },
-    D4: { x: 42, y: 18 }, D5: { x: 52, y: 30 },
-    B:  { x: 48, y: 28 }
+    O1: { x: 62, y: 25 }, O2: { x: 74, y: 12 }, O3: { x: 74, y: 38 },
+    O4: { x: 86, y: 8 },  O5: { x: 80, y: 25 },
+    D1: { x: 66, y: 25 }, D2: { x: 78, y: 13 }, D3: { x: 78, y: 37 },
+    D4: { x: 88, y: 8 },  D5: { x: 84, y: 25 },
+    B:  { x: 59, y: 25 }
   };
+}
+/* Ink lives on each frame (main steps and branch steps alike). */
+function frameInk(f){
+  if (!f) return [];
+  if (!Array.isArray(f.strokes)) f.strokes = [];
+  return f.strokes;
 }
 function laneFrames(c){
   if (!playDraft) return [];
@@ -6209,12 +6283,13 @@ function branchColor(b){
 function newPlay(){
   playDraft = {
     id: null, name: '', team: '', type: 'Offense', primPos: 'PG', secPos: 'SG',
-    context: '', status: 'active', useWhen: '',
-    roles: {},                                                 // O1..O5 / D1..D5 role specs
-    steps: [{ id: uid(), desc: '', tokens: blankTokens() }],   // MAIN line frames
-    branches: []                                               // git-style offshoot branch paths
+    context: '', status: 'active', notes: '', tags: [], courtView: 'half',
+    roles: {},                                                             // O1..O5 / D1..D5 role specs
+    steps: [{ id: uid(), desc: '', tokens: blankTokens(), strokes: [] }],   // MAIN line frames
+    branches: []                                                           // git-style offshoot branch paths
   };
-  playCursor = { lane: 'main', idx: 0 }; courtView = 'full'; dragTok = null;
+  playCursor = { lane: 'main', idx: 0 }; courtView = 'half'; dragTok = null;
+  stopPlayback();
   renderFilmPlays();
 }
 function loadPlay(id){
@@ -6227,17 +6302,23 @@ function loadPlay(id){
   // Stored step ids are PRESERVED so saved branch splitFrom / mergeTo links stay intact.
   const flat = [];
   (playDraft.steps || []).forEach(s => {
-    flat.push({ id: s.id || uid(), desc: s.desc || '', tokens: s.tokens });
+    flat.push({ id: s.id || uid(), desc: s.desc || '', tokens: s.tokens, strokes: Array.isArray(s.strokes) ? s.strokes : [] });
     const b = s.branches || {};
-    if (b['A']) flat.push({ id: uid(), desc: b['A'].desc || '', tokens: b['A'].tokens });
-    if (b['B']) flat.push({ id: uid(), desc: b['B'].desc || '', tokens: b['B'].tokens });
+    if (b['A']) flat.push({ id: uid(), desc: b['A'].desc || '', tokens: b['A'].tokens, strokes: [] });
+    if (b['B']) flat.push({ id: uid(), desc: b['B'].desc || '', tokens: b['B'].tokens, strokes: [] });
   });
-  playDraft.steps = flat.length ? flat : [{ id: uid(), desc: '', tokens: blankTokens() }];
+  playDraft.steps = flat.length ? flat : [{ id: uid(), desc: '', tokens: blankTokens(), strokes: [] }];
   playDraft.branches.forEach(b => {
-    b.steps = (b.steps || []).map(s => ({ id: s.id || uid(), desc: s.desc || '', tokens: s.tokens }));
+    b.steps = (b.steps || []).map(s => ({ id: s.id || uid(), desc: s.desc || '', tokens: s.tokens, strokes: Array.isArray(s.strokes) ? s.strokes : [] }));
     if (!b.name) b.name = 'Feature ' + (BRANCH_LETTERS[(playDraft.branches.indexOf(b)) % BRANCH_LETTERS.length] || 'X');
   });
-  playCursor = { lane: 'main', idx: 0 }; courtView = 'full'; dragTok = null;
+  playDraft.tags = Array.isArray(playDraft.tags) ? playDraft.tags : [];
+  playDraft.notes = playDraft.notes || '';
+  /* Plays saved before the tactical board keep their full-court framing. */
+  playCursor = { lane: 'main', idx: 0 };
+  courtView = ['full', 'half', 'key'].includes(playDraft.courtView) ? playDraft.courtView : 'full';
+  dragTok = null;
+  stopPlayback();
   renderFilmPlays();
 }
 function deletePlay(id){
@@ -6248,21 +6329,28 @@ function deletePlay(id){
   save(); renderFilmPlays();
   toast(p ? 'Play deleted — ' + p.name : 'Play deleted');
 }
+/* Pull every meta input back into the draft without disturbing the board. */
+function captureMeta(){
+  if (!playDraft) return;
+  const v = id => { const el = document.getElementById(id); return el ? el.value.trim() : null; };
+  const val = id => { const el = document.getElementById(id); return el ? el.value : null; };
+  stepDescSave();
+  const name = v('pl-name'); if (name !== null) playDraft.name = name;
+  const team = v('pl-team'); if (team !== null) playDraft.team = team;
+  const type = val('pl-type'); if (type) playDraft.type = type;
+  const prim = v('pl-prim'); if (prim !== null) playDraft.primPos = prim;
+  const sec = v('pl-sec'); if (sec !== null) playDraft.secPos = sec;
+  const ctx = v('pl-context'); if (ctx !== null) playDraft.context = ctx;
+  const notes = v('pl-notes'); if (notes !== null) playDraft.notes = notes;
+  const stat = val('pl-status'); if (stat) playDraft.status = stat;
+  const col = val('pl-mycolor'); if (col) playDraft.myColor = col;
+  playDraft.courtView = courtView;
+  playDraft.tags = Array.isArray(playDraft.tags) ? playDraft.tags : [];
+}
 function savePlay(){
   snapshot();
   if (!playDraft) return;
-  const v = id => document.getElementById(id).value.trim();
-  stepDescSave();
-  playDraft.name = v('pl-name');
-  playDraft.team = v('pl-team');
-  playDraft.type = document.getElementById('pl-type').value;
-  playDraft.primPos = v('pl-prim');
-  playDraft.secPos = v('pl-sec');
-  playDraft.context = v('pl-context');
-  const statEl = document.getElementById('pl-status');
-  if (statEl) playDraft.status = statEl.value || 'active';
-  const colorEl = document.getElementById('pl-mycolor');
-  if (colorEl) playDraft.myColor = colorEl.value || 'o';
+  captureMeta();
   if (!playDraft.name){ toast('Enter a play name', 'error'); return; }
   if (playDraft.id){
     const p = state.film.plays.find(x => x.id === playDraft.id);
@@ -6274,8 +6362,44 @@ function savePlay(){
   save();
   const saved = JSON.parse(JSON.stringify(playDraft));
   playDraft = null;
+  stopPlayback();
   renderFilmPlays();
-  toast('✓ Play saved — ' + saved.name);
+  toast('✓ Play saved — ' + saved.name + ' (' + (saved.steps || []).length + ' frames)');
+}
+/* ---------- Playbook library hand-off + tag chips ---------- */
+function togglePlayTag(tag){
+  if (!playDraft) return;
+  playDraft.tags = Array.isArray(playDraft.tags) ? playDraft.tags : [];
+  const i = playDraft.tags.indexOf(tag);
+  if (i >= 0) playDraft.tags.splice(i, 1); else playDraft.tags.push(tag);
+  renderPlayTags();
+}
+function renderPlayTags(){
+  const el = document.getElementById('play-tags');
+  if (el) el.innerHTML = playTagsHtml();
+}
+function playTagsHtml(){
+  const tags = (playDraft && playDraft.tags) || [];
+  return PLAY_TAGS.map(t => '<button class="chip-btn' + (tags.includes(t) ? ' active' : '') + '" onclick="togglePlayTag(\'' + t + '\')">' + esc(t) + '</button>').join('');
+}
+function playLibraryCategory(tags){
+  const t = (tags || []).map(x => String(x).toLowerCase());
+  if (t.some(x => x.includes('blob') || x.includes('slob'))) return 'SLOB / BLOB';
+  if (t.some(x => x.includes('press'))) return 'Defenses / Presses';
+  if (t.some(x => x.includes('fast break'))) return 'Fast Breaks';
+  return 'Offenses';
+}
+/* Export the current diagram into the Mental Game → Master Playbook Library. */
+function pushPlayToLibrary(){
+  if (!playDraft) return;
+  captureMeta();
+  if (!playDraft.name){ toast('Name the play first', 'error'); return; }
+  const cat = playLibraryCategory(playDraft.tags);
+  const notes = [playDraft.context, playDraft.notes, (playDraft.tags || []).join(', ')].filter(Boolean).join(' · ');
+  snapshot();
+  mentalState().playbook.push({ id: uid(), name: playDraft.name, cat, url: '', mastery: 'Learning', notes });
+  save();
+  toast('✓ Saved to the Master Playbook Library (' + cat + ')');
 }
 function stepDescSave(){
   const f = curFrame();
@@ -6285,23 +6409,27 @@ function stepDescSave(){
 }
 function nextStep(){
   if (!playDraft) return;
+  stopPlayback();
   stepDescSave();
   const frames = laneFrames(playCursor);
   if (playCursor.idx === frames.length - 1){
-    // keep one blank frame at the end of the current lane ahead of the cursor
-    frames.push({ id: uid(), desc: '', tokens: JSON.parse(JSON.stringify(frames[playCursor.idx].tokens)) });
+    // keep one blank frame at the end of the current lane ahead of the cursor;
+    // each frame gets its own canvas, so the ink starts clean
+    frames.push({ id: uid(), desc: '', tokens: JSON.parse(JSON.stringify(frames[playCursor.idx].tokens)), strokes: [] });
   }
   playCursor.idx++;
   renderFilmPlays();
 }
 function prevStep(){
   if (!playDraft || playCursor.idx === 0) return;
+  stopPlayback();
   stepDescSave();
   playCursor.idx--;
   renderFilmPlays();
 }
 function gotoStep(i){
   if (!playDraft || i < 0 || i >= playDraft.steps.length) return;
+  stopPlayback();
   stepDescSave();
   playCursor = { lane: 'main', idx: i };
   renderFilmPlays();
@@ -6309,6 +6437,7 @@ function gotoStep(i){
 function gotoBranchStep(bid, i){
   const b = (playDraft.branches || []).find(x => x.id === bid);
   if (!b || i < 0 || i >= b.steps.length) return;
+  stopPlayback();
   stepDescSave();
   playCursor = { lane: bid, idx: i };
   renderFilmPlays();
@@ -6349,7 +6478,7 @@ function addBranchFromHere(){
     color: BRANCH_COLORS[n % BRANCH_COLORS.length],
     splitFrom: src.id,
     mergeTo: null,                      // null = standalone branch; main-step id = re-merge target
-    steps: [{ id: uid(), desc: '', tokens: JSON.parse(JSON.stringify(src.tokens)) }]
+    steps: [{ id: uid(), desc: '', tokens: JSON.parse(JSON.stringify(src.tokens)), strokes: [] }]
   };
   playDraft.branches.push(b);
   playCursor = { lane: b.id, idx: 0 };
@@ -6362,7 +6491,7 @@ function addBranchStep(bid){
   if (!b){ toast('Select a branch first', 'error'); return; }
   stepDescSave();
   const src = b.steps[b.steps.length - 1] || playDraft.steps[0];
-  b.steps.push({ id: uid(), desc: '', tokens: JSON.parse(JSON.stringify(src.tokens)) });
+  b.steps.push({ id: uid(), desc: '', tokens: JSON.parse(JSON.stringify(src.tokens)), strokes: [] });
   playCursor = { lane: bid, idx: b.steps.length - 1 };
   renderFilmPlays();
 }
@@ -6431,11 +6560,26 @@ function stepTreeHtml(){
   }).join('');
   return mainEl + branchEls;
 }
-function setCourtView(v){ courtView = v; renderFilmPlays(); }
+function setCourtView(v){
+  courtView = COURT_VIEWS.some(c => c.id === v) ? v : 'half';
+  if (playDraft) playDraft.courtView = courtView;
+  const svg = document.getElementById('play-canvas');
+  const views = document.getElementById('court-views');
+  if (svg && views && playDraft){
+    /* light re-render: swap the framing without losing typed meta values */
+    svg.setAttribute('viewBox', courtViewBox());
+    views.innerHTML = courtViewButtonsHtml();
+    return;
+  }
+  renderFilmPlays();
+}
 function courtViewBox(){
-  if (courtView === 'front') return '50 0 50 50';
-  if (courtView === 'back') return '0 0 50 50';
-  return '0 0 100 50';
+  const v = COURT_VIEWS.find(c => c.id === courtView) || COURT_VIEWS[1];
+  return v.box;
+}
+function courtViewButtonsHtml(){
+  return COURT_VIEWS.map(v =>
+    '<button class="chip-btn' + (courtView === v.id ? ' active' : '') + '" onclick="setCourtView(\'' + v.id + '\')">' + v.label + '</button>').join('');
 }
 function courtMarkup(){
   // Full court 100×50 (2:1). Correct 3-pt geometry per end: straight legs run parallel to the
@@ -6468,8 +6612,13 @@ function tokenColor(tokId){
   const isB = tokId === 'B';
   if (isB) return { fill: '#f0a500', stroke: '#ffe08a', label: 'B' };
   const isMine = myCol === 'o' ? isO : !isO;
-  if (isO) return isMine ? { fill: '#2563ff', stroke: '#cfe0ff', label: tokId.slice(1) } : { fill: '#3b82f6', stroke: '#bfdbfe', label: tokId.slice(1) };
-  return isMine ? { fill: '#e11d48', stroke: '#ffc9d2', label: tokId.slice(1) } : { fill: '#e63946', stroke: '#ffb3b8', label: tokId.slice(1) };
+  /* Offense reads 1–5, defense reads X1–X5 so the two units never blur together. */
+  if (isO) return isMine
+    ? { fill: '#2563ff', stroke: '#cfe0ff', label: tokId.slice(1) }
+    : { fill: '#3b82f6', stroke: '#bfdbfe', label: tokId.slice(1) };
+  return isMine
+    ? { fill: '#e11d48', stroke: '#ffc9d2', label: 'X' + tokId.slice(1), small: true }
+    : { fill: '#e63946', stroke: '#ffb3b8', label: 'X' + tokId.slice(1), small: true };
 }
 function ballGlyph(){
   // Realistic 2D basketball: orange sphere with seam arcs + dimples.
@@ -6586,6 +6735,280 @@ function rolesPanelHtml(){
     '<p class="paste-hint" style="margin-bottom:8px">Click any player token on the court diagram — or use the buttons below — to set their role, position, NBA archetype comparison and who executes the spot.</p>' +
     '<div class="role-list">' + ids.map(row).join('') + '</div>';
 }
+/* ---------- Ink rendering ---------- */
+const r2 = n => (Math.round(n * 100) / 100);
+function polyD(pts){
+  return pts.map((p, i) => (i ? 'L' : 'M') + r2(p[0]) + ' ' + r2(p[1])).join(' ');
+}
+/* Squiggly dribble path: walk the polyline and alternate a perpendicular offset. */
+function wavyD(pts, amp){
+  if (!pts || pts.length < 2) return polyD(pts || []);
+  const step = 0.85, out = [];
+  for (let i = 0; i < pts.length - 1; i++){
+    const a = pts[i], b = pts[i + 1];
+    const dx = b[0] - a[0], dy = b[1] - a[1];
+    const len = Math.hypot(dx, dy) || 0.001;
+    const nx = -dy / len, ny = dx / len;
+    const n = Math.max(1, Math.round(len / step));
+    for (let k = 0; k <= n; k++){
+      const t = k / n, off = amp * Math.sin((i * n + k) * Math.PI / 2);
+      out.push([a[0] + dx * t + nx * off, a[1] + dy * t + ny * off]);
+    }
+  }
+  return polyD(out);
+}
+function arrowD(pts, w){
+  if (!pts || pts.length < 2) return '';
+  let i = pts.length - 1;
+  const b = pts[i];
+  while (i > 0 && Math.hypot(b[0] - pts[i - 1][0], b[1] - pts[i - 1][1]) < 0.3) i--;
+  const a = pts[Math.max(0, i - 1)];
+  const ang = Math.atan2(b[1] - a[1], b[0] - a[0]);
+  const size = Math.max(1.5, w * 3);
+  const p1 = [b[0] - size * Math.cos(ang - 0.42), b[1] - size * Math.sin(ang - 0.42)];
+  const p2 = [b[0] - size * Math.cos(ang + 0.42), b[1] - size * Math.sin(ang + 0.42)];
+  return polyD([b, p1, p2]) + ' Z';
+}
+function strokeSvg(s, interactive){
+  const pts = s.pts || [];
+  if (pts.length < 2) return '';
+  const col = s.color || '#e63946';
+  const w = s.tool === 'highlight' ? (s.width || .7) * 2.6 : (s.width || .7);
+  const d = s.tool === 'dribble' ? wavyD(pts, Math.max(.4, (s.width || .7) * .95)) : polyD(pts);
+  const dash = s.tool === 'pass' ? ' stroke-dasharray="' + r2((s.width || .7) * 3.4) + ' ' + r2((s.width || .7) * 2.4) + '"' : '';
+  const op = s.tool === 'highlight' ? ' stroke-opacity=".38"' : '';
+  const hit = interactive
+    ? '<path d="' + d + '" fill="none" stroke="rgba(255,255,255,.001)" stroke-width="' + r2(Math.max(2.6, w + 1.8)) + '" stroke-linecap="round" stroke-linejoin="round"/>'
+    : '';
+  return '<g class="ink"' + (interactive ? ' onclick="eraseInk(event,event.currentTarget.dataset.ink)" data-ink="' + s.id + '"' : '') + '>' + hit +
+    '<path d="' + d + '" fill="none" stroke="' + col + '" stroke-width="' + r2(w) + '" stroke-linecap="round" stroke-linejoin="round"' + dash + op + '/>' +
+    (s.arrow ? '<path d="' + arrowD(pts, w) + '" fill="' + col + '"/>' : '') +
+  '</g>';
+}
+function stampSvg(st, interactive){
+  const col = st.kind === 'cone' ? '#f0a500' : (st.color || '#e63946');
+  let glyph = '';
+  if (st.kind === 'screen'){
+    glyph = '<line x1="-2.3" y1="0" x2="2.3" y2="0" stroke="' + col + '" stroke-width="1.1" stroke-linecap="round"/>' +
+      '<line x1="-2.3" y1="-1.15" x2="-2.3" y2="1.15" stroke="' + col + '" stroke-width="1.1" stroke-linecap="round"/>' +
+      '<line x1="2.3" y1="-1.15" x2="2.3" y2="1.15" stroke="' + col + '" stroke-width="1.1" stroke-linecap="round"/>';
+  } else if (st.kind === 'cone'){
+    glyph = '<polygon points="0,-1.9 1.5,1.3 -1.5,1.3" fill="rgba(240,165,0,.35)" stroke="' + col + '" stroke-width=".35"/>' +
+      '<line x1="-2" y1="1.45" x2="2" y2="1.45" stroke="' + col + '" stroke-width=".35"/>';
+  } else if (st.kind === 'target'){
+    glyph = '<circle r="1.5" fill="none" stroke="' + col + '" stroke-width=".35"/>' +
+      '<circle r=".35" fill="' + col + '"/>' +
+      '<line x1="-2.1" y1="0" x2="-.7" y2="0" stroke="' + col + '" stroke-width=".3"/>' +
+      '<line x1="2.1" y1="0" x2=".7" y2="0" stroke="' + col + '" stroke-width=".3"/>' +
+      '<line x1="0" y1="-2.1" x2="0" y2="-.7" stroke="' + col + '" stroke-width=".3"/>' +
+      '<line x1="0" y1="2.1" x2="0" y2=".7" stroke="' + col + '" stroke-width=".3"/>';
+  } else {
+    glyph = ballGlyph();
+  }
+  const hit = interactive ? '<circle r="3" fill="rgba(255,255,255,.001)"/>' : '';
+  return '<g class="ink stamp" transform="translate(' + st.x + ' ' + st.y + ') rotate(' + (st.angle || 0) + ')"' +
+    (interactive ? ' onclick="eraseInk(event,event.currentTarget.dataset.ink)" data-ink="' + st.id + '"' : '') + '>' + hit + glyph + '</g>';
+}
+function inkLayerHtml(f){
+  const interactive = boardTool === 'erase';
+  return frameInk(f).map(el => el.type === 'stamp' ? stampSvg(el, interactive) : strokeSvg(el, interactive)).join('');
+}
+function tokensHtml(f){
+  const toks = (f && f.tokens) || {};
+  return Object.entries(toks).map(([id, t]) => {
+    const c = tokenColor(id);
+    if (id === 'B') return '<g data-tok="B" transform="translate(' + t.x + ' ' + t.y + ')">' + ballGlyph() + '</g>';
+    const r = roleFor(id);
+    const label = roleCourtLabel(r);
+    return '<g data-tok="' + id + '" transform="translate(' + t.x + ' ' + t.y + ')" style="cursor:pointer">' +
+      (r ? '<circle r="3.05" fill="none" stroke="#66fcf1" stroke-width=".28" stroke-dasharray=".9 .7"/>' : '') +
+      '<circle r="2.3" fill="' + c.fill + '" stroke="' + c.stroke + '" stroke-width=".4" style="cursor:grab"/>' +
+      '<text y="' + (c.small ? '.55' : '.7') + '" text-anchor="middle" font-size="' + (c.small ? '1.75' : '2.2') + '" fill="#fff" font-weight="800">' + c.label + '</text>' +
+      (label ? '<text y="4.6" text-anchor="middle" font-size="1.6" fill="' + c.stroke + '" font-weight="700">' + esc(label) + '</text>' : '') +
+    '</g>';
+  }).join('');
+}
+
+/* ---------- Board toolbar ---------- */
+function toolHint(id){
+  const t = BOARD_TOOLS.concat(BOARD_STAMPS.map(s => ({ id: 'stamp:' + s.id, hint: s.hint }))).find(x => x.id === id);
+  return (t && t.hint) || '';
+}
+function boardToolbarHtml(){
+  const btn = (id, label, cls) => '<button class="bt-btn' + (boardTool === id ? ' active' : '') + (cls ? ' ' + cls : '') + '"' +
+    ' onclick="setBoardTool(\'' + id + '\')" title="' + esc(toolHint(id)) + '">' + label + '</button>';
+  const swatch = c => '<button class="color-swatch' + (boardColor === c.value ? ' active' : '') + '" style="background:' + c.value + '"' +
+    ' onclick="setBoardColor(\'' + c.value + '\')" title="' + c.label + '"></button>';
+  const wbtn = w => '<button class="bt-btn' + (boardWidth === w.value ? ' active' : '') + '" onclick="setBoardWidth(' + w.value + ')" title="' + w.label + ' line">' + w.label + '</button>';
+  return '<div class="grp">' + BOARD_TOOLS.map(t => btn(t.id, t.label)).join('') + '</div>' +
+    '<div class="grp">' + btn('arrow', '↗ Arrow ' + (boardArrow ? 'On' : 'Off'), boardArrow ? 'active' : '') +
+      '<button class="bt-btn" onclick="rotateBoardAngle()" title="Rotate the next stamp by 45°">⟳ ' + boardAngle + '°</button>' +
+      '<button class="bt-btn danger" onclick="clearFrameInk()" title="Clear every line and stamp on this frame">✕ Clear All</button>' +
+    '</div>' +
+    '<div class="grp"><span class="kicker">STAMPS</span>' + BOARD_STAMPS.map(s => btn('stamp:' + s.id, s.label)).join('') + '</div>' +
+    '<div class="grp"><span class="kicker">COLOR</span>' + BOARD_COLORS.map(swatch).join('') + '</div>' +
+    '<div class="grp"><span class="kicker">THICK</span>' + BOARD_WIDTHS.map(wbtn).join('') + '</div>' +
+    '<div class="grp">' +
+      '<button class="bt-btn" id="play-toggle" onclick="togglePlayback()">' + (isPlaying() ? '⏸ Pause' : '⏵ Play') + '</button>' +
+      '<button class="bt-btn" onclick="stopPlayback(); playCursor={lane:playCursor.lane,idx:0}; renderPlayFrameOnly();" title="Back to the first frame">⏮ Reset</button>' +
+    '</div>';
+}
+function renderBoardTools(){
+  const el = document.getElementById('board-toolbar');
+  if (el) el.innerHTML = boardToolbarHtml();
+  const hint = document.getElementById('board-hint');
+  if (hint) hint.textContent = boardToolMeta().hint + (isStampTool() ? ' Rotate with ⟳ (' + boardAngle + '°).' : '');
+  renderInkLayer();
+}
+function renderInkLayer(){
+  const layer = document.getElementById('board-ink');
+  if (layer && playDraft) layer.innerHTML = inkLayerHtml(curFrame());
+  /* keep the frame header in sync while drawing */
+  const lbl = document.getElementById('step-frame-label');
+  if (lbl && playDraft) lbl.textContent = stepFrameText();
+}
+function setBoardTool(t){
+  if (t === 'arrow'){ boardArrow = !boardArrow; renderBoardTools(); return; }
+  boardTool = t;
+  if (isStampTool(t)) boardAngle = boardAngle || 0;
+  renderBoardTools();
+}
+function setBoardColor(v){ boardColor = v; renderBoardTools(); }
+function setBoardWidth(w){ boardWidth = Number(w) || 0.7; renderBoardTools(); }
+function rotateBoardAngle(){ boardAngle = (boardAngle + 45) % 360; renderBoardTools(); }
+function eraseInk(ev, id){
+  if (ev && ev.stopPropagation) ev.stopPropagation();
+  if (boardTool !== 'erase' || !id) return;
+  const f = curFrame();
+  if (!f) return;
+  const list = frameInk(f);
+  const i = list.findIndex(x => x.id === id);
+  if (i < 0) return;
+  snapshot();
+  list.splice(i, 1);
+  save();
+  renderInkLayer();
+  toast('Element erased');
+}
+function clearFrameInk(){
+  const f = curFrame();
+  if (!f) return;
+  if (!frameInk(f).length){ toast('This frame canvas is already clear'); return; }
+  snapshot();
+  f.strokes = [];
+  save();
+  renderInkLayer();
+  toast('✓ Frame canvas cleared');
+}
+/* ---------- Drawing capture (coordinates live in the play's 100×50 space) ---------- */
+function inkPoint(e){
+  const svg = document.getElementById('play-canvas');
+  if (!svg) return null;
+  const vb = svg.viewBox.baseVal;
+  const r = svg.getBoundingClientRect();
+  if (!r.width || !r.height) return null;
+  const x = vb.x + (e.clientX - r.left) / r.width * vb.width;
+  const y = vb.y + (e.clientY - r.top) / r.height * vb.height;
+  return {
+    x: clamp(x, vb.x + .5, vb.x + vb.width - .5),
+    y: clamp(y, vb.y + .5, vb.y + vb.height - .5)
+  };
+}
+function beginStroke(e){
+  const f = curFrame();
+  const layer = document.getElementById('board-ink');
+  const p = inkPoint(e);
+  if (!f || !layer || !p) return;
+  liveStroke = { frame: f, stroke: { tool: boardTool, color: boardColor, width: boardWidth, arrow: !!boardArrow, pts: [p] } };
+  const s = liveStroke.stroke;
+  layer.innerHTML = layer.innerHTML + '<path id="live-ink" fill="none" stroke="' + s.color + '" stroke-width="' + r2(s.tool === 'highlight' ? s.width * 2.6 : s.width) + '"' +
+    ' stroke-linecap="round" stroke-linejoin="round"' + (s.tool === 'highlight' ? ' stroke-opacity=".38"' : '') +
+    (s.tool === 'pass' ? ' stroke-dasharray="' + r2(s.width * 3.4) + ' ' + r2(s.width * 2.4) + '"' : '') +
+    ' d="M' + r2(p.x) + ' ' + r2(p.y) + '"/>';
+  if (e.preventDefault) e.preventDefault();
+}
+function extendStroke(e){
+  if (!liveStroke) return;
+  const p = inkPoint(e);
+  if (!p) return;
+  const s = liveStroke.stroke, last = s.pts[s.pts.length - 1];
+  if (last && Math.hypot(p.x - last.x, p.y - last.y) < 0.55) return;
+  s.pts.push(p);
+  const el = document.getElementById('live-ink');
+  if (el) el.setAttribute('d', s.tool === 'dribble' ? wavyD(s.pts, Math.max(.4, s.width * .95)) : polyD(s.pts));
+  if (e.preventDefault) e.preventDefault();
+}
+function commitStroke(){
+  const live = liveStroke;
+  liveStroke = null;
+  const el = document.getElementById('live-ink');
+  if (el && el.remove) el.remove();
+  if (!live) return;
+  const s = live.stroke;
+  if (s.pts.length < 2){ renderInkLayer(); return; }
+  snapshot();
+  frameInk(live.frame).push({
+    id: uid(), type: 'stroke', tool: s.tool, color: s.color, width: s.width, arrow: s.arrow,
+    pts: s.pts.map(p => [r2(p.x), r2(p.y)])
+  });
+  save();
+  renderInkLayer();
+}
+function placeStamp(kind, p){
+  const f = curFrame();
+  if (!f || !p) return;
+  snapshot();
+  frameInk(f).push({ id: uid(), type: 'stamp', kind, x: r2(p.x), y: r2(p.y), angle: boardAngle, color: boardColor });
+  save();
+  renderInkLayer();
+}
+/* ---------- Frame playback ---------- */
+let playTimer = null;
+function isPlaying(){ return !!playTimer; }
+function stopPlayback(){
+  if (playTimer){ clearInterval(playTimer); playTimer = null; }
+  const btn = document.getElementById('play-toggle');
+  if (btn) btn.textContent = '⏵ Play';
+}
+function playbackTick(){
+  if (!playDraft){ stopPlayback(); return; }
+  const frames = laneFrames(playCursor);
+  if (!frames.length){ stopPlayback(); return; }
+  playCursor = { lane: playCursor.lane, idx: (playCursor.idx + 1) % frames.length };
+  renderPlayFrameOnly();
+}
+function startPlayback(){
+  if (!playDraft) return;
+  stepDescSave();
+  if (!playTimer) playTimer = setInterval(playbackTick, 850);
+  const btn = document.getElementById('play-toggle');
+  if (btn) btn.textContent = '⏸ Pause';
+  renderPlayFrameOnly();
+}
+function togglePlayback(){
+  if (isPlaying()){
+    captureMeta();
+    stopPlayback();
+    renderFilmPlays();
+    return;
+  }
+  startPlayback();
+}
+function renderPlayFrameOnly(){
+  const svg = document.getElementById('play-canvas');
+  const f = curFrame();
+  if (!svg || !f || !playDraft) return;
+  svg.innerHTML = courtMarkup() + '<g class="board-ink" id="board-ink">' + inkLayerHtml(f) + '</g>' + tokensHtml(f);
+  const lbl = document.getElementById('step-frame-label');
+  if (lbl) lbl.textContent = stepFrameText();
+}
+function stepFrameText(){
+  const br = playBranchOf(playCursor);
+  const frames = laneFrames(playCursor);
+  const marks = frameInk(curFrame()).length;
+  return (br ? br.name + ' · Frame ' : 'Main Line · Step ') + (playCursor.idx + 1) + ' of ' + frames.length +
+    (marks ? ' · ' + marks + ' mark' + (marks === 1 ? '' : 's') : ' · empty canvas');
+}
 function renderFilmPlays(){
   const el = document.getElementById('film-plays');
   if (!el) return;
@@ -6604,7 +7027,9 @@ function renderFilmPlays(){
             '<div class="game-row">' +
               statusChip(p.status || 'active') +
               '<span class="g-opp">' + esc(p.name) + '</span>' +
-              '<span class="p-tags">' + esc(p.type || '') + (p.team ? ' · ' + esc(p.team) : '') + (p.primPos ? ' · ' + esc(p.primPos) + '/' + esc(p.secPos || '') : '') + (p.context ? ' · “' + esc(p.context) + '”' : '') + '</span>' +
+              '<span class="p-tags">' + esc(p.type || '') + (p.team ? ' · ' + esc(p.team) : '') + (p.primPos ? ' · ' + esc(p.primPos) + '/' + esc(p.secPos || '') : '') +
+                ' · ' + ((p.steps || []).length) + ' frame' + ((p.steps || []).length === 1 ? '' : 's') + (p.context ? ' · “' + esc(p.context) + '”' : '') + '</span>' +
+              ((p.tags || []).length ? '<span class="play-tagline">' + p.tags.map(t => '<span class="t">' + esc(t) + '</span>').join('') + '</span>' : '') +
               '<button class="btn sm" onclick="loadPlay(\'' + p.id + '\')">Load</button>' +
               '<button class="icon-btn danger" onclick="deletePlay(\'' + p.id + '\')" title="Delete play">✕</button>' +
             '</div>'
@@ -6612,25 +7037,12 @@ function renderFilmPlays(){
         : empty('No plays saved yet.')) +
     '</div>';
   if (!playDraft){
+    stopPlayback();
     el.innerHTML = listHtml;
     return;
   }
   const step = curFrame();
-  const toks = step.tokens;
-  const tokHtml = Object.entries(toks).map(([id, t]) => {
-    const c = tokenColor(id);
-    if (id === 'B'){
-      return '<g data-tok="B" transform="translate(' + t.x + ' ' + t.y + ')">' + ballGlyph() + '</g>';
-    }
-    const r = roleFor(id);
-    const label = roleCourtLabel(r);
-    return '<g data-tok="' + id + '" transform="translate(' + t.x + ' ' + t.y + ')" style="cursor:pointer">' +
-      (r ? '<circle r="3.05" fill="none" stroke="#66fcf1" stroke-width=".28" stroke-dasharray=".9 .7"/>' : '') +
-      '<circle r="2.3" fill="' + c.fill + '" stroke="' + c.stroke + '" stroke-width=".4" style="cursor:grab"/>' +
-      '<text y=".7" text-anchor="middle" font-size="2.2" fill="#fff" font-weight="800">' + c.label + '</text>' +
-      (label ? '<text y="4.6" text-anchor="middle" font-size="1.6" fill="' + c.stroke + '" font-weight="700">' + esc(label) + '</text>' : '') +
-    '</g>';
-  }).join('');
+  const tokHtml = tokensHtml(step);
   const stepTree = stepTreeHtml();
   el.innerHTML =
     '<div class="play-layout">' +
@@ -6646,6 +7058,8 @@ function renderFilmPlays(){
           '<div class="field"><label>Secondary Pos</label><input id="pl-sec" class="mini-input" value="' + esc(playDraft.secPos) + '" placeholder="SG"></div>' +
         '</div>' +
         '<div class="field" style="margin-top:10px"><label>When is this play used?</label><input id="pl-context" value="' + esc(playDraft.context || '') + '" placeholder="e.g. SLOB under 5s, vs 2-3 zone, late clock"></div>' +
+        '<div class="field"><label>Tags <span class="hint">tap to toggle</span></label><div class="tag-chips" id="play-tags">' + playTagsHtml() + '</div></div>' +
+        '<div class="field"><label>Coaching Notes</label><textarea id="pl-notes" rows="2" placeholder="Counters, reads, personnel notes...">' + esc(playDraft.notes || '') + '</textarea></div>' +
         '<div class="compact-row" style="margin-top:10px;align-items:center">' +
           '<div class="team-toggle"><span class="kicker">MY TEAM</span>' +
             '<select id="pl-mycolor">' +
@@ -6657,30 +7071,32 @@ function renderFilmPlays(){
             '<option value="archived"' + (playDraft.status === 'archived' ? ' selected' : '') + '>Archived</option>' +
           '</select></div>' +
         '</div>' +
-        '<div style="display:flex;gap:8px;margin-top:10px">' +
+        '<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">' +
           '<button class="btn" onclick="savePlay()">💾 Save Play</button>' +
-          '<button class="btn sm ghost" onclick="playDraft=null;renderFilmPlays()">Cancel</button>' +
+          '<button class="btn sm" onclick="pushPlayToLibrary()" title="Also file this diagram in the Master Playbook Library">⇪ Save to Playbook</button>' +
+          '<button class="btn sm ghost" onclick="stopPlayback();playDraft=null;renderFilmPlays()">Cancel</button>' +
         '</div>' +
       '</div>' +
       '<div class="court-wrap">' +
-        '<div class="court-views">' +
-          ['full', 'front', 'back'].map(v =>
-            '<button class="chip-btn' + (courtView === v ? ' active' : '') + '" onclick="setCourtView(\'' + v + '\')">' +
-            ({ full: 'Full Court', front: 'Front Court', back: 'Back Court' })[v] + '</button>').join('') +
-        '</div>' +
+        '<div class="board-tools" id="board-toolbar">' + boardToolbarHtml() + '</div>' +
+        '<p class="board-hint" id="board-hint">' + esc(boardToolMeta().hint) + (isStampTool() ? ' Rotate with ⟳ (' + boardAngle + '°).' : '') + '</p>' +
+        '<div class="court-views" id="court-views">' + courtViewButtonsHtml() + '</div>' +
         '<div class="court-legend">' +
-          '<span class="lg"><span class="sw" style="background:#2563ff"></span> My offense</span>' +
-          '<span class="lg"><span class="sw" style="background:#e11d48"></span> My defense</span>' +
+          '<span class="lg"><span class="sw" style="background:#2563ff"></span> Offense 1–5</span>' +
+          '<span class="lg"><span class="sw" style="background:#e11d48"></span> Defense X1–X5</span>' +
           '<span class="lg"><span class="sw" style="background:#e8762c"></span> Ball</span>' +
+          '<span class="lg"><span class="sw" style="background:transparent;border:1px dashed #8b95a3"></span> Pass</span>' +
+          '<span class="lg"><span class="sw" style="background:transparent;border-top:2px dotted #8b95a3"></span> Dribble</span>' +
         '</div>' +
-        '<svg id="play-canvas" viewBox="' + courtViewBox() + '" preserveAspectRatio="xMidYMid meet" style="height:min(58vh,460px)">' +
-          courtMarkup() + tokHtml +
+        '<svg id="play-canvas" viewBox="' + courtViewBox() + '" preserveAspectRatio="xMidYMid meet" style="height:min(58vh,460px)" data-tool="' + esc(boardTool) + '">' +
+          courtMarkup() + '<g class="board-ink" id="board-ink">' + inkLayerHtml(step) + '</g>' + tokHtml +
         '</svg>' +
-        '<div class="step-frame">' +            '<div class="card-head"><h3>' + stepFrameLabel() + '</h3><span class="kicker">Frame description</span></div>' +
+        '<div class="step-frame">' +            '<div class="card-head"><h3 id="step-frame-label">' + esc(stepFrameText()) + '</h3><span class="kicker">Frame description</span></div>' +
           '<div class="step-ctrl">' +
-            '<button class="btn sm" onclick="prevStep()" title="Previous">◀ Previous</button>' +
-            '<span class="step-count">Drag tokens to position each frame · click a player to assign their role</span>' +
-            '<button class="btn sm" onclick="nextStep()">Next ▶</button>' +
+            '<button class="btn sm" onclick="prevStep()" title="Previous frame">◀ Previous</button>' +
+            '<button class="btn sm" onclick="togglePlayback()" title="Auto-play this sequence">' + (isPlaying() ? '⏸ Pause' : '⏵ Play') + '</button>' +
+            '<button class="btn sm" onclick="nextStep()" title="Next frame (adds one at the end)">Next ▶</button>' +
+            '<span class="step-count">Drag tokens · draw with the toolbar · click a player to assign their role</span>' +
           '</div>' +
           '<textarea class="step-desc" id="pl-desc" placeholder="Describe this frame / execution note...">' + esc(step.desc || '') + '</textarea>' +
           '<div class="branch-frame-actions" style="margin-top:8px">' +
@@ -6688,6 +7104,7 @@ function renderFilmPlays(){
             '<button class="btn sm ghost" onclick="deleteBranch(playCursor.lane)" ' + (playCursor.lane === 'main' ? 'disabled' : '') + '>- Branch</button>' +
             '<button class="btn sm ghost" onclick="nextStep()">+ Frame</button>' +
             '<button class="btn sm ghost danger" onclick="deleteStep()">- Frame</button>' +
+            '<button class="btn sm ghost" onclick="clearFrameInk()">✕ Clear Ink</button>' +
           '</div>' +
           '<div class="step-tree">' + stepTree + '</div>' +
         '</div>' +
@@ -8011,13 +8428,27 @@ function bindEvents(){
   let tokDown = null;      // distinguishes a click (assign role) from a drag (reposition)
   if (playsHost){
     playsHost.addEventListener('pointerdown', e => {
-      const g = e.target.closest('[data-tok]');
-      if (!g || !playDraft) return;
-      dragTok = g.dataset.tok;
-      tokDown = { id: dragTok, x: e.clientX, y: e.clientY, moved: false };
-      e.preventDefault();
+      if (!playDraft) return;
+      const g = e.target.closest ? e.target.closest('[data-tok]') : null;
+      if (g){
+        dragTok = g.dataset.tok;
+        tokDown = { id: dragTok, x: e.clientX, y: e.clientY, moved: false };
+        e.preventDefault();
+        return;
+      }
+      /* Tactical board: stamps place on click, drawing tools capture a path. */
+      const court = document.getElementById('play-canvas');
+      if (!court || !(court === e.target || (court.contains && court.contains(e.target)))) return;
+      if (isStampTool()){
+        const p = inkPoint(e);
+        if (p) placeStamp(stampKind(), p);
+        e.preventDefault();
+        return;
+      }
+      if (isDrawTool()) beginStroke(e);
     });
     playsHost.addEventListener('pointermove', e => {
+      if (liveStroke){ extendStroke(e); return; }
       if (tokDown && !tokDown.moved && (Math.abs(e.clientX - tokDown.x) > 4 || Math.abs(e.clientY - tokDown.y) > 4)) tokDown.moved = true;
       if (!dragTok || !playDraft) return;
       const canvas = document.getElementById('play-canvas');
@@ -8033,6 +8464,7 @@ function bindEvents(){
       if (g) g.setAttribute('transform', 'translate(' + tok.x + ' ' + tok.y + ')');
     });
     const endDrag = () => {
+      if (liveStroke){ commitStroke(); tokDown = null; dragTok = null; return; }
       /* A tap on a player token opens their role editor; dragging moves them. */
       if (tokDown && !tokDown.moved && tokDown.id && tokDown.id !== 'B' && playDraft) openPlayerRoleModal(tokDown.id);
       tokDown = null;
