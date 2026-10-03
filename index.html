@@ -1518,6 +1518,55 @@ input[type=range]:focus{ box-shadow:none; }
 .rm-step.on{ border-color:var(--accent); background:rgba(69,162,158,.08); }
 .rm-step b{ display:block; color:var(--hi); font-size:13px; }
 .rm-step i{ color:var(--muted); font-size:12px; font-style:normal; }
+/* V1.1 — Master Playbook tactical boards */
+.pb-item{ flex-wrap:wrap; }
+.pb-board-wrap{ display:flex; flex-direction:column; align-items:center; gap:3px; flex:0 0 84px; }
+.pb-board-wrap .pb-board{ width:84px; height:auto; border-radius:6px; }
+.pb-board-wrap .kicker{ font-size:9px; text-align:center; line-height:1.2; }
+/* V1.1 — Player ID cards (Scouting) */
+.player-card{ background:var(--bg2); border:1px solid var(--line); border-radius:var(--r); padding:12px; display:flex; gap:12px; margin-bottom:12px; flex-wrap:wrap; }
+.pc-avatar{ flex:0 0 84px; display:flex; flex-direction:column; align-items:center; gap:4px; }
+.pc-avatar .pc-photo{ width:74px; height:74px; border-radius:50%; background:linear-gradient(135deg,#1f2833,#0b0c10); border:2px solid var(--accent); display:flex; align-items:center; justify-content:center; font-size:26px; font-weight:800; color:var(--bright); overflow:hidden; }
+.pc-avatar .pc-photo img{ width:100%; height:100%; object-fit:cover; }
+.pc-avatar .pc-num{ font-family:var(--mono); font-size:12px; color:var(--muted); }
+.pc-body{ flex:1; min-width:180px; }
+.pc-name{ font-size:16px; font-weight:800; color:var(--hi); }
+.pc-sub{ font-size:12px; color:var(--accent); margin-bottom:6px; }
+.pc-fields{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; }
+.pc-tag{ background:var(--bg); border:1px solid var(--line); border-radius:20px; padding:2px 10px; font-size:11px; color:var(--muted); }
+.pc-tag b{ color:var(--hi); }
+.pc-sect{ margin-top:6px; }
+.pc-sect i{ display:block; font-style:normal; font-size:9.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-bottom:2px; }
+.pc-sect span{ font-size:12px; color:var(--text); white-space:pre-wrap; }
+.pc-actions{ display:flex; gap:6px; align-self:flex-start; }
+.pc-edit-top{ display:flex; align-items:center; gap:14px; margin-bottom:10px; }
+/* V1.1 — editable habit categories + good / bad split */
+.habit-section-h{ margin:18px 0 8px; font-size:14px; letter-spacing:.04em; }
+.habit-section-h.good{ color:#2ecc71; }
+.habit-section-h.bad{ color:#e63946; }
+.habit-cat-manager{ display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:10px 0 4px; padding:8px 10px; background:var(--bg2); border:1px solid var(--line); border-radius:var(--r); }
+.habit-cat-chip{ display:inline-flex; align-items:center; gap:3px; background:var(--bg); border:1px solid var(--line); border-left:3px solid var(--bc); border-radius:20px; padding:2px 6px 2px 10px; font-size:12px; color:var(--text); }
+.habit-cat-chip .icon-btn{ padding:0 3px; font-size:11px; }
+.bad-card{ opacity:.97; }
+.habit-row.bad-row .h-label{ color:#ff9aa2; }
+/* V1.1 — Strength category selector in the session head */
+.ws-cat-sel{ display:inline-flex; align-items:center; gap:6px; font-size:9.5px; letter-spacing:.05em; text-transform:uppercase; color:var(--muted); }
+.ws-cat-sel select{ padding:4px 8px; font-size:12px; }
+/* V1.1 — multi-session workout list + spot-level shot breakdown */
+.ws-saved{ display:flex; flex-direction:column; gap:10px; }
+.ws-saved-head{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+.ws-saved-item{ display:flex; align-items:center; gap:10px; background:var(--bg2); border:1px solid var(--line); border-radius:var(--r); padding:8px 10px; }
+.ws-saved-item .wss-main{ flex:1; min-width:0; }
+.ws-saved-item .wss-main b{ display:block; color:var(--hi); font-size:13px; }
+.ws-saved-item .wss-main i{ display:block; font-style:normal; font-size:11px; color:var(--muted); margin-top:2px; }
+.ws-saved-item .wss-meta{ font-size:11px; color:var(--accent); }
+.ws-drill-spots{ margin:2px 0 8px 14px; padding:8px 10px; background:var(--bg2); border:1px dashed var(--line); border-radius:var(--r); display:flex; flex-direction:column; gap:6px; }
+.ws-spot-head{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+.ws-spot-head .kicker{ flex:1 1 100%; }
+.ws-spot-total{ font-family:var(--mono); font-size:11.5px; color:var(--bright); }
+.ws-spot-row{ display:flex; align-items:center; gap:6px; }
+.ws-spot-row select{ min-width:132px; }
+.ws-drill-sum{ font-family:var(--mono); font-size:11.5px; color:var(--bright); padding:0 6px; white-space:nowrap; }
 </style>
 </head>
 <body>
@@ -1628,14 +1677,6 @@ input[type=range]:focus{ box-shadow:none; }
 
           <div class="card">
             <div class="card-head">
-              <h3>Recovery Score</h3>
-              <span class="kicker" id="recovery-kicker"></span>
-            </div>
-            <div id="dash-recovery"></div>
-          </div>
-
-          <div class="card">
-            <div class="card-head">
               <h3>Upcoming Deadlines</h3>
               <span class="kicker" id="dash-dl-count"></span>
             </div>
@@ -1723,6 +1764,11 @@ input[type=range]:focus{ box-shadow:none; }
                       <output id="log-score-val">5</output>
                     </div>
                   </div>
+                </div>
+
+                <div class="log-section recovery-block">
+                  <div class="log-label">RECOVERY SCORE <span class="hint">CNS / sleep 1–10</span> <span class="kicker" id="recovery-kicker"></span></div>
+                  <div id="log-recovery"></div>
                 </div>
 
                 <div class="log-section reflect-block">
@@ -2114,9 +2160,9 @@ input[type=range]:focus{ box-shadow:none; }
           <div class="card-head-row">
             <div>
               <h2 class="page-title">Film Study &amp; Opponent Scouting</h2>
-              <p class="page-sub">Break down video with timestamped notes and build opponent matchup cards.</p>
+              <p class="page-sub">Break down video with timestamped notes and build Player ID cards — identity, vitals and scouting breakdown.</p>
             </div>
-            <button class="btn" onclick="openMatchupModal()">+ New Matchup Card</button>
+            <button class="btn" onclick="openMatchupModal()">+ New Player ID</button>
           </div>
           <div class="mental-grid">
             <div class="card">
@@ -2124,7 +2170,7 @@ input[type=range]:focus{ box-shadow:none; }
               <div id="scout-panel"></div>
             </div>
             <div class="card">
-              <div class="card-head"><h3>Opponent Matchup Cards</h3><span class="kicker" id="matchup-kicker"></span></div>
+              <div class="card-head"><h3>Player ID Cards</h3><span class="kicker" id="matchup-kicker"></span></div>
               <div id="matchup-list"></div>
             </div>
           </div>
@@ -2135,7 +2181,7 @@ input[type=range]:focus{ box-shadow:none; }
           <div class="card-head-row">
             <div>
               <h2 class="page-title">Master Playbook Library</h2>
-              <p class="page-sub">Categorized repository of offenses, defenses &amp; presses, SLOB/BLOB and fast breaks.</p>
+              <p class="page-sub">Categorized repository of offenses, press / press break, SLOB/BLOB and defense — with simplified tactical boards.</p>
             </div>
             <button class="btn" onclick="openPlaybookModal()">+ Add Play</button>
           </div>
@@ -2491,6 +2537,50 @@ const SHOT_ZONE_ALIASES = {
   'wm-right': ['wm-right', 'mid-right'],
   'w3-left':  ['w3-left', 'backcourt']
 };
+/* V1.1 — Spot-level shot tracking. Each shooting drill can carry a list of spots
+   (5 Spot Midrange → Left Corner, Left Wing, Top, Right Wing, Right Corner, …)
+   with per-spot makes/attempts that auto-sum into the drill totals and feed the
+   Shot Chart through SPOT_ZONE_MAP. */
+const BB_SPOT_LIST = ['Left Corner', 'Left Wing', 'Top', 'Right Wing', 'Right Corner', 'Left Elbow', 'Right Elbow', 'Free Throw', 'Paint', 'Mid-Range Center', 'Short Corner Left', 'Short Corner Right'];
+const SPOT_ZONE_MAP = {
+  'Left Corner': 'c3-left', 'Right Corner': 'c3-right',
+  'Left Wing': 'w3-left', 'Right Wing': 'w3-right',
+  'Top': 'top3', 'Top of Key': 'top3', '3-Pointer': 'top3',
+  'Left Elbow': 'el-left', 'Right Elbow': 'el-right',
+  'Free Throw': 'ft', 'Paint': 'ra', 'Midrange': 'mid-center', 'Mid-Range Center': 'mid-center',
+  'Short Corner Left': 'sc-left', 'Short Corner Right': 'sc-right',
+  'Wing Mid Left': 'wm-left', 'Wing Mid Right': 'wm-right'
+};
+function spotZone(label){ return SPOT_ZONE_MAP[String(label || '').trim()] || null; }
+function drillSpotTotals(dr){
+  let m = 0, a = 0;
+  ((dr && dr.spots) || []).forEach(sp => { const at = num(sp.attempts); a += at; m += Math.min(num(sp.makes), at); });
+  return { m, a };
+}
+/* Auto-sum a drill's spot makes/attempts back into its own totals. */
+function syncDrillSpots(dr){
+  if (!dr || !Array.isArray(dr.spots) || !dr.spots.length) return;
+  const t = drillSpotTotals(dr);
+  dr.attempts = t.a ? String(t.a) : '';
+  dr.makes = t.m ? String(t.m) : '';
+}
+/* Aggregates every saved drill's spot data for the Shot Chart, so spot entries
+   always render on the heatmap and stay correct after any edit. */
+function drillSpotAggregate(){
+  const agg = {};
+  allSessions().forEach(({ session }) => {
+    if (!session || session.type !== 'basketball') return;
+    basketAllDrills(session).forEach(dr => {
+      (dr.spots || []).forEach(sp => {
+        const z = spotZone(sp.spot); if (!z) return;
+        const a = num(sp.attempts); if (!(a > 0)) return;
+        const rec = agg[z] || (agg[z] = { m: 0, a: 0 });
+        rec.a += a; rec.m += Math.min(num(sp.makes), a);
+      });
+    });
+  });
+  return agg;
+}
 const SPRINT_DURATIONS = [21, 30, 45, 60, 90, 120];
 /* Physical Combine — biometric baseline for the Life Maxx > Stats sub-section. */
 const COMBINE_METRICS = [
@@ -2514,8 +2604,45 @@ const LIFE_SKILLS = {
   'Focus / Deep Work':['Deep-work blocks', 'Distraction pulls', 'Minutes focused', 'Breaks taken'],
   'Fitness / Body':   ['Training minutes', 'Protein (g)', 'Steps', 'Mobility (min)']
 };
-const PLAYBOOK_CATS = ['Offenses', 'Defenses / Presses', 'SLOB / BLOB', 'Fast Breaks'];
+const PLAYBOOK_CATS = ['Offenses', 'Press / Press Break', 'SLOB / BLOB', 'Defense'];
 const PLAYBOOK_MASTERY = ['Learning', 'Reps', 'Mastered'];
+/* V1.1 — Master Playbook restructure: Fast Breaks retired, Presses renamed to
+   Press / Press Break, and a dedicated Defense category added. Legacy category
+   names are mapped forward so no saved play is ever dropped. */
+const PLAYBOOK_CAT_ALIASES = { 'Defenses / Presses': 'Press / Press Break', 'Fast Breaks': 'Offenses' };
+function normalizePlaybookCat(cat){ return PLAYBOOK_CATS.includes(cat) ? cat : (PLAYBOOK_CAT_ALIASES[cat] || 'Offenses'); }
+/* Simplified tactical play boards — preset formations for the two on-ball
+   system categories (Press / Press Break and Defense). Each play can carry one
+   board, drawn as a compact half-court diagram on its card. */
+const PLAYBOOK_BOARD_CATS = ['Press / Press Break', 'Defense'];
+const PLAYBOOK_BOARD_FORMATIONS = {
+  'Press / Press Break': ['1-2-1-1 Full', '2-2-1 Full', '1-3-1 Half', 'Man Full-Court', 'Run & Jump'],
+  'Defense': ['2-3 Zone', '3-2 Zone', '1-3-1 Zone', 'Man-to-Man', 'Box-and-1', 'Triangle-and-2']
+};
+const FORMATION_XY = {
+  '2-3 Zone':       [[30,26],[70,26],[16,58],[50,58],[84,58]],
+  '3-2 Zone':       [[20,26],[50,22],[80,26],[32,60],[68,60]],
+  '1-3-1 Zone':     [[50,16],[22,38],[50,38],[78,38],[50,66]],
+  'Man-to-Man':     [[30,26],[70,26],[24,54],[76,54],[50,74]],
+  'Box-and-1':      [[34,26],[66,26],[34,52],[66,52],[50,70]],
+  'Triangle-and-2': [[50,18],[24,46],[76,46],[18,66],[82,66]],
+  '1-2-1-1 Full':   [[50,18],[26,40],[74,40],[50,56],[50,80]],
+  '2-2-1 Full':     [[30,24],[70,24],[34,56],[66,56],[50,82]],
+  '1-3-1 Half':     [[50,34],[24,48],[50,48],[76,48],[50,74]],
+  'Man Full-Court': [[30,22],[70,22],[24,50],[76,50],[50,78]],
+  'Run & Jump':     [[34,28],[66,24],[26,56],[70,52],[50,80]]
+};
+function formationList(cat){ return PLAYBOOK_BOARD_FORMATIONS[cat] || []; }
+function formationDiagram(name){
+  const xy = FORMATION_XY[name] || [];
+  const dots = xy.map((p, i) => '<g><circle cx="' + p[0] + '" cy="' + p[1] + '" r="5.2" fill="#e11d48" fill-opacity=".9"/><text x="' + p[0] + '" y="' + (p[1] + 2.4) + '" text-anchor="middle" font-size="6" font-weight="700" fill="#fff">X' + (i + 1) + '</text></g>').join('');
+  return '<svg viewBox="0 0 100 94" class="pb-board" preserveAspectRatio="xMidYMid meet">' +
+    '<rect x="1" y="1" width="98" height="92" fill="#10161d" stroke="#2c3a47"/>' +
+    '<rect x="27" y="1" width="46" height="34" fill="none" stroke="#31414f"/>' +
+    '<circle cx="50" cy="35" r="12" fill="none" stroke="#31414f"/>' +
+    '<path d="M2 1 L2 34 A 48 48 0 0 0 98 34 L98 1" fill="none" stroke="#31414f"/>' +
+    '<circle cx="50" cy="8" r="2.6" fill="none" stroke="#f0a500" stroke-width="1.4"/>' + dots + '</svg>';
+}
 const ASSIGNMENT_CATEGORIES = ['Homework', 'Quiz', 'Test', 'Project', 'Presentation', 'Other'];
 /* Social Skills tree — 4 tiers, 4 skills per tier, rendered as a clean vertical progression. */
 const SOCIAL_TIERS = [
@@ -2585,7 +2712,7 @@ const TYPE_META = {
 const LOCATIONS = ['Richmond Olympic Oval', 'Gaston Park', 'Central Park', 'DT', 'Home', 'Gym', 'Other'];
 const LIFT_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 /* §3 — strength training covers core, plyometrics, explosive jump work and mobility. */
-const STRENGTH_CATS = ['Core', 'Plyometrics', 'Jump Training', 'Mobility / Stability', 'Sprints', 'Isometrics', 'Calisthenics'];
+const STRENGTH_CATS = ['Plyos', 'Sprints', 'Lifting', 'Plyometrics', 'Jump Training', 'Core', 'Mobility / Stability', 'Isometrics', 'Calisthenics'];
 /* §3 — the standard five-day upper / lower hypertrophy split for lift sessions. */
 const LIFT_SPLITS = ['Upper #1', 'Lower #1', 'Upper #2', 'Lower #2', 'Upper #3'];
 const SET_TYPES = ['Shooting', 'Ball Handling', 'Finishing', 'Free Throws', 'Lifts'];
@@ -2646,13 +2773,36 @@ const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov
    calendar day in state.logs[key].habits, so they reset on their own at
    midnight while the historical record — and therefore every streak — stays
    intact forever.                                                          */
-const HABIT_BUCKETS = [
+/* V1.1 — habit categories are user-editable. The four defaults below seed the
+   store once; after that everything reads from state.habitBuckets, so categories
+   can be created, renamed, restyled and removed without losing a single habit. */
+const DEFAULT_HABIT_BUCKETS = [
   { id: 'physical',  label: 'Physical & Recovery', icon: '💪', color: '#45a29e' },
   { id: 'sleep',     label: 'Sleep Hygiene',       icon: '🌙', color: '#66a3ff' },
   { id: 'nutrition', label: 'Nutrition & Fuel',    icon: '🥗', color: '#2ecc71' },
   { id: 'mindset',   label: 'Mindset',             icon: '🧠', color: '#9d4edd' }
 ];
-const HABIT_BUCKET_IDS = HABIT_BUCKETS.map(b => b.id);
+let HABIT_BUCKETS = DEFAULT_HABIT_BUCKETS.map(b => ({ ...b }));
+function habitBucketIds(){ return HABIT_BUCKETS.map(b => b.id); }
+function habitBucketById(id){ return HABIT_BUCKETS.find(b => b.id === id) || null; }
+function normalizeHabitBuckets(list){
+  const src = (Array.isArray(list) && list.length) ? list : DEFAULT_HABIT_BUCKETS;
+  const seen = {};
+  return src.map((b, i) => {
+    let id = String((b && b.id) || '').trim() || ('cat-' + (i + 1));
+    while (seen[id]) id = id + '_';
+    seen[id] = true;
+    return { id, label: String((b && b.label) || 'Untitled').trim() || 'Untitled', icon: String((b && b.icon) || '⭐').trim() || '⭐', color: (b && b.color) || '#45a29e' };
+  });
+}
+/* Pulls the live category list out of state and into the module cache. Called
+   once at boot and after every category edit. */
+function syncHabitBuckets(){
+  if (state && !Array.isArray(state.habitBuckets)) state.habitBuckets = DEFAULT_HABIT_BUCKETS.map(b => ({ ...b }));
+  // (guard ensures a legacy save without the field gains the defaults)
+  HABIT_BUCKETS = normalizeHabitBuckets(state && state.habitBuckets);
+  if (state) state.habitBuckets = HABIT_BUCKETS.map(b => ({ ...b }));
+}
 const SPEC_HABITS = [
   { label: '60s Hang',            bucket: 'physical'  },
   { label: 'Foam Rolling',        bucket: 'physical'  },
@@ -2676,9 +2826,10 @@ const LEGACY_HABIT_BUCKET = {
 };
 const SPEC_HABIT_BUCKET = Object.fromEntries(SPEC_HABITS.map(h => [h.label, h.bucket]));
 function habitBucketOf(h){
-  if (h && HABIT_BUCKET_IDS.includes(h.bucket)) return h.bucket;
+  const ids = habitBucketIds();
+  if (h && ids.includes(h.bucket)) return h.bucket;
   const guess = (h && (SPEC_HABIT_BUCKET[h.label] || LEGACY_HABIT_BUCKET[h.label])) || '';
-  return HABIT_BUCKET_IDS.includes(guess) ? guess : 'mindset';
+  return ids.includes(guess) ? guess : (ids[0] || 'mindset');
 }
 const DEFAULT_HABITS = SPEC_HABITS.map((h, i) => ({ id: 'hb' + (i + 1), label: h.label, type: 'good', bucket: h.bucket, desc: '', target: '' }));
 
@@ -2913,6 +3064,7 @@ function defaultState(){
     version: 2,
     seedVersion: 0,     // marks the automatic seed data as applied (see seedDefaults)
     habits: DEFAULT_HABITS.map(h => ({ ...h })),
+    habitBuckets: DEFAULT_HABIT_BUCKETS.map(b => ({ ...b })),  // V1.1 — user-editable habit categories
     school: [],         // academic assignment database
     classCats: DEFAULT_CLASS_SLOTS.map(c => ({ id: 'class-' + uid(), label: c.label, category: classCategory(c.label), room: c.room || '', teacher: c.teacher || '', credits: c.credits || 4, multi: !!c.multi, period: c.period, semester: c.semester || 's1', note: c.note || '', days: Array.isArray(c.days) ? c.days.slice() : [], volunteerHours: c.volunteerHours || '', earnedCredits: c.earnedCredits || '', currentGrade: '', targetGrade: '' })),      // registered classes (e.g. Pre-Calculus 11)
     extracurricular: { volunteerGoal: '', xcCredits: '', volunteerHours: [] },  // volunteer hours + graduation credits
@@ -2999,7 +3151,8 @@ function mergeState(p){
   const merged = {
     version: 2,
     seedVersion: Number(p.seedVersion) || 0,
-    habits:   Array.isArray(p.habits)   && p.habits.length   ? p.habits.map(h => ({ ...h, type: h.type || 'good', desc: h.desc || '', target: h.target ?? '', bucket: habitBucketOf(h) })) : d.habits,
+    habits:   Array.isArray(p.habits)   && p.habits.length   ? p.habits.map(h => ({ ...h, type: h.type || 'good', desc: h.desc || '', target: h.target ?? '', bucket: (h && typeof h.bucket === 'string' && h.bucket) ? h.bucket : habitBucketOf(h) })) : d.habits,
+    habitBuckets: Array.isArray(p.habitBuckets) && p.habitBuckets.length ? normalizeHabitBuckets(p.habitBuckets) : d.habitBuckets,
     school:   Array.isArray(p.school)   ? p.school.map(a => ({ ...a, semester: a.semester || 's1', status: a.status || 'Not Started', desc: a.desc || '', category: ASSIGNMENT_CATEGORIES.includes(a.category) ? a.category : (a.category === 'Exam' ? 'Test' : (a.category || 'Homework')) })) : d.school,
     classCats: Array.isArray(p.classCats) && p.classCats.length ? p.classCats.map(c => ({ ...c, category: c.category || classCategory(c.label), room: c.room || '', teacher: c.teacher || '', credits: (c.credits === undefined || c.credits === null || c.credits === '') ? 4 : c.credits, period: c.period || 'p1', semester: c.semester || 's1', targetGrade: c.targetGrade ?? '', currentGrade: c.currentGrade ?? '' })) : d.classCats,
     extracurricular: p.extracurricular && typeof p.extracurricular === 'object'
@@ -3057,13 +3210,15 @@ function mergeState(p){
                 notes: Array.isArray(p.mental.scouting.notes) ? p.mental.scouting.notes.map(n => ({ id: n.id || uid(), stamp: n.stamp || '', text: n.text || '' })) : [],
                 matchups: Array.isArray(p.mental.scouting.matchups) ? p.mental.scouting.matchups.map(x => ({
                   id: x.id || uid(), team: x.team || '', number: x.number || '', name: x.name || '', position: x.position || '',
-                  height: x.height || '', weight: x.weight || '', hand: x.hand || 'Right', tendencies: x.tendencies || '', defense: x.defense || ''
+                  height: x.height || '', weight: x.weight || '', hand: x.hand || 'Right', tendencies: x.tendencies || '', defense: x.defense || '',
+                  photo: x.photo || '', yog: x.yog || '', strengths: x.strengths || '', weaknesses: x.weaknesses || '', shooting: x.shooting || ''
                 })) : []
               }
             : { videoUrl: '', title: '', notes: [], matchups: [] },
           playbook: Array.isArray(p.mental.playbook) ? p.mental.playbook.map(x => ({
-            id: x.id || uid(), cat: PLAYBOOK_CATS.includes(x.cat) ? x.cat : 'Offenses',
-            name: x.name || '', url: x.url || '', notes: x.notes || '', mastery: PLAYBOOK_MASTERY.includes(x.mastery) ? x.mastery : 'Learning'
+            id: x.id || uid(), cat: normalizePlaybookCat(x.cat),
+            name: x.name || '', url: x.url || '', notes: x.notes || '', mastery: PLAYBOOK_MASTERY.includes(x.mastery) ? x.mastery : 'Learning',
+            board: (typeof x.board === 'string') ? x.board : ''
           })) : []
         }
       : d.mental,
@@ -3408,26 +3563,75 @@ const WORKOUT_ENV_META = {
   strength:   { label: 'Strength Training', icon: '💪', color: '#9d4edd', blurb: 'Outdoor Field Plyos · Speed Priming · Home Isometrics · Band / Med-ball protocols' }
 };
 function workoutDay(key){ const d = state.workouts[key]; return (d && typeof d === 'object' && !d.type) ? d : null; }
-function sessionFor(key, env){ const d = state.workouts[key]; if (!d) return null; if (d.type) return d.type === env ? d : null; return d[env] || null; }
-function setSessionFor(key, env, s){ if (!s) return; if (!s.type) s.type = env; const d = workoutDay(key); if (!d){ const legacy = state.workouts[key]; state.workouts[key] = {}; if (legacy && legacy.type) state.workouts[key][legacy.type] = legacy; } state.workouts[key][env] = s; }
-function deleteSessionFor(key, env){ const d = state.workouts[key]; if (!d) return; if (d.type){ if (d.type === env) delete state.workouts[key]; return; } delete state.workouts[key][env]; if (!Object.keys(state.workouts[key]).length) delete state.workouts[key]; }
-function sessionsFor(key){ const d = state.workouts[key]; if (!d) return []; if (d.type) return [d]; return WORKOUT_ENVS.map(e => d[e]).filter(Boolean); }
-function allSessions(){ const out = []; Object.entries(state.workouts || {}).forEach(([k, d]) => { if (!d) return; if (d.type){ out.push({ key: k, env: d.type, session: d }); return; } WORKOUT_ENVS.forEach(e => { if (d[e]) out.push({ key: k, env: e, session: d[e] }); }); }); return out; }
+/* V1.1 — a day can hold MULTIPLE sessions per discipline, so state.workouts[day][env]
+   is an array of sessions. Legacy single-session days (bare object or one session
+   per env) auto-migrate in normalizeWorkoutDay(); every reader goes through these
+   accessors, so nothing downstream needs to know the storage shape. */
+function envSessions(key, env){
+  const d = state.workouts[key];
+  if (!d) return [];
+  if (d.type) return d.type === env ? [d] : [];
+  const v = d[env];
+  if (!v) return [];
+  return Array.isArray(v) ? v : [v];
+}
+function sessionFor(key, env){ return envSessions(key, env)[0] || null; }
+function latestSessionFor(key, env){ const list = envSessions(key, env); return list.length ? list[list.length - 1] : null; }
+function addSessionFor(key, env, s){
+  if (!s) return;
+  if (!s.type) s.type = env;
+  if (!s.id) s.id = uid();
+  if (!workoutDay(key)){
+    const legacy = state.workouts[key];
+    state.workouts[key] = {};
+    if (legacy && legacy.type) state.workouts[key][legacy.type] = [legacy];
+  }
+  const cur = state.workouts[key][env];
+  const list = Array.isArray(cur) ? cur : (cur ? [cur] : []);
+  list.push(s);
+  state.workouts[key][env] = list;
+}
+/* Replace an existing session (matched by id) or append a new one. */
+function setSessionFor(key, env, s){
+  if (!s) return;
+  if (!s.id) s.id = uid();
+  const list = envSessions(key, env);
+  const i = list.findIndex(x => x.id === s.id);
+  if (i < 0) addSessionFor(key, env, s);
+  else list[i] = s;
+}
+function deleteSessionFor(key, env, id){
+  const d = state.workouts[key];
+  if (!d) return;
+  if (d.type){ if (d.type === env && (!id || d.id === id)) delete state.workouts[key]; return; }
+  if (!id){ delete state.workouts[key][env]; }
+  else {
+    const list = (state.workouts[key][env] || []).filter(x => x.id !== id);
+    if (list.length) state.workouts[key][env] = list; else delete state.workouts[key][env];
+  }
+  if (!Object.keys(state.workouts[key]).length) delete state.workouts[key];
+}
+function sessionsFor(key){ const out = []; WORKOUT_ENVS.forEach(e => envSessions(key, e).forEach(s => out.push(s))); return out; }
+function allSessions(){ const out = []; Object.entries(state.workouts || {}).forEach(([k, d]) => { if (!d) return; if (d.type){ out.push({ key: k, env: d.type, session: d }); return; } WORKOUT_ENVS.forEach(e => { const v = d[e]; if (!v) return; (Array.isArray(v) ? v : [v]).forEach(s => out.push({ key: k, env: e, session: s })); }); }); return out; }
 function normalizeWorkoutDay(v){
   if (!v || typeof v !== 'object') return {};
   const day = {};
-  if (v.type){
-    const s = { ...v, notes: v.notes || '' };
+  const push = (env, raw) => {
+    if (!raw || typeof raw !== 'object') return;
+    const s = { ...raw, notes: raw.notes || '' };
+    if (!s.type) s.type = env;
+    if (!TYPE_META[s.type]) s.type = env;
+    if (!s.id) s.id = uid();
     if (s.type === 'basketball' && !s.sets && Array.isArray(s.drills)) s.sets = toSets(s.drills);
-    day[s.type] = s;
-  } else {
+    (day[env] = day[env] || []).push(s);
+  };
+  if (v.type){ push(v.type, v); }
+  else {
     WORKOUT_ENVS.forEach(e => {
-      if (v[e] && typeof v[e] === 'object'){
-        const s = { ...v[e], notes: (v[e].notes) || '' };
-        if (!TYPE_META[s.type]) s.type = e;
-        if (s.type === 'basketball' && !s.sets && Array.isArray(s.drills)) s.sets = toSets(s.drills);
-        day[e] = s;
-      }
+      const val = v[e];
+      if (!val) return;
+      if (Array.isArray(val)) val.forEach(s => push(e, s));
+      else if (typeof val === 'object') push(e, val);
     });
   }
   return day;
@@ -3478,19 +3682,23 @@ function migrateSessionPreset(x){
 }
 /* §1 v1.1 — every tracking environment carries the full session tracker:
    sets, reps, weight/volume, RPE (1–10) and a rest target (seconds). */
+/* V1.1 — rest / recovery duration tracking was removed from the workout
+   modules, so rows no longer carry a rest target. Legacy stored values are
+   retained on the row objects (never deleted); they are simply not collected
+   or displayed any more. */
 function blankRow(type){
-  if (type === 'lift')       return { name:'', sets:'', reps:'', weight:'', rpe:'', rest:'', pr:false };
-  return { name:'', sets:'', reps:'', rpe:'', rest:'', sec:false, secs:'' };
+  if (type === 'lift')       return { name:'', sets:'', reps:'', weight:'', rpe:'', pr:false };
+  return { name:'', sets:'', reps:'', rpe:'', sec:false, secs:'' };
 }
 function blankSession(type){
-  if (type === 'basketball') return { type, presetId:null, presetName:'', location:'Home', sets:[blankSet('Shooting')], time:'', notes:'', logDate:'' };
-  if (type === 'lift')       return { type, presetId:null, presetName:'', day:'Mon', exercises:[blankRow(type)], time:'', notes:'' };
-  return { type, presetId:null, presetName:'', category:'Sprints', items:[blankRow(type)], time:'', notes:'' };
+  if (type === 'basketball') return { id: uid(), type, presetId:null, presetName:'', location:'Home', sets:[blankSet('Shooting')], time:'', notes:'', logDate:'' };
+  if (type === 'lift')       return { id: uid(), type, presetId:null, presetName:'', day:'Mon', exercises:[blankRow(type)], time:'', notes:'' };
+  return { id: uid(), type, presetId:null, presetName:'', category:'Plyos', items:[blankRow(type)], time:'', notes:'' };
 }
 function sessionFromPreset(p){
-  if (p.type === 'basketball') return { type:'basketball', presetId:p.id, presetName:p.name, location:p.location, sets: JSON.parse(JSON.stringify(p.sets || toSets(p.drills))), time:(p.time ? String(p.time) : ''), notes:p.notes || '', logDate:'' };
-  if (p.type === 'lift')       return { type:'lift', presetId:p.id, presetName:p.name, day:p.day, exercises:p.exercises.map(r => ({ ...r })), time:'', notes:p.notes || '' };
-  return { type:'strength', presetId:p.id, presetName:p.name, category:p.category, items:p.items.map(r => ({ ...r })), time:'', notes:p.notes || '' };
+  if (p.type === 'basketball') return { id: uid(), type:'basketball', presetId:p.id, presetName:p.name, location:p.location, sets: JSON.parse(JSON.stringify(p.sets || toSets(p.drills))), time:(p.time ? String(p.time) : ''), notes:p.notes || '', logDate:'' };
+  if (p.type === 'lift')       return { id: uid(), type:'lift', presetId:p.id, presetName:p.name, day:p.day, exercises:p.exercises.map(r => ({ ...r })), time:'', notes:p.notes || '' };
+  return { id: uid(), type:'strength', presetId:p.id, presetName:p.name, category:p.category, items:p.items.map(r => ({ ...r })), time:'', notes:p.notes || '' };
 }
 /* Shooting totals — only shooting-style SET TYPES (Shooting, Finishing,
    Free Throws) with Attempts > 0 are counted; warm-ups & other skills excluded. */
@@ -3521,23 +3729,21 @@ function sessionMetrics(s){
     return { shots, makes, pct: shots ? Math.round(clamp(makes / shots * 100, 0, 100)) : 0, sets: sets.length, drills, bhReps, weight, liftSets, liftReps, rpe: rpeCount ? rpeSum / rpeCount : 0, rpeCount };
   }
   if (s.type === 'lift'){
-    let sets = 0, reps = 0, weight = 0, prs = 0, rpeSum = 0, rpeCount = 0, rest = 0;
+    let sets = 0, reps = 0, weight = 0, prs = 0, rpeSum = 0, rpeCount = 0;
     (s.exercises || []).forEach(e => {
       const st = num(e.sets), rp = num(e.reps), w = num(e.weight);
       sets += st; reps += st * rp; weight += st * rp * w;
       if (e.pr) prs++;
       const rpe = num(e.rpe); if (rpe > 0){ rpeSum += rpe; rpeCount++; }
-      rest += num(e.rest);
     });
-    return { sets, reps, weight, prs, rpe: rpeCount ? rpeSum / rpeCount : 0, rpeCount, rest };
+    return { sets, reps, weight, prs, rpe: rpeCount ? rpeSum / rpeCount : 0, rpeCount };
   }
-  let itemSets = 0, rpeSum = 0, rpeCount = 0, rest = 0;
+  let itemSets = 0, rpeSum = 0, rpeCount = 0;
   (s.items || []).forEach(i => {
     itemSets += num(i.sets);
     const rpe = num(i.rpe); if (rpe > 0){ rpeSum += rpe; rpeCount++; }
-    rest += num(i.rest);
   });
-  return { items: (s.items || []).length, sets: itemSets, rpe: rpeCount ? rpeSum / rpeCount : 0, rpeCount, rest };
+  return { items: (s.items || []).length, sets: itemSets, rpe: rpeCount ? rpeSum / rpeCount : 0, rpeCount };
 }
 function workoutSummaryLine(s){
   if (!s) return '';
@@ -3576,16 +3782,48 @@ function bbDrillHtml(setType, dr, si, di){
       '<input class="n wide" type="number" min="0" step="any" data-si="' + si + '" data-di="' + di + '" data-wf="weight" placeholder="lbs" value="' + esc(dr.weight) + '">' +
       '<label class="pr-box' + (dr.pr ? ' on' : '') + '"><input type="checkbox" data-si="' + si + '" data-di="' + di + '" data-wf="pr" ' + (dr.pr ? 'checked' : '') + '><span>PR</span></label>' + rm + '</div>';
   }
-  const spotIn = setType === 'Free Throws' ? '' :
+  /* V1.1 — shooting / finishing drills can be broken down by spot. Once a drill
+     has spot rows, its own attempts / makes are auto-summed (read-only). */
+  const hasSpots = Array.isArray(dr.spots) && dr.spots.length > 0;
+  const canSpot = setType === 'Shooting' || setType === 'Finishing';
+  const spotIn = (setType === 'Free Throws' || hasSpots) ? '' :
     '<input class="grow" list="spots-list" data-si="' + si + '" data-di="' + di + '" data-wf="spot" placeholder="Spot" value="' + esc(dr.spot) + '">';
+  const totals = hasSpots
+    ? '<span class="ws-drill-sum" id="ws-drill-sum-' + si + '-' + di + '" title="Auto-summed from spots">Σ ' + (dr.attempts || 0) + ' att · ' + (dr.makes || 0) + ' mk</span>'
+    : '<input class="n" type="number" min="0" data-si="' + si + '" data-di="' + di + '" data-wf="attempts" placeholder="Att" title="Optional" value="' + esc(dr.attempts) + '">' +
+      '<input class="n" type="number" min="0" data-si="' + si + '" data-di="' + di + '" data-wf="makes" placeholder="Makes" value="' + esc(dr.makes) + '">';
+  const spotToggle = (canSpot && !hasSpots)
+    ? '<button class="icon-btn" onclick="addDrillSpot(' + si + ',' + di + ')" title="Break this drill down by spot">⊞</button>'
+    : '';
   return '<div class="ws-row">' +
     '<input class="grow" data-si="' + si + '" data-di="' + di + '" data-wf="name" placeholder="Drill name" value="' + esc(dr.name) + '">' +
     '<select class="ws-settype drill-category" data-si="' + si + '" data-di="' + di + '" data-wf="category" title="Drill category">' +
       DRILL_CATS.map(x => '<option' + (drillCategory(dr, setType) === x ? ' selected' : '') + '>' + x + '</option>').join('') +
     '</select>' +
-    spotIn +
-    '<input class="n" type="number" min="0" data-si="' + si + '" data-di="' + di + '" data-wf="attempts" placeholder="Att" title="Optional" value="' + esc(dr.attempts) + '">' +
-    '<input class="n" type="number" min="0" data-si="' + si + '" data-di="' + di + '" data-wf="makes" placeholder="Makes" value="' + esc(dr.makes) + '">' + rm + '</div>';
+    spotIn + totals + spotToggle + rm + '</div>' +
+    (hasSpots ? drillSpotsHtml(dr, si, di) : '');
+}
+/* Per-spot makes / attempts rows. Field names feed onWsInput (data-sf). */
+function drillSpotsHtml(dr, si, di){
+  const rows = (dr.spots || []).map((sp, pi) =>
+    '<div class="ws-spot-row">' +
+      '<select data-si="' + si + '" data-di="' + di + '" data-spot="' + pi + '" data-sf="spot">' +
+        (BB_SPOT_LIST.includes(sp.spot) ? '' : '<option selected>' + esc(sp.spot || 'Spot') + '</option>') +
+        BB_SPOT_LIST.map(x => '<option' + (sp.spot === x ? ' selected' : '') + '>' + esc(x) + '</option>').join('') +
+      '</select>' +
+      '<input class="n" type="number" min="0" data-si="' + si + '" data-di="' + di + '" data-spot="' + pi + '" data-sf="makes" placeholder="Makes" value="' + esc(sp.makes) + '">' +
+      '<input class="n" type="number" min="0" data-si="' + si + '" data-di="' + di + '" data-spot="' + pi + '" data-sf="attempts" placeholder="Att" value="' + esc(sp.attempts) + '">' +
+      '<button class="icon-btn danger" onclick="removeDrillSpot(' + si + ',' + di + ',' + pi + ')" title="Remove spot">✕</button>' +
+    '</div>').join('');
+  const t = drillSpotTotals(dr);
+  const pct = t.a ? Math.round(t.m / t.a * 100) : 0;
+  return '<div class="ws-drill-spots">' +
+    '<div class="ws-spot-head"><span class="kicker">SPOT BREAKDOWN · auto-syncs to the Shot Chart on Save</span>' +
+      '<span class="ws-spot-total">Total ' + t.m + ' / ' + t.a + (t.a ? ' · ' + pct + '%' : '') + '</span>' +
+      '<button class="chip-btn" onclick="addDrillSpot(' + si + ',' + di + ')">+ Add spot</button>' +
+      '<button class="chip-btn" onclick="clearDrillSpots(' + si + ',' + di + ')">Clear spots</button>' +
+    '</div>' + rows +
+  '</div>';
 }
 function renderWsSets(s){
   return basketSets(s).map((set, si) =>
@@ -3618,6 +3856,79 @@ function wsEnvEmptyHtml(env){
     '</div>' +
   '</div>';
 }
+/* ---------- V1.1 workout editor: draft + explicit Save ----------
+   A discipline can hold many saved sessions per day. The tracker edits a draft
+   (wsDraft) that only attaches to the Daily Log when the user clicks Save; on
+   Save the inputs clear so another session can be logged the same day. Saved
+   sessions are fully editable and re-sync the Shot Chart + logs on commit. */
+let wsDraft = null;       // session currently being edited (not yet committed)
+let wsDraftEnv = null;    // discipline the draft belongs to
+let wsDraftEditId = null; // id of the saved session being edited, if any
+function activeDraft(){ return (wsDraft && wsDraftEnv === activeEnv()) ? wsDraft : null; }
+function sessionHasData(s){
+  if (!s) return false;
+  if (s.type === 'basketball') return basketAllDrills(s).some(dr => String(dr.name || '').trim() || num(dr.attempts) || num(dr.makes) || (Array.isArray(dr.spots) && dr.spots.length));
+  if (s.type === 'lift') return (s.exercises || []).some(r => String(r.name || '').trim() || num(r.sets) || num(r.reps) || num(r.weight));
+  return (s.items || []).some(r => String(r.name || '').trim() || num(r.sets));
+}
+function wsSavedListHtml(env, key, list){
+  const meta = WORKOUT_ENV_META[env] || WORKOUT_ENV_META.lift;
+  const rows = (list || []).map(s => {
+    const m = sessionMetrics(s);
+    const details = s.type === 'basketball'
+      ? m.makes + '/' + m.shots + ' shots · ' + m.pct + '%'
+      : s.type === 'lift' ? fmtNum(m.sets) + ' sets · ' + fmtNum(m.weight) + ' lbs'
+      : m.items + ' exercises';
+    return '<div class="ws-saved-item">' +
+      '<div class="wss-main"><b>' + esc(s.presetName || 'Session') + '</b>' +
+        '<i>' + esc(workoutSummaryLine(s)) + '</i>' +
+        '<span class="wss-meta">' + esc(details) + (s.time ? ' · ' + esc(s.time) + ' min' : '') + '</span></div>' +
+      '<button class="btn sm" onclick="editSavedSession(\'' + env + '\',\'' + s.id + '\')">✎ Edit</button>' +
+      '<button class="icon-btn danger" onclick="deleteSavedSession(\'' + env + '\',\'' + s.id + '\')" title="Delete session">✕</button>' +
+    '</div>';
+  }).join('');
+  return '<div class="ws-saved">' +
+    '<div class="ws-saved-head"><span class="kicker">SAVED ' + esc(meta.label.toUpperCase()) + ' SESSIONS · ' + fmtDate(key) + '</span>' +
+      '<button class="btn sm" style="background:' + meta.color + ';border-color:' + meta.color + ';color:#0b0c10" onclick="openPresetChooser(\'' + env + '\')">+ New ' + esc(meta.label) + ' Session</button>' +
+      (env === 'basketball' ? '<button class="btn sm" onclick="startLiveWorkout()">🔴 Live</button>' : '') +
+    '</div>' +
+    (rows || wsEnvEmptyHtml(env)) +
+  '</div>';
+}
+function wsEditorHtml(s, env, key){
+  const m = sessionMetrics(s);
+  const t = TYPE_META[s.type] || TYPE_META.basketball;
+  const chips =
+    (s.type === 'lift'       ? chip('#f0a500', 'DAY ' + esc(s.day || '')) : '') +
+    (s.type === 'basketball' ? chip('#45a29e', esc(s.location || ''))     : '') +
+    (s.type === 'strength'   ? chip('#9d4edd', esc(s.category || ''))    : '');
+  /* V1.1 — explicit category selector for Strength / Conditioning / Plyos. */
+  const strengthCats = STRENGTH_CATS.includes(s.category) ? STRENGTH_CATS : (s.category ? [s.category].concat(STRENGTH_CATS) : STRENGTH_CATS);
+  const catSel = s.type === 'strength'
+    ? '<label class="ws-cat-sel"><span>CATEGORY</span><select data-wf="category">' + strengthCats.map(c => '<option' + ((s.category || '') === c ? ' selected' : '') + '>' + c + '</option>').join('') + '</select></label>'
+    : '';
+  const body = s.type === 'basketball'
+    ? renderWsSets(s)
+    : sessionRows(s).map((r, i) => wsRowHtml(s.type, r, i)).join('');
+  const addBtn = s.type === 'basketball'
+    ? '<div class="ws-addrow"><button class="btn sm ghost" onclick="addWsSet()">+ Add Set</button></div>'
+    : '<div class="ws-addrow"><button class="btn sm ghost" onclick="addWsRow()">+ Add Row</button></div>';
+  return '<div class="ws-head">' + chip(t.color, t.label) + chips + catSel +
+      '<span class="ws-name">' + esc(s.presetName || 'New Session') + (wsDraftEditId ? ' · editing saved' : ' · unsaved draft') + '</span>' +
+      '<button class="btn" style="background:' + t.color + ';border-color:' + t.color + ';color:#0b0c10" onclick="saveWorkoutDraft()">💾 Save Session</button>' +
+      '<button class="btn sm ghost" onclick="cancelWorkoutDraft()">Cancel</button>' +
+      '<button class="btn sm ghost" onclick="changeWsPreset()">⚡ Change</button>' +
+      '<button class="btn sm ghost" onclick="createPresetFromWorkout()">＋ Create Preset</button>' +
+      (s.type === 'basketball' ? '<button class="btn sm" style="border-color:rgba(255,77,94,.6);color:#ff4d5e" onclick="startLiveWorkout()">🔴 Live Mode</button>' : '') +
+    '</div>' +
+    '<div class="ws-body">' + body + '</div>' +
+    addBtn +
+    '<div class="ws-metrics">' + wsMetricsHtml(s.type, m, s) + '</div>' +
+    '<div class="ws-foot">' +
+      '<label>Time Spent (min) <input class="n" type="number" min="0" data-wf="time" value="' + esc(s.time || '') + '"></label>' +
+      '<label style="flex:1;min-width:220px">Notes <textarea rows="2" data-wf="notes" placeholder="Session notes...">' + esc(s.notes || '') + '</textarea></label>' +
+    '</div>';
+}
 function renderWorkoutSession(key){
   const env = activeEnv();
   WORKOUT_ENVS.forEach(e => {
@@ -3630,38 +3941,53 @@ function renderWorkoutSession(key){
   WORKOUT_ENVS.forEach(e => { if (e !== env){ const other = document.getElementById('workout-session-' + e); if (other) other.innerHTML = ''; } });
   const el = document.getElementById('workout-session-' + env);
   if (!el) return;
-  const s = sessionFor(key, env);
-
-  if (!s){ el.innerHTML = wsEnvEmptyHtml(env); return; }
-
-  const m = sessionMetrics(s);
-  const t = TYPE_META[s.type] || TYPE_META.basketball;
-  const chips =
-    (s.type === 'lift'       ? chip('#f0a500', 'DAY ' + esc(s.day || '')) : '') +
-    (s.type === 'basketball' ? chip('#45a29e', esc(s.location || ''))     : '') +
-    (s.type === 'strength'   ? chip('#9d4edd', esc(s.category || ''))    : '');
-  const body = s.type === 'basketball'
-    ? renderWsSets(s)
-    : sessionRows(s).map((r, i) => wsRowHtml(s.type, r, i)).join('');
-  const addBtn = s.type === 'basketball'
-    ? '<div class="ws-addrow"><button class="btn sm ghost" onclick="addWsSet()">+ Add Set</button></div>'
-    : '<div class="ws-addrow"><button class="btn sm ghost" onclick="addWsRow()">+ Add Row</button></div>';
-
-  el.innerHTML =
-    '<div class="ws-head">' + chip(t.color, t.label) + chips +
-      '<span class="ws-name">' + esc(s.presetName || 'Custom Session') + '</span>' +
-      '<button class="btn sm ghost" onclick="changeWsPreset()">⚡ Change</button>' +
-      '<button class="btn sm ghost" onclick="createPresetFromWorkout()">＋ Create Preset</button>' +
-      (s.type === 'basketball' ? '<button class="btn sm" style="border-color:rgba(255,77,94,.6);color:#ff4d5e" onclick="startLiveWorkout()">🔴 Live Mode</button>' : '') +
-      '<button class="icon-btn danger" onclick="clearWorkoutSession()" title="Clear session">🗑</button>' +
-    '</div>' +
-    '<div class="ws-body">' + body + '</div>' +
-    addBtn +
-    '<div class="ws-metrics">' + wsMetricsHtml(s.type, m, s) + '</div>' +
-    '<div class="ws-foot">' +
-      '<label>Time Spent (min) <input class="n" type="number" min="0" data-wf="time" value="' + esc(s.time || '') + '"></label>' +
-      '<label style="flex:1;min-width:220px">Notes <textarea rows="2" data-wf="notes" placeholder="Session notes...">' + esc(s.notes || '') + '</textarea></label>' +
-    '</div>';
+  if (wsDraft && wsDraftEnv === env){ el.innerHTML = wsEditorHtml(wsDraft, env, key); return; }
+  el.innerHTML = wsSavedListHtml(env, key, envSessions(key, env));
+}
+/* ---------- Draft lifecycle ---------- */
+function saveWorkoutDraft(){
+  const env = activeEnv(), key = state.settings.logDate;
+  const s = activeDraft();
+  if (!s){ toast('No active session to save', 'error'); return; }
+  if (!sessionHasData(s)){ toast('Add some data before saving', 'error'); return; }
+  snapshot();
+  s.logDate = key;
+  if (!s.type) s.type = env;
+  setSessionFor(key, env, s);
+  wsDraft = null; wsDraftEnv = null; wsDraftEditId = null;
+  syncSessionToLog(key);
+  save();
+  renderWorkoutSession(key);
+  renderLogFields(); renderLogHistory(); renderDashboard(); renderShots(); renderRecords();
+  toast('✓ ' + (WORKOUT_ENV_META[env] || {}).label + ' session saved to ' + fmtDate(key));
+}
+function cancelWorkoutDraft(){
+  if (!wsDraft){ return; }
+  wsDraft = null; wsDraftEnv = null; wsDraftEditId = null;
+  renderWorkoutSession(state.settings.logDate);
+  toast('Draft discarded');
+}
+function editSavedSession(env, id){
+  const s = envSessions(state.settings.logDate, env).find(x => x.id === id);
+  if (!s) return;
+  wsDraft = JSON.parse(JSON.stringify(s));
+  wsDraftEnv = env;
+  wsDraftEditId = id;
+  state.settings.workoutEnv = env;
+  state.settings.logView = env;
+  save(); applyLogView();
+  renderWorkoutSession(state.settings.logDate);
+  toast('Editing saved session — Save to apply changes');
+}
+function deleteSavedSession(env, id){
+  snapshot();
+  deleteSessionFor(state.settings.logDate, env, id);
+  if (wsDraftEditId === id){ wsDraft = null; wsDraftEnv = null; wsDraftEditId = null; }
+  syncSessionToLog(state.settings.logDate);
+  save();
+  renderWorkoutSession(state.settings.logDate);
+  renderLogFields(); renderLogHistory(); renderDashboard(); renderShots(); renderRecords();
+  toast('Session deleted');
 }
 
 function wsRowHtml(type, r, i){
@@ -3672,7 +3998,6 @@ function wsRowHtml(type, r, i){
       '<input class="n" type="number" min="0" data-wrow="' + i + '" data-wf="reps" placeholder="Reps" value="' + esc(r.reps) + '">' +
       '<input class="n wide" type="number" min="0" step="any" data-wrow="' + i + '" data-wf="weight" placeholder="lbs" value="' + esc(r.weight) + '">' +
       '<input class="n sm" type="number" min="1" max="10" step="1" data-wrow="' + i + '" data-wf="rpe" placeholder="RPE" title="Rate of perceived exertion (1–10)" value="' + esc(r.rpe) + '">' +
-      '<input class="n sm" type="number" min="0" step="5" data-wrow="' + i + '" data-wf="rest" placeholder="Rest" title="Rest target between sets (sec)" value="' + esc(r.rest) + '">' +
       '<label class="pr-box' + (r.pr ? ' on' : '') + '"><input type="checkbox" data-wrow="' + i + '" data-wf="pr" ' + (r.pr ? 'checked' : '') + '><span>PR</span></label>' +
       '<button class="icon-btn danger" onclick="removeWsRow(' + i + ')" title="Remove row">✕</button>' +
     '</div>';
@@ -3682,7 +4007,6 @@ function wsRowHtml(type, r, i){
     '<input class="n" type="number" min="0" data-wrow="' + i + '" data-wf="sets" placeholder="Sets" value="' + esc(r.sets) + '">' +
     '<input class="n wide" type="number" min="0" step="any" data-wrow="' + i + '" data-wf="reps" placeholder="Reps / Hold" value="' + esc(r.reps) + '">' +
     '<input class="n sm" type="number" min="1" max="10" step="1" data-wrow="' + i + '" data-wf="rpe" placeholder="RPE" title="Rate of perceived exertion (1–10)" value="' + esc(r.rpe) + '">' +
-    '<input class="n sm" type="number" min="0" step="5" data-wrow="' + i + '" data-wf="rest" placeholder="Rest" title="Rest target (sec)" value="' + esc(r.rest) + '">' +
     '<label class="sec-box' + (r.sec ? ' on' : '') + '"><input type="checkbox" data-wrow="' + i + '" data-wf="sec" ' + (r.sec ? 'checked' : '') + '><span>Seconds</span></label>' +
     (r.sec ? '<input class="n" type="number" min="0" step="any" data-wrow="' + i + '" data-wf="secs" placeholder="sec" title="Duration in seconds" value="' + esc(r.secs) + '">' : '') +
     '<button class="icon-btn danger" onclick="removeWsRow(' + i + ')" title="Remove row">✕</button>' +
@@ -3690,15 +4014,14 @@ function wsRowHtml(type, r, i){
 }
 function wsMetricsHtml(type, m, s){
   const rpeStat = stat('ws-m-rpe', m.rpe ? m.rpe.toFixed(1) : '—', type === 'basketball' ? 'Avg Set RPE' : 'Avg RPE');
-  const restStat = stat('ws-m-rest', m.rest ? Math.round(m.rest / 60) + ' min' : '—', 'Rest Logged');
   if (type === 'basketball'){
     let stats = stat('ws-m-pct', m.pct + '%', 'Shooting %') + stat('ws-m-makes', m.makes + ' / ' + m.shots, 'Makes / Shots') + stat('ws-m-sets', m.sets, 'Skill Sets') + stat('ws-m-drills', m.drills, 'Drills');
     if (m.bhReps) stats += stat('ws-m-bh', fmtNum(m.bhReps), 'BH Reps');
     if (m.weight) stats += stat('ws-m-wt', fmtNum(m.weight) + ' lbs', 'Lift Volume');
     return stats + rpeStat + stat('ws-m-time', s.time || '—', 'Time (min)');
   }
-  if (type === 'lift')       return stat('ws-m-weight', fmtNum(m.weight) + ' lbs', 'Weight Moved') + stat('ws-m-sets', fmtNum(m.sets), 'Total Sets') + stat('ws-m-reps', fmtNum(m.reps), 'Total Reps') + rpeStat + restStat + stat('ws-m-prs', m.prs, 'PRs') + stat('ws-m-time', s.time || '—', 'Time (min)');
-  return stat('ws-m-items', m.items, 'Exercises') + stat('ws-m-sets', fmtNum(m.sets), 'Total Sets') + rpeStat + restStat + stat('ws-m-time', s.time || '—', 'Time (min)');
+  if (type === 'lift')       return stat('ws-m-weight', fmtNum(m.weight) + ' lbs', 'Weight Moved') + stat('ws-m-sets', fmtNum(m.sets), 'Total Sets') + stat('ws-m-reps', fmtNum(m.reps), 'Total Reps') + rpeStat + stat('ws-m-prs', m.prs, 'PRs') + stat('ws-m-time', s.time || '—', 'Time (min)');
+  return stat('ws-m-items', m.items, 'Exercises') + stat('ws-m-sets', fmtNum(m.sets), 'Total Sets') + rpeStat + stat('ws-m-time', s.time || '—', 'Time (min)');
 }
 function stat(id, v, label){
   return '<div class="stat"><span class="stat-v" id="' + id + '">' + v + '</span><span class="stat-l">' + label + '</span></div>';
@@ -3707,16 +4030,15 @@ function renderSessionMetrics(s){
   const m = sessionMetrics(s);
   const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
   const rpeVal = m.rpe ? m.rpe.toFixed(1) : '—';
-  const restVal = m.rest ? Math.round(m.rest / 60) + ' min' : '—';
   if (s.type === 'basketball'){ set('ws-m-pct', m.pct + '%'); set('ws-m-makes', m.makes + ' / ' + m.shots); set('ws-m-sets', m.sets); set('ws-m-drills', m.drills); set('ws-m-rpe', rpeVal); }
-  else if (s.type === 'lift'){ set('ws-m-weight', fmtNum(m.weight) + ' lbs'); set('ws-m-sets', fmtNum(m.sets)); set('ws-m-reps', fmtNum(m.reps)); set('ws-m-prs', m.prs); set('ws-m-rpe', rpeVal); set('ws-m-rest', restVal); }
-  else { set('ws-m-items', m.items); set('ws-m-sets', fmtNum(m.sets)); set('ws-m-rpe', rpeVal); set('ws-m-rest', restVal); }
+  else if (s.type === 'lift'){ set('ws-m-weight', fmtNum(m.weight) + ' lbs'); set('ws-m-sets', fmtNum(m.sets)); set('ws-m-reps', fmtNum(m.reps)); set('ws-m-prs', m.prs); set('ws-m-rpe', rpeVal); }
+  else { set('ws-m-items', m.items); set('ws-m-sets', fmtNum(m.sets)); set('ws-m-rpe', rpeVal); }
 }
 function onWsInput(e){
-  const s = sessionFor(state.settings.logDate, activeEnv());
+  const s = activeDraft();
   if (!s) return;
+  const el = e.target, f = el.dataset.wf, ri = el.dataset.wrow, si = el.dataset.si, di = el.dataset.di, sp = el.dataset.spot;
   snapshotDebounced();
-  const el = e.target, f = el.dataset.wf, ri = el.dataset.wrow, si = el.dataset.si, di = el.dataset.di;
   let full = false;
   if (s.type === 'basketball'){
     const sets = basketSets(s);
@@ -3726,6 +4048,16 @@ function onWsInput(e){
     } else if (f === 'setRpe' && si !== undefined){
       const sset = sets[parseInt(si, 10)];
       if (sset) sset.rpe = el.value;
+    } else if (sp !== undefined && si !== undefined && di !== undefined){
+      /* Spot-level makes/attempts — auto-sum into the drill + Shot Chart on Save. */
+      const sset = sets[parseInt(si, 10)]; if (!sset) return;
+      const row = (sset.drills || [])[parseInt(di, 10)]; if (!row) return;
+      row.spots = row.spots || [];
+      const spotRow = row.spots[parseInt(sp, 10)]; if (!spotRow) return;
+      spotRow[el.dataset.sf] = el.value;
+      syncDrillSpots(row);
+      const sumEl = document.getElementById('ws-drill-sum-' + si + '-' + di);
+      if (sumEl) sumEl.textContent = 'Σ ' + (row.attempts || 0) + ' att · ' + (row.makes || 0) + ' mk';
     } else if (si !== undefined && di !== undefined){
       const sset = sets[parseInt(si, 10)]; if (!sset) return;
       const row = (sset.drills || [])[parseInt(di, 10)]; if (!row) return;
@@ -3741,58 +4073,48 @@ function onWsInput(e){
       else if (f === 'sec'){ row.sec = el.checked; full = true; }
       else row[f] = el.value;
     } else if (f === 'time' || f === 'notes'){ s[f] = el.value; }
+    else if (f === 'category'){ s.category = el.value; full = true; }
     else return;
   }
-  syncSessionToLog(state.settings.logDate);
+  /* Draft edits persist locally but attach to the Daily Log only on Save. */
   save();
   renderSessionMetrics(s);
   if (full) renderWorkoutSession(state.settings.logDate);
 }
+/* ---------- Basketball draft structure helpers ---------- */
 function addWsSet(){
+  const s = activeDraft(); if (!s) return;
   snapshot();
-  const key = state.settings.logDate;
-  const s = sessionFor(key, activeEnv());
-  if (!s) return;
-  s.sets = basketSets(s);
-  s.sets.push(blankSet('Shooting'));
-  syncSessionToLog(key);
-  save();
-  renderWorkoutSession(key);
+  s.sets = basketSets(s); s.sets.push(blankSet('Shooting'));
+  save(); renderWorkoutSession(state.settings.logDate);
 }
 function addWsDrill(si){
+  const s = activeDraft(); if (!s) return;
+  const set = basketSets(s)[si]; if (!set) return;
   snapshot();
-  const key = state.settings.logDate;
-  const s = sessionFor(key, activeEnv());
-  if (!s) return;
-  const set = basketSets(s)[si];
-  if (!set) return;
   set.drills = set.drills || [];
   set.drills.push(blankDrill(set.setType));
-  syncSessionToLog(key);
-  save();
-  renderWorkoutSession(key);
+  save(); renderWorkoutSession(state.settings.logDate);
 }
 function moveWsSet(si, delta){
-  snapshot();
-  const key = state.settings.logDate;
-  const s = sessionFor(key, 'basketball');
-  if (!s) return;
+  const s = activeDraft(); if (!s) return;
   const sets = basketSets(s), target = si + delta;
   if (target < 0 || target >= sets.length) return;
+  snapshot();
   const tmp = sets[si]; sets[si] = sets[target]; sets[target] = tmp;
-  syncSessionToLog(key); save(); renderWorkoutSession(key);
+  save(); renderWorkoutSession(state.settings.logDate);
 }
 function setWorkoutDate(value){
   const next = value || todayKey();
   if (next === state.settings.logDate) return;
   const current = state.settings.logDate;
-  const s = state.workouts[current];
-  if (s){
+  const d = state.workouts[current];
+  if (d){
     snapshot();
     delete state.workouts[current];
-    state.workouts[next] = s;
+    state.workouts[next] = d;
     sessionsFor(next).forEach(x => { x.logDate = next; });
-    delete state.logs[current].workoutLabel;
+    if (state.logs[current]) delete state.logs[current].workoutLabel;
     syncSessionToLog(next);
     state.settings.logDate = next;
     save();
@@ -3803,66 +4125,70 @@ function setWorkoutDate(value){
   }
 }
 function removeWsSet(si){
+  const s = activeDraft(); if (!s) return;
   snapshot();
-  const key = state.settings.logDate;
-  const s = sessionFor(key, activeEnv());
-  if (!s) return;
   basketSets(s).splice(si, 1);
-  syncSessionToLog(key);
-  save();
-  renderWorkoutSession(key);
+  save(); renderWorkoutSession(state.settings.logDate);
 }
 function removeWsDrill(si, di){
+  const s = activeDraft(); if (!s) return;
+  const set = basketSets(s)[si]; if (!set) return;
   snapshot();
-  const key = state.settings.logDate;
-  const s = sessionFor(key, activeEnv());
-  if (!s) return;
-  const set = basketSets(s)[si];
-  if (!set) return;
   (set.drills || []).splice(di, 1);
-  syncSessionToLog(key);
-  save();
-  renderWorkoutSession(key);
+  save(); renderWorkoutSession(state.settings.logDate);
 }
-function addWsRow(){
+/* ---------- Spot-level shot rows ---------- */
+function addDrillSpot(si, di){
+  const s = activeDraft(); if (!s) return;
+  const set = basketSets(s)[si]; if (!set) return;
+  const row = (set.drills || [])[di]; if (!row) return;
   snapshot();
-  const key = state.settings.logDate;
-  const s = sessionFor(key, activeEnv());
-  if (!s || s.type === 'basketball') return;
+  row.spots = row.spots || [];
+  row.spots.push({ spot: BB_SPOT_LIST[0], makes: '', attempts: '' });
+  syncDrillSpots(row);
+  save(); renderWorkoutSession(state.settings.logDate);
+  toast('Spot row added — data syncs to the Shot Chart on Save');
+}
+function removeDrillSpot(si, di, pi){
+  const s = activeDraft(); if (!s) return;
+  const set = basketSets(s)[si]; if (!set) return;
+  const row = (set.drills || [])[di]; if (!row || !row.spots) return;
+  snapshot();
+  row.spots.splice(pi, 1);
+  if (!row.spots.length){ delete row.spots; row.attempts = ''; row.makes = ''; }
+  else syncDrillSpots(row);
+  save(); renderWorkoutSession(state.settings.logDate);
+}
+function clearDrillSpots(si, di){
+  const s = activeDraft(); if (!s) return;
+  const set = basketSets(s)[si]; if (!set) return;
+  const row = (set.drills || [])[di]; if (!row) return;
+  snapshot();
+  delete row.spots; row.attempts = ''; row.makes = '';
+  save(); renderWorkoutSession(state.settings.logDate);
+}
+/* ---------- Non-basketball draft rows ---------- */
+function addWsRow(){
+  const s = activeDraft(); if (!s || s.type === 'basketball') return;
+  snapshot();
   sessionRows(s).push(blankRow(s.type));
-  syncSessionToLog(key);
-  save();
-  renderWorkoutSession(key);
+  save(); renderWorkoutSession(state.settings.logDate);
 }
 function removeWsRow(i){
+  const s = activeDraft(); if (!s || s.type === 'basketball') return;
   snapshot();
-  const key = state.settings.logDate;
-  const s = sessionFor(key, activeEnv());
-  if (!s || s.type === 'basketball') return;
   sessionRows(s).splice(i, 1);
-  syncSessionToLog(key);
-  save();
-  renderWorkoutSession(key);
+  save(); renderWorkoutSession(state.settings.logDate);
 }
-function clearWorkoutSession(){
-  snapshot();
-  const key = state.settings.logDate;
-  deleteSessionFor(key, activeEnv());
-  syncSessionToLog(key);
-  save();
-  renderWorkoutSession(key);
-  renderLogHistory();
-  renderDashboard();
-  toast('Session cleared');
-}
+function clearWorkoutSession(){ cancelWorkoutDraft(); }
 function changeWsPreset(){
-  const s = sessionFor(state.settings.logDate, activeEnv());
-  if (s) openPresetChooser(s.type);
+  const s = activeDraft();
+  openPresetChooser(s ? s.type : activeEnv());
 }
 function createPresetFromWorkout(){
   const key = state.settings.logDate;
-  const session = sessionFor(key, activeEnv());
-  if (!session){ toast('Start or load a workout before creating a preset', 'error'); return; }
+  const session = activeDraft();
+  if (!session){ toast('Start a workout session before creating a preset', 'error'); return; }
   const name = window.prompt('Preset name', session.presetName || 'New Workout Preset');
   if (!name || !name.trim()) return;
   snapshot();
@@ -3879,12 +4205,12 @@ function createPresetFromWorkout(){
   } else if (session.type === 'lift'){
     preset.day = session.day || 'Mon';
     preset.exercises = JSON.parse(JSON.stringify(session.exercises || [])).map(r => ({
-      name: String(r.name || '').trim(), sets: optNum(r.sets), reps: optNum(r.reps), weight: optNum(r.weight), rpe: optNum(r.rpe), rest: optNum(r.rest), pr: !!r.pr
+      name: String(r.name || '').trim(), sets: optNum(r.sets), reps: optNum(r.reps), weight: optNum(r.weight), rpe: optNum(r.rpe), pr: !!r.pr
     }));
   } else {
     preset.category = session.category || 'Sprints';
     preset.items = JSON.parse(JSON.stringify(session.items || [])).map(r => ({
-      name: String(r.name || '').trim(), sets: optNum(r.sets), reps: optNum(r.reps), rpe: optNum(r.rpe), rest: optNum(r.rest), sec: !!r.sec, secs: optNum(r.secs)
+      name: String(r.name || '').trim(), sets: optNum(r.sets), reps: optNum(r.reps), rpe: optNum(r.rpe), sec: !!r.sec, secs: optNum(r.secs)
     }));
   }
   state.presets[session.type] = state.presets[session.type] || [];
@@ -3916,18 +4242,20 @@ function openPresetChooser(type){
     '</div>';
   document.getElementById('modal-overlay').classList.remove('hidden');
 }
+/* V1.1 — loading a preset opens an editable DRAFT; nothing attaches to the
+   Daily Log or Shot Chart until the user clicks Save Session. */
 function loadPresetSession(type, id){
-  snapshot();
   const p = (state.presets[type] || []).find(x => x.id === id);
-  setSessionFor(state.settings.logDate, type, p ? sessionFromPreset(p) : blankSession(type));
+  wsDraft = p ? sessionFromPreset(p) : blankSession(type);
+  wsDraftEnv = type;
+  wsDraftEditId = null;
   state.settings.workoutEnv = type;
-  syncSessionToLog(state.settings.logDate);
+  state.settings.logView = type;
   save();
   closeModal();
+  applyLogView();
   renderWorkoutSession(state.settings.logDate);
-  renderLogHistory();
-  renderDashboard();
-  toast('✓ ' + (p ? p.name : 'Blank template') + ' loaded for ' + fmtDate(state.settings.logDate));
+  toast('Draft ready — edit it, then click 💾 Save Session');
 }
 function loadBlankSession(type){
   loadPresetSession(type, null);
@@ -4108,6 +4436,7 @@ function cleanBbDrill(setType, dr){
   else if (setType === 'Lifts'){ out.sets = optNum(dr.sets); out.reps = optNum(dr.reps); out.weight = optNum(dr.weight); out.pr = !!dr.pr; out.category = drillCategory(dr, setType); }
   else if (setType === 'Free Throws'){ out.attempts = optNum(dr.attempts); out.makes = optNum(dr.makes); out.category = 'FT'; }
   else { out.spot = (dr.spot || '').trim(); out.attempts = optNum(dr.attempts); out.makes = optNum(dr.makes); out.category = drillCategory(dr, setType); }
+  if (Array.isArray(dr.spots) && dr.spots.length) out.spots = dr.spots.map(sp => ({ spot: String(sp.spot || ''), makes: optNum(sp.makes), attempts: optNum(sp.attempts) }));
   return out;
 }
 function onPmInput(e){
@@ -4275,8 +4604,7 @@ function renderDashboard(){
   /* --- Shooting % summary (7 / 30 day) --- */
   renderShooting();
 
-  /* --- Daily recovery score + shooting correlation --- */
-  renderRecovery();
+  /* --- Daily recovery score moved to Routine > Daily Log (V1.1) --- */
 
   /* --- Upcoming school deadlines --- */
   renderSchoolDeadlines();
@@ -4646,6 +4974,7 @@ function renderLogFields(){
   }
 
   renderDraftBanner(key);
+  renderRecovery();
 }
 
 /* V1.0: habits were pulled out of the Daily Log — tracking now lives in the
@@ -4737,11 +5066,10 @@ function shootingAvgPct(days){
   let pctSum = 0, counted = 0;
   for (let i = 0; i < days; i++){
     const d = new Date(today); d.setDate(d.getDate() - i);
-    const s = sessionFor(dateKey(d), 'basketball');
-    if (s){
-      const m = drillTotals(basketAllDrills(s));
-      if (m.shots > 0){ pctSum += m.pct; counted++; }
-    }
+    const list = envSessions(dateKey(d), 'basketball');
+    let shots = 0, makes = 0;
+    list.forEach(s => { const m = drillTotals(basketAllDrills(s)); shots += m.shots; makes += m.makes; });
+    if (shots > 0){ pctSum += Math.round(makes / shots * 100); counted++; }
   }
   return counted ? Math.round((pctSum / counted) * 10) / 10 : null;
 }
@@ -4767,10 +5095,9 @@ function recoveryScores(){
   return state.recovery;
 }
 function dayShootingPct(k){
-  const s = sessionFor(k, 'basketball');
-  if (!s) return null;
-  const m = drillTotals(basketAllDrills(s));
-  return m.shots > 0 ? m.pct : null;
+  let shots = 0, makes = 0;
+  envSessions(k, 'basketball').forEach(s => { const m = drillTotals(basketAllDrills(s)); shots += m.shots; makes += m.makes; });
+  return shots > 0 ? Math.round(makes / shots * 100) : null;
 }
 function recoveryBuckets(days){
   const out = { high: { days: 0, pct: 0 }, mid: { days: 0, pct: 0 }, low: { days: 0, pct: 0 } };
@@ -4804,7 +5131,8 @@ function setRecoveryToday(v){
   renderRecovery();
 }
 function renderRecovery(){
-  const el = document.getElementById('dash-recovery');
+  /* V1.1 — relocated from the Dashboard to Routine > Daily Log. */
+  const el = document.getElementById('log-recovery');
   if (!el) return;
   const r = recoveryScores();
   const today = r[todayKey()];
@@ -5564,7 +5892,7 @@ function addHabit(){
   if (!label){ toast('Enter a habit name', 'error'); return; }
   const type = document.getElementById('habit-new-type').value;
   const bEl = document.getElementById('habit-new-bucket');
-  habitNewBucket = (bEl && HABIT_BUCKET_IDS.includes(bEl.value)) ? bEl.value : habitNewBucket;
+  habitNewBucket = (bEl && habitBucketIds().includes(bEl.value)) ? bEl.value : habitNewBucket;
   state.habits.push({ id: uid(), label, type, bucket: habitNewBucket, desc: '', target: '' });
   inp.value = '';
   save();
@@ -6012,14 +6340,17 @@ function applySchoolView(){
   if (showNcaa) renderNcaa();
 }
 
-/* ---------- Automated GPA tracker (all semesters, credit-weighted) ---------- */
+/* ---------- Automated GPA tracker (all semesters, credit-weighted) ----------
+   V1.1 — grading scale aligned to Vancouver Public Schools / VSB / BC Ministry
+   standards: A 86–100 (4.0), B 73–85 (3.0), C+ 67–72 (2.5), C 60–66 (2.0),
+   C- 50–59 (1.0), F below 50 (0.0). */
 const GPA_SCALE = [
-  { min: 93, pts: 4.0, letter: 'A' },  { min: 90, pts: 3.7, letter: 'A-' },
-  { min: 87, pts: 3.3, letter: 'B+' }, { min: 83, pts: 3.0, letter: 'B' },
-  { min: 80, pts: 2.7, letter: 'B-' }, { min: 77, pts: 2.3, letter: 'C+' },
-  { min: 73, pts: 2.0, letter: 'C' },  { min: 70, pts: 1.7, letter: 'C-' },
-  { min: 67, pts: 1.3, letter: 'D+' }, { min: 63, pts: 1.0, letter: 'D' },
-  { min: 60, pts: 0.7, letter: 'D-' }, { min: 0,  pts: 0.0, letter: 'F' }
+  { min: 86, pts: 4.0, letter: 'A' },
+  { min: 73, pts: 3.0, letter: 'B' },
+  { min: 67, pts: 2.5, letter: 'C+' },
+  { min: 60, pts: 2.0, letter: 'C' },
+  { min: 50, pts: 1.0, letter: 'C-' },
+  { min: 0,  pts: 0.0, letter: 'F' }
 ];
 function gpaFor(pct){ const v = parseFloat(pct); if (!Number.isFinite(v)) return null; return GPA_SCALE.find(s => v >= s.min) || GPA_SCALE[GPA_SCALE.length - 1]; }
 function gpaSummary(){
@@ -6088,7 +6419,7 @@ function gpaWidgetHtml(){
       semRow(s.buckets.s2, 'Semester 2') +
     '</div>' +
   '</div>' +
-  '<p class="paste-hint" style="margin-top:10px">Credit-weighted across every semester, using each class\u2019s manual Current Grade override or its scored assignments.</p>';
+  '<p class="paste-hint" style="margin-top:10px">Credit-weighted across every semester, using each class\u2019s manual Current Grade override or its scored assignments. Grading scale: VSB / BC Ministry — A 86–100 · B 73–85 · C+ 67–72 · C 60–66 · C- 50–59 · F &lt;50.</p>';
 }
 
 /* ---------- School sub-view: Extracurricular (volunteer hours + credits) ---------- */
@@ -6891,9 +7222,17 @@ function playTagsHtml(){
 function playLibraryCategory(tags){
   const t = (tags || []).map(x => String(x).toLowerCase());
   if (t.some(x => x.includes('blob') || x.includes('slob'))) return 'SLOB / BLOB';
-  if (t.some(x => x.includes('press'))) return 'Defenses / Presses';
-  if (t.some(x => x.includes('fast break'))) return 'Fast Breaks';
+  if (t.some(x => x.includes('press'))) return 'Press / Press Break';
+  if (t.some(x => x.includes('zone') || x.includes('defen'))) return 'Defense';
   return 'Offenses';
+}
+/* Attach a sensible tactical board when a press / defense play is filed. */
+function playLibraryBoard(cat, tags){
+  if (!PLAYBOOK_BOARD_CATS.includes(cat)) return '';
+  const list = formationList(cat);
+  const t = (tags || []).map(x => String(x).toLowerCase());
+  const hit = list.find(f => t.some(x => x.includes(f.split(' ')[0].toLowerCase())));
+  return hit || (list[0] || '');
 }
 /* Export the current diagram into the Mental Game → Master Playbook Library. */
 function pushPlayToLibrary(){
@@ -6903,7 +7242,7 @@ function pushPlayToLibrary(){
   const cat = playLibraryCategory(playDraft.tags);
   const notes = [playDraft.context, playDraft.notes, (playDraft.tags || []).join(', ')].filter(Boolean).join(' · ');
   snapshot();
-  mentalState().playbook.push({ id: uid(), name: playDraft.name, cat, url: '', mastery: 'Learning', notes });
+  mentalState().playbook.push({ id: uid(), name: playDraft.name, cat, url: '', mastery: 'Learning', notes, board: playLibraryBoard(cat, playDraft.tags) });
   save();
   toast('✓ Saved to the Master Playbook Library (' + cat + ')');
 }
@@ -9466,7 +9805,7 @@ function finishLiveWorkout(){
       category: c.category
     }))
   }));
-  let s = sessionFor(key, 'basketball');
+  let s = latestSessionFor(key, 'basketball');
   if (s){
     s.sets = Array.isArray(s.sets) ? s.sets : [];
     sets.forEach(st => s.sets.push(st));
@@ -9960,62 +10299,140 @@ function toggleBucketHabit(id){
 function habitBucketRowHtml(h, entry){
   const done = !!(entry.habits && entry.habits[h.id]);
   const st = habitStreak(h);
-  return '<div class="habit-row' + (done ? ' done' : '') + '">' +
-    '<input type="checkbox" ' + (done ? 'checked' : '') + ' onchange="toggleBucketHabit(\'' + h.id + '\')" title="Mark today complete">' +
+  const isBad = (h.type || 'good') === 'bad';
+  return '<div class="habit-row' + (done ? ' done' : '') + (isBad ? ' bad-row' : '') + '">' +
+    '<input type="checkbox" ' + (done ? 'checked' : '') + ' onchange="toggleBucketHabit(\'' + h.id + '\')" title="' + (isBad ? 'Log today as kept clean' : 'Mark today complete') + '">' +
     '<span class="h-label">' + esc(h.label) + (h.desc ? '<i class="h-desc">' + esc(h.desc) + '</i>' : '') + '</span>' +
     (habitTarget(h) ? '<span class="habit-target">🎯 ' + habitMonthDoneCount(h) + '/' + habitTarget(h) + ' Days</span>' : '') +
     '<span class="streak' + (st >= 3 ? ' hot' : '') + '">🔥 ' + st + '</span>' +
     '<button class="icon-btn" onclick="openHabitDetail(\'' + h.id + '\')" title="Edit habit">✎</button>' +
+    '<button class="icon-btn danger" onclick="removeHabit(\'' + h.id + '\')" title="Remove habit">✕</button>' +
+  '</div>';
+}
+/* V1.1 — habit categories are editable; manager chips + per-card edit open the
+   category modal. Good habits render in the upper half of the tracker, bad
+   habits in the lower half, each grouped by its category. */
+function habitCatManagerHtml(){
+  return '<div class="habit-cat-manager">' +
+    '<span class="kicker">CATEGORIES</span>' +
+    HABIT_BUCKETS.map(b =>
+      '<span class="habit-cat-chip" style="--bc:' + b.color + '">' + esc(b.icon) + ' ' + esc(b.label) +
+        '<button class="icon-btn" onclick="openHabitCatModal(\'' + b.id + '\')" title="Edit category">✎</button>' +
+        '<button class="icon-btn danger" onclick="deleteHabitCat(\'' + b.id + '\')" title="Remove category">✕</button>' +
+      '</span>').join('') +
+    '<button class="chip-btn" onclick="openHabitCatModal()">＋ New Category</button>' +
+  '</div>';
+}
+function habitCatCardHead(meta, right){
+  return '<div class="bucket-head">' +
+    '<span class="bucket-icon">' + esc(meta.icon) + '</span>' +
+    '<div class="bucket-title"><b>' + esc(meta.label) + '</b>' + right + '</div>' +
+    '<button class="icon-btn" onclick="openHabitCatModal(\'' + meta.id + '\')" title="Edit category">✎</button>' +
   '</div>';
 }
 function habitBucketCardHtml(bucket){
-  const meta = HABIT_BUCKETS.find(b => b.id === bucket) || HABIT_BUCKETS[0];
+  const meta = habitBucketById(bucket) || HABIT_BUCKETS[0];
   const list = bucketHabits(bucket);
-  const banned = bucketBanned(bucket);
   const entry = state.logs[todayKey()] || {};
   const ratio = bucketTodayRatio(bucket);
   const pct = ratio === null ? 0 : Math.round(ratio * 100);
   const hist = bucketHistory(bucket, 14);
-  const total = list.length + banned.length;
   return '<div class="bucket-card" style="--bc:' + meta.color + '">' +
-    '<div class="bucket-head">' +
-      '<span class="bucket-icon">' + meta.icon + '</span>' +
-      '<div class="bucket-title"><b>' + esc(meta.label) + '</b>' +
-        '<span class="kicker">' + total + ' habit' + (total === 1 ? '' : 's') + ' · ' + pct + '% today</span></div>' +
-      '<div class="bucket-streaks">' +
-        '<span class="bk-streak' + (bucketStreak(bucket) >= 3 ? ' hot' : '') + '">🔥 ' + bucketStreak(bucket) + 'd streak</span>' +
-        '<span class="bk-best">best ' + bucketBestStreak(bucket) + 'd</span>' +
-      '</div>' +
-    '</div>' +
+    habitCatCardHead(meta, '<span class="kicker">' + list.length + ' good habit' + (list.length === 1 ? '' : 's') + ' · ' + pct + '% today</span>') +
     '<div class="bucket-bar"><div class="bucket-bar-fill" style="width:' + pct + '%;background:' + meta.color + '"></div></div>' +
     '<div class="bucket-metrics">' +
       '<span>7-day <b>' + bucketCompletion(bucket, 7) + '%</b></span>' +
       '<span>30-day <b>' + bucketCompletion(bucket, 30) + '%</b></span>' +
-      '<span>history <b>' + Object.keys(state.logs || {}).filter(k => bucketDayRatio(bucket, k) === 1).length + ' perfect days</b></span>' +
+      '<span><b>🔥 ' + bucketStreak(bucket) + 'd</b> streak · best ' + bucketBestStreak(bucket) + 'd</span>' +
     '</div>' +
     '<div class="bucket-hist" title="Last 14 days">' + hist.map(d =>
       '<span class="bh-dot' + (d.pct >= 100 ? ' full' : (d.pct > 0 ? ' part' : '')) + '" style="--bc:' + meta.color + '" title="' + fmtDate(d.k) + ' · ' + d.pct + '%"></span>').join('') + '</div>' +
-    '<div class="bucket-list">' + (list.length ? list.map(h => habitBucketRowHtml(h, entry)).join('') : '<div class="empty sm">No habits in this bucket yet.</div>') + '</div>' +
-    '<div class="bucket-foot">' +
-      '<button class="chip-btn" onclick="addHabitToBucket(\'' + bucket + '\')">+ Add habit</button>' +
-      (banned.length ? '<span class="kicker bad">' + banned.length + ' banned habit' + (banned.length === 1 ? '' : 's') + ' tracked in the Banned List below</span>' : '') +
-    '</div>' +
+    '<div class="bucket-list">' + (list.length ? list.map(h => habitBucketRowHtml(h, entry)).join('') : '<div class="empty sm">No good habits in this category yet.</div>') + '</div>' +
+    '<div class="bucket-foot"><button class="chip-btn" onclick="addHabitToBucket(\'' + bucket + '\')">+ Add good habit</button></div>' +
+  '</div>';
+}
+function habitBadCardHtml(bucket){
+  const meta = habitBucketById(bucket) || HABIT_BUCKETS[0];
+  const list = bucketBanned(bucket);
+  const entry = state.logs[todayKey()] || {};
+  if (!list.length) return '';
+  return '<div class="bucket-card bad-card" style="--bc:' + meta.color + '">' +
+    habitCatCardHead(meta, '<span class="kicker bad">' + list.length + ' bad habit' + (list.length === 1 ? '' : 's') + '</span>') +
+    '<div class="bucket-list">' + list.map(h => habitBucketRowHtml(h, entry)).join('') + '</div>' +
+    '<div class="bucket-foot"><button class="chip-btn" onclick="addBadHabitToBucket(\'' + bucket + '\')">+ Add bad habit</button></div>' +
   '</div>';
 }
 function renderHabitBuckets(){
   const el = document.getElementById('habit-buckets');
   if (!el) return;
-  el.innerHTML = habitAddHtml() + '<div class="bucket-grid">' + HABIT_BUCKETS.map(b => habitBucketCardHtml(b.id)).join('') + '</div>' +
-    '<div class="paste-hint" style="margin:12px 0 0">These are <b>today\'s</b> check-ins — <b>' + fmtDate(todayKey(), { long: true }) + '</b>. They clear themselves at <b>00:00 midnight</b>; the daily records behind them stay in history forever, so each bucket keeps its streak, best streak and rolling rates. Full history lives in <b>Monthly Tracker</b>.</div>';
+  const badCards = HABIT_BUCKETS.map(b => habitBadCardHtml(b.id)).join('');
+  el.innerHTML =
+    habitAddHtml() +
+    habitCatManagerHtml() +
+    '<h3 class="habit-section-h good">✅ Good Habits</h3>' +
+    '<div class="bucket-grid">' + HABIT_BUCKETS.map(b => habitBucketCardHtml(b.id)).join('') + '</div>' +
+    '<h3 class="habit-section-h bad">🚫 Bad Habits</h3>' +
+    '<div class="bucket-grid">' + (badCards || '<div class="empty sm">No bad habits tracked yet — add one above and set its type to Bad Habit.</div>') + '</div>' +
+    '<div class="paste-hint" style="margin:12px 0 0">These are <b>today\'s</b> check-ins — <b>' + fmtDate(todayKey(), { long: true }) + '</b>. They clear at <b>00:00 midnight</b>; the daily records behind them stay in history forever. Full history lives in <b>Monthly Tracker</b>.</div>';
 }
 let habitNewBucket = 'physical';
 function addHabitToBucket(bucket){
-  habitNewBucket = HABIT_BUCKET_IDS.includes(bucket) ? bucket : 'mindset';
+  habitNewBucket = habitBucketIds().includes(bucket) ? bucket : (habitBucketIds()[0] || 'mindset');
   const sel = document.getElementById('habit-new-bucket');
   if (sel) sel.value = habitNewBucket;
+  const t = document.getElementById('habit-new-type');
+  if (t) t.value = 'good';
   const inp = document.getElementById('habit-new');
   if (inp && inp.focus) inp.focus();
-  toast('Name it below — it will land in ' + (HABIT_BUCKETS.find(b => b.id === habitNewBucket) || {}).label);
+  toast('Name it below — it will land in ' + (habitBucketById(habitNewBucket) || {}).label);
+}
+function addBadHabitToBucket(bucket){
+  addHabitToBucket(bucket);
+  const t = document.getElementById('habit-new-type');
+  if (t) t.value = 'bad';
+  const inp = document.getElementById('habit-new');
+  if (inp && inp.focus) inp.focus();
+}
+/* ---------- Habit category CRUD (V1.1) ---------- */
+function openHabitCatModal(id){
+  const b = id ? habitBucketById(id) : null;
+  openModal(b ? 'Edit Habit Category — ' + b.label : 'New Habit Category');
+  const d = b || { label: '', icon: '⭐', color: '#45a29e' };
+  modalBody.innerHTML =
+    '<div class="compact-row">' +
+      '<div class="field inline-block" style="flex:2 1 160px"><label>Category Name</label><input id="hc-label" value="' + esc(d.label) + '" placeholder="e.g. Discipline"></div>' +
+      '<div class="field inline-block"><label>Icon</label><input id="hc-icon" value="' + esc(d.icon) + '" maxlength="6" placeholder="⭐"></div>' +
+      '<div class="field inline-block"><label>Color</label><input type="color" id="hc-color" value="' + esc(d.color || '#45a29e') + '"></div>' +
+    '</div>' +
+    '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">' +
+      (b ? '<button class="btn sm danger-ghost" onclick="deleteHabitCat(\'' + b.id + '\')">Delete Category</button>' : '') +
+      '<button class="btn" onclick="saveHabitCat(' + (b ? '\'' + b.id + '\'' : 'null') + ')">Save Category</button>' +
+    '</div>';
+}
+function saveHabitCat(id){
+  const label = (document.getElementById('hc-label').value || '').trim();
+  if (!label){ toast('Enter a category name', 'error'); return; }
+  const icon = (document.getElementById('hc-icon').value || '').trim() || '⭐';
+  const color = document.getElementById('hc-color').value || '#45a29e';
+  snapshot();
+  if (id){ const b = habitBucketById(id); if (b){ b.label = label; b.icon = icon; b.color = color; } }
+  else HABIT_BUCKETS.push({ id: 'cat-' + uid(), label, icon, color });
+  state.habitBuckets = HABIT_BUCKETS.map(x => ({ ...x }));
+  syncHabitBuckets(); save(); closeModal(); renderHabits(); renderDashboard();
+  toast('✓ Category saved — ' + label);
+}
+function deleteHabitCat(id){
+  const b = habitBucketById(id);
+  if (!b) return;
+  if (HABIT_BUCKETS.length <= 1){ toast('Keep at least one category', 'error'); return; }
+  snapshot();
+  const fallback = HABIT_BUCKETS.find(x => x.id !== id);
+  state.habits.forEach(h => { if (habitBucketOf(h) === id) h.bucket = fallback.id; });
+  HABIT_BUCKETS = HABIT_BUCKETS.filter(x => x.id !== id);
+  state.habitBuckets = HABIT_BUCKETS.map(x => ({ ...x }));
+  if (habitNewBucket === id) habitNewBucket = fallback.id;
+  syncHabitBuckets(); save(); closeModal(); renderHabits(); renderDashboard();
+  toast('Category removed — its habits moved to ' + fallback.label);
 }
 function openHabitModal(){
   const inp = document.getElementById('habit-new');
@@ -10033,11 +10450,23 @@ function shotMapState(){
   if (!state.shotMap || typeof state.shotMap !== 'object') state.shotMap = {};
   return state.shotMap;
 }
-function zoneStats(id){
+/* Manual zone-log values (the numbers the Rapid Log modal edits). */
+function manualZoneStats(id){
   const map = shotMapState();
   const ids = SHOT_ZONE_ALIASES[id] || [id];
   let m = 0, a = 0;
   ids.forEach(k => { const s = map[k] || { m: 0, a: 0 }; a += num(s.a); m += Math.min(num(s.m), num(s.a)); });
+  return { m, a, pct: a ? Math.round(m / a * 100) : null };
+}
+/* Chart values = manual zone log + every saved drill's spot data. Because the
+   drill aggregate is derived, editing a saved session re-syncs the chart
+   automatically and nothing is ever double-counted. */
+function zoneStats(id){
+  const ids = SHOT_ZONE_ALIASES[id] || [id];
+  const base = manualZoneStats(id);
+  let m = base.m, a = base.a;
+  const agg = drillSpotAggregate();
+  ids.forEach(k => { const s = agg[k]; if (s){ a += s.a; m += Math.min(s.m, s.a); } });
   return { m, a, pct: a ? Math.round(m / a * 100) : null };
 }
 /* Hot-hand efficiency bands: green ≥ 60%, yellow 45–59%, red < 45%. */
@@ -10134,10 +10563,12 @@ function openZoneLogModal(zoneId){
   if (!z) return;
   openModal(z.label + ' — Rapid Log');
   const s = zoneStats(zoneId);
+  const man = manualZoneStats(zoneId);
+  const drillExtra = (s.a - man.a);
   modalBody.innerHTML =
     '<div class="zone-log">' +
       '<div class="zone-log-stats"><span class="zl-pct" style="color:' + heatColor(s.pct) + '">' + (s.pct === null ? '—' : s.pct + '%') + '</span>' +
-        '<span class="zl-sub">' + s.m + ' makes / ' + s.a + ' attempts lifetime · ' + z.pts + '-point zone</span></div>' +
+        '<span class="zl-sub">' + s.m + ' makes / ' + s.a + ' attempts lifetime · ' + z.pts + '-point zone' + (drillExtra > 0 ? ' (incl. ' + drillExtra + ' from drill spots)' : '') + '</span></div>' +
       '<div class="zone-log-btns">' +
         '<button class="btn" onclick="applyZoneLog(\'' + zoneId + '\',\'make\')">+1 Make</button>' +
         '<button class="btn ghost" onclick="applyZoneLog(\'' + zoneId + '\',\'miss\')">+1 Miss</button>' +
@@ -10147,8 +10578,8 @@ function openZoneLogModal(zoneId){
         '<button class="live-fix" onclick="applyZoneLog(\'' + zoneId + '\',\'umiss\')">−1 Miss</button>' +
       '</div>' +
       '<div class="compact-row" style="margin-top:12px">' +
-        '<div class="field inline-block"><label>Makes</label><input type="number" min="0" id="zl-m" value="' + s.m + '"></div>' +
-        '<div class="field inline-block"><label>Attempts</label><input type="number" min="0" id="zl-a" value="' + s.a + '"></div>' +
+        '<div class="field inline-block"><label>Makes <span class="hint">manual</span></label><input type="number" min="0" id="zl-m" value="' + man.m + '"></div>' +
+        '<div class="field inline-block"><label>Attempts <span class="hint">manual</span></label><input type="number" min="0" id="zl-a" value="' + man.a + '"></div>' +
         '<button class="btn sm" onclick="setZoneLog(\'' + zoneId + '\')">Set</button>' +
       '</div>' +
       '<button class="btn sm danger-ghost" style="margin-top:10px" onclick="resetZone(\'' + zoneId + '\')">Reset zone</button>' +
@@ -10265,49 +10696,85 @@ function renderMatchups(){
         MATCHUP_POSITIONS.map(p => '<option value="' + p + '"' + (scoutPosFilter === p ? ' selected' : '') + '>' + p + '</option>').join('') +
       '</select></label>' +
     '</div>';
-  el.innerHTML = filterBar + (list.length
-    ? list.map(x =>
-        '<div class="matchup-card">' +
-          '<div class="mc-top"><b>' + esc(x.name || 'Player') + '</b>' + (x.number ? '<span class="mc-num">#' + esc(x.number) + '</span>' : '') +
-            '<span class="mc-team">' + esc(x.team || '') + '</span>' +
-            '<button class="icon-btn" onclick="openMatchupModal(\'' + x.id + '\')" title="Edit">✎</button>' +
-            '<button class="icon-btn danger" onclick="deleteMatchup(\'' + x.id + '\')" title="Delete">✕</button></div>' +
-          '<div class="mc-meta">' + [x.position, x.height, x.weight, x.hand ? x.hand + ' Hand' : ''].filter(Boolean).map(v => '<span>' + esc(v) + '</span>').join('') + '</div>' +
-          (x.tendencies ? '<div class="mc-row"><i>KEY TENDENCIES</i>' + esc(x.tendencies) + '</div>' : '') +
-          (x.defense ? '<div class="mc-row"><i>DEFENSIVE STRATEGY</i>' + esc(x.defense) + '</div>' : '') +
-        '</div>').join('')
+  el.innerHTML = filterBar + (list.length ? list.map(playerCardHtml).join('')
     : empty(all.length ? 'No matchup cards match these filters.' : 'No matchup cards yet — scout your next opponent.'));
+}
+function playerInitials(name){
+  const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return '🏀';
+  return parts.slice(0, 2).map(p => p[0].toUpperCase()).join('');
+}
+/* V1.1 — Player ID card: circular avatar, identity block (Name / Co-YOG /
+   Position / School-Team), then a secondary breakdown of strengths,
+   weaknesses, shooting tendencies and vital metrics. */
+function playerCardHtml(x){
+  const photo = x.photo ? '<img src="' + esc(safeUrl(x.photo) || '') + '" alt="" onerror="this.style.display=\'none\'">' : '';
+  const vitals = [x.height, x.weight, x.hand ? x.hand + ' Hand' : ''].filter(Boolean);
+  return '<div class="player-card">' +
+    '<div class="pc-avatar">' +
+      '<div class="pc-photo">' + (photo || playerInitials(x.name)) + '</div>' +
+      (x.number ? '<span class="pc-num">#' + esc(x.number) + '</span>' : '') +
+    '</div>' +
+    '<div class="pc-body">' +
+      '<div class="pc-name">' + esc(x.name || 'Unnamed Player') + '</div>' +
+      '<div class="pc-sub">' + [x.position, x.team || 'School / Team'].filter(Boolean).map(v => esc(v)).join(' · ') + (x.yog ? ' · Co ' + esc(x.yog) : '') + '</div>' +
+      '<div class="pc-fields">' +
+        '<span class="pc-tag"><b>Co/YOG</b> ' + esc(x.yog || '—') + '</span>' +
+        (vitals.length ? vitals.map(v => '<span class="pc-tag">' + esc(v) + '</span>').join('') : '<span class="pc-tag">vitals not set</span>') +
+      '</div>' +
+      (x.strengths ? '<div class="pc-sect"><i>Key Strengths</i><span>' + esc(x.strengths) + '</span></div>' : '') +
+      (x.weaknesses ? '<div class="pc-sect"><i>Weaknesses</i><span>' + esc(x.weaknesses) + '</span></div>' : '') +
+      (x.shooting ? '<div class="pc-sect"><i>Shooting Tendencies</i><span>' + esc(x.shooting) + '</span></div>' : '') +
+      (x.tendencies ? '<div class="pc-sect"><i>Key Tendencies</i><span>' + esc(x.tendencies) + '</span></div>' : '') +
+      (x.defense ? '<div class="pc-sect"><i>Defensive Strategy</i><span>' + esc(x.defense) + '</span></div>' : '') +
+    '</div>' +
+    '<div class="pc-actions">' +
+      '<button class="icon-btn" onclick="openMatchupModal(\'' + x.id + '\')" title="Edit">✎</button>' +
+      '<button class="icon-btn danger" onclick="deleteMatchup(\'' + x.id + '\')" title="Delete">✕</button>' +
+    '</div>' +
+  '</div>';
 }
 let matchupModalId = null;
 function openMatchupModal(id){
   const x = id ? mentalState().scouting.matchups.find(y => y.id === id) : null;
   matchupModalId = x ? x.id : null;
-  openModal(x ? 'Edit Matchup — ' + x.name : 'Opponent Matchup Card');
-  const d = x || { team: '', number: '', name: '', position: 'PG', height: '', weight: '', hand: 'Right', tendencies: '', defense: '' };
+  openModal(x ? 'Edit Player ID — ' + x.name : 'New Player ID Card');
+  const d = x || { team: '', number: '', name: '', position: 'PG', height: '', weight: '', hand: 'Right', tendencies: '', defense: '', photo: '', yog: '', strengths: '', weaknesses: '', shooting: '' };
   const handOpts = ['Right', 'Left'].map(h => '<option' + (d.hand === h ? ' selected' : '') + '>' + h + '</option>').join('');
   const posOpts = ['PG', 'SG', 'SF', 'PF', 'C'].map(p => '<option' + (d.position === p ? ' selected' : '') + '>' + p + '</option>').join('');
+  const initials = playerInitials(d.name);
   modalBody.innerHTML =
-    '<div class="compact-row">' +
-      '<div class="field inline-block" style="flex:1.6 1 150px"><label>Team</label><input id="mu-team" value="' + esc(d.team) + '"></div>' +
-      '<div class="field inline-block"><label>Jersey #</label><input id="mu-number" value="' + esc(d.number) + '"></div>' +
-      '<div class="field inline-block" style="flex:1.6 1 150px"><label>Name</label><input id="mu-name" value="' + esc(d.name) + '"></div>' +
+    '<div class="pc-edit-top">' +
+      '<div class="pc-avatar"><div class="pc-photo" id="mu-avatar">' + (d.photo ? '<img src="' + esc(safeUrl(d.photo) || '') + '" alt="" onerror="this.style.display=\'none\'">' : initials) + '</div></div>' +
+      '<div class="field inline-block" style="flex:1"><label>Photo URL <span class="hint">optional</span></label><input id="mu-photo" value="' + esc(d.photo) + '" placeholder="https://..."></div>' +
     '</div>' +
     '<div class="compact-row">' +
+      '<div class="field inline-block" style="flex:1.6 1 150px"><label>Name</label><input id="mu-name" value="' + esc(d.name) + '"></div>' +
+      '<div class="field inline-block"><label>Co/YOG</label><input id="mu-yog" value="' + esc(d.yog) + '" placeholder="e.g. 2027"></div>' +
       '<div class="field inline-block"><label>Position</label><select id="mu-position">' + posOpts + '</select></div>' +
+    '</div>' +
+    '<div class="compact-row">' +
+      '<div class="field inline-block" style="flex:1.6 1 150px"><label>School / Team</label><input id="mu-team" value="' + esc(d.team) + '"></div>' +
+      '<div class="field inline-block"><label>Jersey #</label><input id="mu-number" value="' + esc(d.number) + '"></div>' +
+    '</div>' +
+    '<div class="compact-row">' +
       '<div class="field inline-block"><label>Height</label><input id="mu-height" value="' + esc(d.height) + '" placeholder="6\'2\""></div>' +
       '<div class="field inline-block"><label>Weight</label><input id="mu-weight" value="' + esc(d.weight) + '" placeholder="175 lbs"></div>' +
       '<div class="field inline-block"><label>Dominant Hand</label><select id="mu-hand">' + handOpts + '</select></div>' +
     '</div>' +
-    '<div class="field"><label>Key Tendencies</label><textarea id="mu-tendencies" rows="3" placeholder="Favourite moves, shot locations, how they attack...">' + esc(d.tendencies) + '</textarea></div>' +
-    '<div class="field"><label>Defensive Strategy</label><textarea id="mu-defense" rows="3" placeholder="How you will guard / attack them...">' + esc(d.defense) + '</textarea></div>' +
+    '<div class="field"><label>Key Strengths</label><textarea id="mu-strengths" rows="2" placeholder="What they do well...">' + esc(d.strengths) + '</textarea></div>' +
+    '<div class="field"><label>Weaknesses</label><textarea id="mu-weaknesses" rows="2" placeholder="How to attack them...">' + esc(d.weaknesses) + '</textarea></div>' +
+    '<div class="field"><label>Shooting Tendencies</label><textarea id="mu-shooting" rows="2" placeholder="Favourite spots, catch-and-shoot vs off-dribble, release...">' + esc(d.shooting) + '</textarea></div>' +
+    '<div class="field"><label>Key Tendencies</label><textarea id="mu-tendencies" rows="2" placeholder="Favourite moves, how they attack...">' + esc(d.tendencies) + '</textarea></div>' +
+    '<div class="field"><label>Defensive Strategy</label><textarea id="mu-defense" rows="2" placeholder="How you will guard / attack them...">' + esc(d.defense) + '</textarea></div>' +
     '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">' +
       (x ? '<button class="btn sm danger" onclick="deleteMatchup()">Delete</button>' : '') +
-      '<button class="btn" onclick="saveMatchup()">Save Card</button>' +
+      '<button class="btn" onclick="saveMatchup()">Save Player ID</button>' +
     '</div>';
 }
 function saveMatchup(){
   const v = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
-  const data = { team: v('mu-team'), number: v('mu-number'), name: v('mu-name'), position: v('mu-position'), height: v('mu-height'), weight: v('mu-weight'), hand: v('mu-hand'), tendencies: v('mu-tendencies'), defense: v('mu-defense') };
+  const data = { team: v('mu-team'), number: v('mu-number'), name: v('mu-name'), position: v('mu-position'), height: v('mu-height'), weight: v('mu-weight'), hand: v('mu-hand'), tendencies: v('mu-tendencies'), defense: v('mu-defense'), photo: v('mu-photo'), yog: v('mu-yog'), strengths: v('mu-strengths'), weaknesses: v('mu-weaknesses'), shooting: v('mu-shooting') };
   if (!data.name && !data.team){ toast('Add a team or player name', 'error'); return; }
   snapshot();
   const list = mentalState().scouting.matchups;
@@ -10326,7 +10793,23 @@ function deleteMatchup(id){
   closeModal();
   renderMatchups();
 }
-const PLAYBOOK_TONE = { 'Offenses': '#2ecc71', 'Defenses / Presses': '#3b82f6', 'SLOB / BLOB': '#f0a500', 'Fast Breaks': '#e63946' };
+const PLAYBOOK_TONE = { 'Offenses': '#2ecc71', 'Press / Press Break': '#3b82f6', 'SLOB / BLOB': '#f0a500', 'Defense': '#e63946' };
+function playbookBoardOptions(cat, selected){
+  const list = formationList(cat);
+  return '<option value="">No board</option>' + (list.length ? list.map(f => '<option' + (selected === f ? ' selected' : '') + '>' + esc(f) + '</option>').join('') : '');
+}
+/* Rebuilds the board selector whenever the play category changes; board
+   formations only exist for Press / Press Break and Defense. */
+function refreshPlaybookBoards(){
+  const catEl = document.getElementById('pb-cat');
+  const sel = document.getElementById('pb-board');
+  if (!catEl || !sel) return;
+  const cat = catEl.value;
+  const list = formationList(cat);
+  const wrap = document.getElementById('pb-board-field');
+  if (wrap) wrap.style.display = list.length ? '' : 'none';
+  sel.innerHTML = playbookBoardOptions(cat, list.includes(sel.value) ? sel.value : '');
+}
 function renderPlaybook(){
   const el = document.getElementById('playbook-panel');
   if (!el) return;
@@ -10335,16 +10818,18 @@ function renderPlaybook(){
     const rows = list.filter(p => p.cat === cat);
     const tone = PLAYBOOK_TONE[cat] || '#45a29e';
     const mastered = rows.filter(p => p.mastery === 'Mastered').length;
+    const boardCat = formationList(cat).length > 0;
     return '<div class="card playbook-cat" style="margin-bottom:16px">' +
-      '<div class="card-head"><h3 style="color:' + tone + '">' + esc(cat) + '</h3><span class="kicker">' + mastered + '/' + rows.length + ' mastered</span></div>' +
+      '<div class="card-head"><h3 style="color:' + tone + '">' + esc(cat) + '</h3><span class="kicker">' + mastered + '/' + rows.length + ' mastered' + (boardCat ? ' · tactical boards' : '') + '</span></div>' +
       (rows.length ? '<div class="pb-list">' + rows.map(p =>
         '<div class="pb-item">' +
+          (p.board && boardCat ? '<div class="pb-board-wrap">' + formationDiagram(p.board) + '<span class="kicker">' + esc(p.board) + '</span></div>' : '') +
           '<div class="pb-main"><b>' + esc(p.name) + '</b>' + (p.url ? '<a class="game-video-link" href="' + esc(safeUrl(p.url) || '#') + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">▶ Clip</a>' : '') +
             (p.notes ? '<i>' + esc(p.notes) + '</i>' : '') + '</div>' +
           '<button class="mastery-chip m-' + esc(p.mastery.toLowerCase()) + '" onclick="cyclePlaybookMastery(\'' + p.id + '\')" title="Cycle mastery">' + esc(p.mastery) + '</button>' +
           '<button class="icon-btn" onclick="openPlaybookModal(\'' + p.id + '\')" title="Edit">✎</button>' +
           '<button class="icon-btn danger" onclick="deletePlaybook(\'' + p.id + '\')" title="Delete">✕</button>' +
-        '</div>').join('') + '</div>' : '<div class="empty sm">No plays in this category yet.</div>') +
+        '</div>').join('') + '</div>' : '<div class="empty sm">No plays in this category yet.' + (boardCat ? ' Add a play and attach a tactical board.' : '') + '</div>') +
     '</div>';
   }).join('');
 }
@@ -10353,13 +10838,15 @@ function openPlaybookModal(id){
   const p = id ? mentalState().playbook.find(y => y.id === id) : null;
   playbookModalId = p ? p.id : null;
   openModal(p ? 'Edit Play — ' + p.name : 'Add Play to Library');
-  const d = p || { cat: 'Offenses', name: '', url: '', notes: '', mastery: 'Learning' };
+  const d = p || { cat: 'Offenses', name: '', url: '', notes: '', mastery: 'Learning', board: '' };
+  const boardList = formationList(d.cat);
   modalBody.innerHTML =
     '<div class="field"><label>Play Name</label><input id="pb-name" value="' + esc(d.name) + '" placeholder="e.g. Horns Set — 1-4 Flex"></div>' +
     '<div class="compact-row">' +
-      '<div class="field inline-block" style="flex:1 1 150px"><label>Category</label><select id="pb-cat">' + PLAYBOOK_CATS.map(c => '<option' + (d.cat === c ? ' selected' : '') + '>' + c + '</option>').join('') + '</select></div>' +
+      '<div class="field inline-block" style="flex:1 1 150px"><label>Category</label><select id="pb-cat" onchange="refreshPlaybookBoards()">' + PLAYBOOK_CATS.map(c => '<option' + (d.cat === c ? ' selected' : '') + '>' + c + '</option>').join('') + '</select></div>' +
       '<div class="field inline-block"><label>Mastery</label><select id="pb-mastery">' + PLAYBOOK_MASTERY.map(mm => '<option' + (d.mastery === mm ? ' selected' : '') + '>' + mm + '</option>').join('') + '</select></div>' +
     '</div>' +
+    '<div class="field" id="pb-board-field" style="display:' + (boardList.length ? '' : 'none') + '"><label>Tactical Board <span class="hint">preset formation</span></label><select id="pb-board">' + playbookBoardOptions(d.cat, d.board || '') + '</select></div>' +
     '<div class="field"><label>Clip URL <span class="hint">optional</span></label><input type="url" id="pb-url" value="' + esc(d.url) + '" placeholder="https://..."></div>' +
     '<div class="field"><label>Notes / Coaching Points</label><textarea id="pb-notes" rows="3">' + esc(d.notes) + '</textarea></div>' +
     '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">' +
@@ -10372,7 +10859,7 @@ function savePlaybook(){
   const name = v('pb-name');
   if (!name){ toast('Play name is required', 'error'); return; }
   snapshot();
-  const data = { name, cat: v('pb-cat') || 'Offenses', url: v('pb-url'), notes: v('pb-notes'), mastery: v('pb-mastery') || 'Learning' };
+  const data = { name, cat: normalizePlaybookCat(v('pb-cat') || 'Offenses'), url: v('pb-url'), notes: v('pb-notes'), mastery: v('pb-mastery') || 'Learning', board: v('pb-board') };
   const list = mentalState().playbook;
   if (playbookModalId){ const p = list.find(y => y.id === playbookModalId); if (p) Object.assign(p, data); }
   else list.push({ id: uid(), ...data });
@@ -10748,7 +11235,7 @@ function renderDashFocus(){
       '<div class="focus-block"><span class="kicker">SLEEP WINDOW</span><b>' + fmtTime(w.bed) + ' → ' + fmtTime(w.wake) + '</b><i>' + fmtSleepDur(sleepCalc(w.bed, w.wake)) + ' net</i></div>' +
       '<div class="focus-block"><span class="kicker">HABIT COMPLETION</span><b>' + overall + '%</b><i>' + buckets.filter(x => x.pct === 100).length + ' of ' + buckets.length + ' buckets done</i></div>' +
       '<div class="focus-block"><span class="kicker">DAY SCORE</span><b>' + (entry.score ? entry.score + '/10' : '—') + '</b><i>' + (entry.win ? esc(entry.win).slice(0, 64) : 'Log a win in Daily Log') + '</i></div>' +
-      '<div class="focus-block"><span class="kicker">LIFT VOLUME TODAY</span><b>' + fmtNum(sessionMetrics(sessionFor(key, 'lift') || { type: 'lift', exercises: [] }).weight) + '</b><i>lbs moved in Lifting</i></div>' +
+      '<div class="focus-block"><span class="kicker">LIFT VOLUME TODAY</span><b>' + fmtNum(envSessions(key, 'lift').reduce((n, ss) => n + sessionMetrics(ss).weight, 0)) + '</b><i>lbs moved in Lifting</i></div>' +
     '</div>' +
     '<div class="focus-lists">' +
       '<div class="focus-list"><h4>Deadlines first</h4>' +
@@ -11488,7 +11975,7 @@ function renderSettingsPrefs(){
       '</div>' +
       '<div class="paste-hint">Preferences save instantly.</div>' +
     '</div>' +
-    '<div class="card" style="margin-top:16px"><div class="card-head"><h3>Habit Buckets</h3><span class="kicker">Fixed V1.0 taxonomy</span></div>' +
+    '<div class="card" style="margin-top:16px"><div class="card-head"><h3>Habit Categories</h3><span class="kicker">Custom · Good / Bad split</span></div>' +
       '<div class="bucket-legend">' + HABIT_BUCKETS.map(b => '<span class="focus-bucket" style="--bc:' + b.color + '">' + b.icon + ' ' + esc(b.label) + '</span>').join('') + '</div>' +
       '<div class="paste-hint">Check-ins reset at midnight; streaks, best streaks and 7/30-day rates are computed from the daily records kept in your history.</div>' +
     '</div>' +
@@ -11497,7 +11984,7 @@ function renderSettingsPrefs(){
         '<div class="rm-step on"><b>October 2026</b><i>Active testing phase — dual-running Phoenix OS V1.0 alongside Notion to stress-test the real workflow.</i></div>' +
         '<div class="rm-step"><b>November 2026</b><i>Official launch — complete retirement of Notion; 100% migration to Phoenix OS.</i></div>' +
       '</div>' +
-      '<div class="paste-hint">Build v1.2 · Architecture Restructure &amp; Playbook Consolidation.</div>' +
+      '<div class="paste-hint">Build v1.3 · Spot Shot Tracking, Save Flow &amp; Playbook Defense.</div>' +
     '</div>';
 }
 function renderSettingsBackup(){
@@ -11639,6 +12126,7 @@ function renderSettings(){
 
 /* ---------- Boot ---------- */
 state = loadState();
+syncHabitBuckets();
 seedHabitBuckets();
 pmType = state.settings.pmType || 'basketball';
 if (state.settings.landingTab && state.settings.landingTab !== 'last') state.settings.activeTab = normalizeTab(state.settings.landingTab);
