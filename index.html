@@ -1332,6 +1332,14 @@ input[type=range]:focus{ box-shadow:none; }
   .heat-legend{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-top:10px; font-size:11px; color:var(--text); }
   .heat-legend span{ display:inline-flex; align-items:center; gap:6px; }
   .heat-legend i{ width:12px; height:12px; border-radius:3px; display:inline-block; }
+  .shot-summary-card{ display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; margin:14px 0 6px; padding:12px 16px; border:1px solid var(--line); border-radius:var(--r); background:var(--bg2); }
+  .shot-summary-kpis{ display:flex; gap:26px; flex-wrap:wrap; }
+  .shot-sum-kpi{ display:flex; flex-direction:column; gap:2px; }
+  .shot-sum-kpi b{ font-family:var(--mono); font-size:22px; color:var(--bright); line-height:1; }
+  .shot-sum-kpi span{ font-size:10px; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); }
+  .shot-summary-range{ display:inline-flex; align-items:center; gap:8px; }
+  .shot-range-sel, .shot-summary-range select{ width:auto; min-width:132px; }
+  .mt-grid .mtd.pre{ background:transparent; border-color:transparent; cursor:default; opacity:.16; pointer-events:none; }
   .rich-toolbar{ display:flex; gap:6px; margin-bottom:6px; }
   .rich-toolbar .chip-btn{ min-width:34px; }
   .assign-desc{ margin-top:6px; }
@@ -1871,16 +1879,31 @@ input[type=range]:focus{ box-shadow:none; }
             <div class="card-head-row" style="margin-bottom:0">
               <div>
                 <h2 class="page-title">🎯 Shot Chart — Granular Heatmap</h2>
-                <p class="page-sub">Lifetime makes / attempts across 14 analytical floor zones. Hot-hand colors update automatically; click any zone to log shots.</p>
+                <p class="page-sub">Tracked makes / attempts across 14 analytical floor zones. Hot-hand colors update automatically; click any zone to log shots.</p>
               </div>
+            </div>
+            <div class="shot-summary-card">
+              <div class="shot-summary-kpis" id="shot-summary"></div>
+              <label class="kicker shot-summary-range">Summary range
+                <select class="mini-input" id="shotsum-range" onchange="setShotSummaryRange(this.value)">
+                  <option value="7">Last 7 Days</option>
+                  <option value="30">Last 30 Days</option>
+                </select>
+              </label>
             </div>
             <div class="heat-wrap">
               <div class="card">
-                <div class="card-head"><h3>Shot Heatmap</h3><span class="kicker" id="heat-kicker"></span></div>
+                <div class="card-head"><h3>Shot Heatmap</h3><span class="kicker" id="heat-kicker"></span>
+                  <select class="mini-input shot-range-sel" id="shot-range" onchange="setShotRange(this.value)" title="Heat-map time frame">
+                    <option value="7">Last 7 Days</option>
+                    <option value="30">Last 30 Days</option>
+                    <option value="lifetime">Lifetime</option>
+                  </select>
+                </div>
                 <div id="shot-heatmap"></div>
               </div>
               <div class="card">
-                <div class="card-head"><h3>Zone Breakdown</h3><span class="kicker">Green = Hot · Yellow = Neutral · Red = Cold</span></div>
+                <div class="card-head"><h3>Zone Breakdown</h3><span class="kicker">Heat = Hot / Neutral / Cold, banded per shot type — 2PT ≥70% hot · 3PT ≥60% hot</span></div>
                 <div id="shot-zone-table"></div>
               </div>
             </div>
@@ -1922,10 +1945,6 @@ input[type=range]:focus{ box-shadow:none; }
           <button class="chip-btn" id="sem-s2" onclick="setSchoolSem('s2')">Semester 2 (S2)</button>
         </div>
         <div id="sview-assign">
-        <div class="card" style="margin-bottom:16px">
-          <div class="card-head"><h3>Academic GPA / Grade Calculator</h3><span class="kicker" id="school-gpa-kicker"></span></div>
-          <div id="school-gpa"></div>
-        </div>
         <div class="school-layout">
 
           <div class="card">
@@ -2541,7 +2560,7 @@ const SHOT_ZONE_ALIASES = {
    (5 Spot Midrange → Left Corner, Left Wing, Top, Right Wing, Right Corner, …)
    with per-spot makes/attempts that auto-sum into the drill totals and feed the
    Shot Chart through SPOT_ZONE_MAP. */
-const BB_SPOT_LIST = ['Left Corner', 'Left Wing', 'Top', 'Right Wing', 'Right Corner', 'Left Elbow', 'Right Elbow', 'Free Throw', 'Paint', 'Mid-Range Center', 'Short Corner Left', 'Short Corner Right'];
+const BB_SPOT_LIST = ['Left Corner', 'Left Wing', 'Top', 'Right Wing', 'Right Corner', 'Left Wing Midrange', 'Right Wing Midrange', 'Left Elbow', 'Right Elbow', 'Free Throw', 'Paint', 'Mid-Range Center', 'Short Corner Left', 'Short Corner Right'];
 const SPOT_ZONE_MAP = {
   'Left Corner': 'c3-left', 'Right Corner': 'c3-right',
   'Left Wing': 'w3-left', 'Right Wing': 'w3-right',
@@ -2549,7 +2568,8 @@ const SPOT_ZONE_MAP = {
   'Left Elbow': 'el-left', 'Right Elbow': 'el-right',
   'Free Throw': 'ft', 'Paint': 'ra', 'Midrange': 'mid-center', 'Mid-Range Center': 'mid-center',
   'Short Corner Left': 'sc-left', 'Short Corner Right': 'sc-right',
-  'Wing Mid Left': 'wm-left', 'Wing Mid Right': 'wm-right'
+  'Wing Mid Left': 'wm-left', 'Wing Mid Right': 'wm-right',
+  'Left Wing Midrange': 'wm-left', 'Right Wing Midrange': 'wm-right', 'Mid-Range Left Wing': 'wm-left', 'Mid-Range Right Wing': 'wm-right'
 };
 function spotZone(label){ return SPOT_ZONE_MAP[String(label || '').trim()] || null; }
 function drillSpotTotals(dr){
@@ -2565,11 +2585,13 @@ function syncDrillSpots(dr){
   dr.makes = t.m ? String(t.m) : '';
 }
 /* Aggregates every saved drill's spot data for the Shot Chart, so spot entries
-   always render on the heatmap and stay correct after any edit. */
-function drillSpotAggregate(){
+   always render on the heatmap and stay correct after any edit. An optional
+   time-frame filter windows the dated sessions (see shotRangeKey). */
+function drillSpotAggregate(range){
   const agg = {};
-  allSessions().forEach(({ session }) => {
+  allSessions().forEach(({ key, session }) => {
     if (!session || session.type !== 'basketball') return;
+    if (!sessionInShotRange(key, range)) return;
     basketAllDrills(session).forEach(dr => {
       (dr.spots || []).forEach(sp => {
         const z = spotZone(sp.spot); if (!z) return;
@@ -3141,6 +3163,8 @@ function defaultState(){
       landingTab: 'last',     // boot behaviour: 'last' or one of NAV_SECTIONS
       staleDays: CONTACT_STALE_DAYS,  // recruiting follow-up threshold
       matrixHideDone: false,  // To-Do Matrix: hide completed
+      shotRange: 'lifetime',  // Shot Chart heat-map time frame: 7 | 30 | lifetime
+      shotSummaryRange: '7',  // Shooting summary header time frame: 7 | 30
       habitSeed: 0            // bucket-seed marker (see seedHabitBuckets)
     }
   };
@@ -3151,7 +3175,7 @@ function mergeState(p){
   const merged = {
     version: 2,
     seedVersion: Number(p.seedVersion) || 0,
-    habits:   Array.isArray(p.habits)   && p.habits.length   ? p.habits.map(h => ({ ...h, type: h.type || 'good', desc: h.desc || '', target: h.target ?? '', bucket: (h && typeof h.bucket === 'string' && h.bucket) ? h.bucket : habitBucketOf(h) })) : d.habits,
+    habits:   Array.isArray(p.habits)   && p.habits.length   ? p.habits.map(h => ({ ...h, type: h.type || 'good', desc: h.desc || '', target: h.target ?? '', bucket: (h && typeof h.bucket === 'string' && h.bucket) ? h.bucket : habitBucketOf(h), createdAt: (h && typeof h.createdAt === 'string') ? h.createdAt : '' })) : d.habits,
     habitBuckets: Array.isArray(p.habitBuckets) && p.habitBuckets.length ? normalizeHabitBuckets(p.habitBuckets) : d.habitBuckets,
     school:   Array.isArray(p.school)   ? p.school.map(a => ({ ...a, semester: a.semester || 's1', status: a.status || 'Not Started', desc: a.desc || '', category: ASSIGNMENT_CATEGORIES.includes(a.category) ? a.category : (a.category === 'Exam' ? 'Test' : (a.category || 'Homework')) })) : d.school,
     classCats: Array.isArray(p.classCats) && p.classCats.length ? p.classCats.map(c => ({ ...c, category: c.category || classCategory(c.label), room: c.room || '', teacher: c.teacher || '', credits: (c.credits === undefined || c.credits === null || c.credits === '') ? 4 : c.credits, period: c.period || 'p1', semester: c.semester || 's1', targetGrade: c.targetGrade ?? '', currentGrade: c.currentGrade ?? '' })) : d.classCats,
@@ -3342,7 +3366,7 @@ function mergeState(p){
           selected: p.brainstorm.selected || ''
         }
       : { maps: [], activeId: '', selected: '' },
-    settings: { ...d.settings, ...(p.settings || {}), schoolClassId: (p.settings && p.settings.schoolClassId) || '', schoolFilter: ['all', 'active', 'archived'].includes(p.settings && p.settings.schoolFilter) ? p.settings.schoolFilter : 'all', recruitFilter: ['all', ...RECRUIT_STATUSES].includes(p.settings && p.settings.recruitFilter) ? p.settings.recruitFilter : 'all', recruitDivFilter: ['all', ...RECRUIT_DIVISIONS].includes(p.settings && p.settings.recruitDivFilter) ? p.settings.recruitDivFilter : 'all', mentalView: ['journal'].includes(p.settings && p.settings.mentalView) ? p.settings.mentalView : 'journal', filmView: ['games', 'plays', 'study', 'scouting', 'playbook'].includes(p.settings && p.settings.filmView) ? p.settings.filmView : 'games', lifeView: (function(){ const v = p.settings && p.settings.lifeView; if (LIFE_VIEWS.includes(v)) return v; if (v === 'sprints' || v === 'stats') return 'combine'; if (v === 'goals') return 'goals'; return 'habits'; })(), workoutEnv: WORKOUT_ENVS.includes(p.settings && p.settings.workoutEnv) ? p.settings.workoutEnv : (WORKOUT_ENVS.includes(p.settings && p.settings.logView) ? p.settings.logView : 'lift'), logView: WORKOUT_ENVS.includes(p.settings && p.settings.logView) ? p.settings.logView : 'lift', routineView: ['schedule', 'log', 'mental'].includes(p.settings && p.settings.routineView) ? p.settings.routineView : 'schedule', routineDay: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', ''].includes(p.settings && p.settings.routineDay) ? p.settings.routineDay : '', settingsView: ['prefs', 'backup', 'archive'].includes(p.settings && p.settings.settingsView) ? p.settings.settingsView : 'prefs', goalTf: ['all', 'short', 'mid', 'long'].includes(p.settings && p.settings.goalTf) ? p.settings.goalTf : 'all', goalCat: ['all', 'athletic', 'academic', 'personal'].includes(p.settings && p.settings.goalCat) ? p.settings.goalCat : 'all', staleDays: Math.max(1, parseInt(p.settings && p.settings.staleDays, 10) || CONTACT_STALE_DAYS), matrixHideDone: !!(p.settings && p.settings.matrixHideDone) }
+    settings: { ...d.settings, ...(p.settings || {}), schoolClassId: (p.settings && p.settings.schoolClassId) || '', schoolFilter: ['all', 'active', 'archived'].includes(p.settings && p.settings.schoolFilter) ? p.settings.schoolFilter : 'all', recruitFilter: ['all', ...RECRUIT_STATUSES].includes(p.settings && p.settings.recruitFilter) ? p.settings.recruitFilter : 'all', recruitDivFilter: ['all', ...RECRUIT_DIVISIONS].includes(p.settings && p.settings.recruitDivFilter) ? p.settings.recruitDivFilter : 'all', mentalView: ['journal'].includes(p.settings && p.settings.mentalView) ? p.settings.mentalView : 'journal', filmView: ['games', 'plays', 'study', 'scouting', 'playbook'].includes(p.settings && p.settings.filmView) ? p.settings.filmView : 'games', lifeView: (function(){ const v = p.settings && p.settings.lifeView; if (LIFE_VIEWS.includes(v)) return v; if (v === 'sprints' || v === 'stats') return 'combine'; if (v === 'goals') return 'goals'; return 'habits'; })(), workoutEnv: WORKOUT_ENVS.includes(p.settings && p.settings.workoutEnv) ? p.settings.workoutEnv : (WORKOUT_ENVS.includes(p.settings && p.settings.logView) ? p.settings.logView : 'lift'), logView: WORKOUT_ENVS.includes(p.settings && p.settings.logView) ? p.settings.logView : 'lift', routineView: ['schedule', 'log', 'mental'].includes(p.settings && p.settings.routineView) ? p.settings.routineView : 'schedule', routineDay: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', ''].includes(p.settings && p.settings.routineDay) ? p.settings.routineDay : '', settingsView: ['prefs', 'backup', 'archive'].includes(p.settings && p.settings.settingsView) ? p.settings.settingsView : 'prefs', goalTf: ['all', 'short', 'mid', 'long'].includes(p.settings && p.settings.goalTf) ? p.settings.goalTf : 'all', goalCat: ['all', 'athletic', 'academic', 'personal'].includes(p.settings && p.settings.goalCat) ? p.settings.goalCat : 'all', staleDays: Math.max(1, parseInt(p.settings && p.settings.staleDays, 10) || CONTACT_STALE_DAYS), matrixHideDone: !!(p.settings && p.settings.matrixHideDone), shotRange: ['7', '30', 'lifetime'].includes(p.settings && p.settings.shotRange) ? p.settings.shotRange : 'lifetime', shotSummaryRange: (p.settings && p.settings.shotSummaryRange) === '30' ? '30' : '7' }
   };
   merged.settings.timeWindow = timeWindowFrom(p.settings && p.settings.timeWindow);
   // Baseline data is merged in exactly once, then respected as user-owned.
@@ -3788,10 +3812,14 @@ function bbDrillHtml(setType, dr, si, di){
   const canSpot = setType === 'Shooting' || setType === 'Finishing';
   const spotIn = (setType === 'Free Throws' || hasSpots) ? '' :
     '<input class="grow" list="spots-list" data-si="' + si + '" data-di="' + di + '" data-wf="spot" placeholder="Spot" value="' + esc(dr.spot) + '">';
+  /* Standalone Total Makes column: raw make volume for drills where attempts
+     aren’t tracked (e.g. form shooting). It is deliberately separate from
+     makes/attempts so it never skews accuracy percentages. */
+  const tmIn = '<input class="n" type="number" min="0" data-si="' + si + '" data-di="' + di + '" data-wf="totalMakes" placeholder="Tot M" title="Standalone total makes — raw volume, not counted in accuracy" value="' + esc(dr.totalMakes) + '">';
   const totals = hasSpots
-    ? '<span class="ws-drill-sum" id="ws-drill-sum-' + si + '-' + di + '" title="Auto-summed from spots">Σ ' + (dr.attempts || 0) + ' att · ' + (dr.makes || 0) + ' mk</span>'
+    ? '<span class="ws-drill-sum" id="ws-drill-sum-' + si + '-' + di + '" title="Auto-summed from spots">Σ ' + (dr.attempts || 0) + ' att · ' + (dr.makes || 0) + ' mk</span>' + tmIn
     : '<input class="n" type="number" min="0" data-si="' + si + '" data-di="' + di + '" data-wf="attempts" placeholder="Att" title="Optional" value="' + esc(dr.attempts) + '">' +
-      '<input class="n" type="number" min="0" data-si="' + si + '" data-di="' + di + '" data-wf="makes" placeholder="Makes" value="' + esc(dr.makes) + '">';
+      '<input class="n" type="number" min="0" data-si="' + si + '" data-di="' + di + '" data-wf="makes" placeholder="Makes" value="' + esc(dr.makes) + '">' + tmIn;
   const spotToggle = (canSpot && !hasSpots)
     ? '<button class="icon-btn" onclick="addDrillSpot(' + si + ',' + di + ')" title="Break this drill down by spot">⊞</button>'
     : '';
@@ -4434,8 +4462,8 @@ function cleanBbDrill(setType, dr){
   const out = { name: (dr.name || '').trim() };
   if (setType === 'Ball Handling'){ out.reps = optNum(dr.reps); out.style = BH_STYLES.includes(dr.style) ? dr.style : 'Stationary'; }
   else if (setType === 'Lifts'){ out.sets = optNum(dr.sets); out.reps = optNum(dr.reps); out.weight = optNum(dr.weight); out.pr = !!dr.pr; out.category = drillCategory(dr, setType); }
-  else if (setType === 'Free Throws'){ out.attempts = optNum(dr.attempts); out.makes = optNum(dr.makes); out.category = 'FT'; }
-  else { out.spot = (dr.spot || '').trim(); out.attempts = optNum(dr.attempts); out.makes = optNum(dr.makes); out.category = drillCategory(dr, setType); }
+  else if (setType === 'Free Throws'){ out.attempts = optNum(dr.attempts); out.makes = optNum(dr.makes); out.totalMakes = optNum(dr.totalMakes); out.category = 'FT'; }
+  else { out.spot = (dr.spot || '').trim(); out.attempts = optNum(dr.attempts); out.makes = optNum(dr.makes); out.totalMakes = optNum(dr.totalMakes); out.category = drillCategory(dr, setType); }
   if (Array.isArray(dr.spots) && dr.spots.length) out.spots = dr.spots.map(sp => ({ spot: String(sp.spot || ''), makes: optNum(sp.makes), attempts: optNum(sp.attempts) }));
   return out;
 }
@@ -5669,6 +5697,20 @@ function habitMonthBase(){
   d.setMonth(d.getMonth() + habitMonthOffset);
   return d;
 }
+/* V1.1 — Creation-date anchor. A habit only begins tracking on the exact day it
+   was added, so days before createdAt render no checkbox and never count toward
+   completion %. Habits saved before this field existed have no createdAt and are
+   treated as always-tracked (their history is preserved untouched). */
+function habitCreatedKey(h){ return (h && typeof h.createdAt === 'string' && h.createdAt) ? h.createdAt : ''; }
+function habitActiveOn(h, key){ const c = habitCreatedKey(h); return !c || key >= c; }
+function habitActiveDaysInMonth(h){
+  const base = habitMonthBase();
+  const y = base.getFullYear(), m = base.getMonth();
+  const days = new Date(y, m + 1, 0).getDate();
+  let n = 0;
+  for (let d = 1; d <= days; d++){ const k = y + '-' + pad(m + 1) + '-' + pad(d); if (habitActiveOn(h, k)) n++; }
+  return n;
+}
 function setHabitMonth(delta){ habitMonthOffset += delta; renderHabitsPanel(); renderRoutine(); }
 function habitMonthCompletionPct(){
   // Average completion across every habit × day in the visible month (up to today for the current month).
@@ -5686,7 +5728,7 @@ function habitMonthCompletionPct(){
   for (let d = 1; d <= lastDay; d++){
     const k = y + '-' + pad(m + 1) + '-' + pad(d);
     const day = (state.logs[k] && state.logs[k].habits) || {};
-    for (const h of state.habits){ total++; if (day[h.id]) done++; }
+    for (const h of state.habits){ if (!habitActiveOn(h, k)) continue; total++; if (day[h.id]) done++; }
   }
   return total ? Math.round(done / total * 100) : 0;
 }
@@ -5724,6 +5766,7 @@ function monthlyTrackerHtml(){
     let out = '<span class="xlabel">' + esc(h.label) + (habitTarget(h) ? ' <i class="h-desc">🎯 ' + habitMonthDoneCount(h) + '/' + habitTarget(h) + 'd</i>' : '') + '</span>';
     for (let d = 1; d <= daysInMonth; d++){
       const k = y + '-' + pad(m + 1) + '-' + pad(d);
+      if (!habitActiveOn(h, k)){ out += '<span class="mtd pre" title="Tracking begins ' + fmtDate(habitCreatedKey(h)) + '"></span>'; continue; }
       const ok = !!(state.logs[k] && state.logs[k].habits && state.logs[k].habits[h.id]);
       out += '<span class="mtd' + (ok ? ' on' : '') + (k === todayK ? ' today' : '') + '" data-h="' + h.id + '" data-k="' + k + '" onclick="toggleHabitDate(\'' + h.id + '\',\'' + k + '\')" title="' + fmtDate(k) + '"></span>';
     }
@@ -5757,6 +5800,7 @@ function habitMonthDoneCount(h){
   let done = 0;
   for (let d = 1; d <= days; d++){
     const k = y + '-' + pad(m + 1) + '-' + pad(d);
+    if (!habitActiveOn(h, k)) continue;
     if (state.logs[k] && state.logs[k].habits && state.logs[k].habits[h.id]) done++;
   }
   return done;
@@ -5783,13 +5827,14 @@ function bannedTrackerHtml(){
     let out = '<span class="xlabel">' + esc(h.label) + '</span>';
     for (let d = 1; d <= daysInMonth; d++){
       const k = y + '-' + pad(m + 1) + '-' + pad(d);
+      if (!habitActiveOn(h, k)){ out += '<span class="mtd pre" title="Tracking begins ' + fmtDate(habitCreatedKey(h)) + '"></span>'; continue; }
       const clean = !!(state.logs[k] && state.logs[k].habits && state.logs[k].habits[h.id]);
       out += '<span class="mtd' + (clean ? ' on' : '') + (k === todayK ? ' today' : '') + '" data-h="' + h.id + '" data-k="' + k + '" onclick="toggleHabitDate(\'' + h.id + '\',\'' + k + '\')" title="' + fmtDate(k) + '"></span>';
     }
     return out;
   });
   const totalClean = bad.reduce((n, h) => n + habitMonthDoneCount(h), 0);
-  const totalPossible = bad.length * daysInMonth;
+  const totalPossible = bad.reduce((n, h) => n + habitActiveDaysInMonth(h), 0);
   return '<div class="card banned-card mt-card">' +
     '<div class="card-head">' +
       '<h3>BANNED LIST — DAYS CLEAN</h3>' +
@@ -5893,7 +5938,7 @@ function addHabit(){
   const type = document.getElementById('habit-new-type').value;
   const bEl = document.getElementById('habit-new-bucket');
   habitNewBucket = (bEl && habitBucketIds().includes(bEl.value)) ? bEl.value : habitNewBucket;
-  state.habits.push({ id: uid(), label, type, bucket: habitNewBucket, desc: '', target: '' });
+  state.habits.push({ id: uid(), label, type, bucket: habitNewBucket, desc: '', target: '', createdAt: todayKey() });
   inp.value = '';
   save();
   renderHabitsPanel();
@@ -9993,7 +10038,7 @@ function weeklyHabitsData(r){
   let done = 0, possible = 0;
   const perHabit = good.map(h => {
     let n = 0;
-    keys.forEach(k => { possible++; if (state.logs[k] && state.logs[k].habits && state.logs[k].habits[h.id]){ n++; done++; } });
+    keys.forEach(k => { if (!habitActiveOn(h, k)) return; possible++; if (state.logs[k] && state.logs[k].habits && state.logs[k].habits[h.id]){ n++; done++; } });
     return { label: h.label, days: n, streak: habitStreak(h) };
   });
   const banned = bad.map(h => {
@@ -10461,25 +10506,27 @@ function manualZoneStats(id){
 /* Chart values = manual zone log + every saved drill's spot data. Because the
    drill aggregate is derived, editing a saved session re-syncs the chart
    automatically and nothing is ever double-counted. */
-function zoneStats(id){
+function zoneStats(id, range){
+  const r = shotRangeKey(range);
   const ids = SHOT_ZONE_ALIASES[id] || [id];
-  const base = manualZoneStats(id);
-  let m = base.m, a = base.a;
-  const agg = drillSpotAggregate();
+  let m = 0, a = 0;
+  /* Manual Rapid-Log entries are undated, so they only count toward Lifetime. */
+  if (r === 'lifetime'){ const base = manualZoneStats(id); m += base.m; a += base.a; }
+  const agg = drillSpotAggregate(r);
   ids.forEach(k => { const s = agg[k]; if (s){ a += s.a; m += Math.min(s.m, s.a); } });
   return { m, a, pct: a ? Math.round(m / a * 100) : null };
 }
-/* Hot-hand efficiency bands: green ≥ 60%, yellow 45–59%, red < 45%. */
-function heatColor(pct){
+/* Per-type efficiency bands: mid-range (2pt) hot ≥ 70% / neutral 50–69%; three (and everything else) hot ≥ 60% / neutral 45–59%. */ function heatBands(pts){ return num(pts) === 2 ? { hot: 70, neutral: 50 } : { hot: 60, neutral: 45 }; }
+function heatColor(pct, pts){
   if (pct === null) return '#3a4a5a';
-  if (pct >= 60) return '#2ecc71';
-  if (pct >= 45) return '#f0a500';
+  if (pct >= heatBands(pts).hot) return '#2ecc71';
+  if (pct >= heatBands(pts).neutral) return '#f0a500';
   return '#e63946';
 }
-function heatLabel(pct){
+function heatLabel(pct, pts){
   if (pct === null) return '—';
-  if (pct >= 60) return 'Hot';
-  if (pct >= 45) return 'Neutral';
+  if (pct >= heatBands(pts).hot) return 'Hot';
+  if (pct >= heatBands(pts).neutral) return 'Neutral';
   return 'Cold';
 }
 /* Analytical half-court geometry: 12 clickable zones laid out as an
@@ -10503,17 +10550,72 @@ const HEAT_GEOM = {
   'c3-right':   { rects: [[430, 15, 70, 175]],                        text: [465, 100] },
   'top3':       { rects: [[130, 260, 240, 130]],                      text: [250, 326] }
 };
+/* ============================================================
+   V1.1 — Shot Chart time-frame filter + shooting summary header
+   ============================================================ */
+function shotRangeKey(range){
+  const r = String(range || 'lifetime');
+  return (r === '7' || r === '30' || r === 'lifetime') ? r : 'lifetime';
+}
+function shotRangeStart(range){
+  const r = shotRangeKey(range);
+  if (r === 'lifetime') return '';
+  const days = r === '7' ? 7 : 30;
+  const d = new Date(); d.setDate(d.getDate() - (days - 1));
+  return dateKey(d);
+}
+function sessionInShotRange(key, range){
+  const r = shotRangeKey(range);
+  if (r === 'lifetime') return true;
+  return !!key && key >= shotRangeStart(r) && key <= todayKey();
+}
+function shotRangeLabel(range){ const r = shotRangeKey(range); return r === '7' ? 'Last 7 Days' : (r === '30' ? 'Last 30 Days' : 'Lifetime'); }
+function shotSummaryRange(){ const v = state.settings && state.settings.shotSummaryRange; return v === '30' ? '30' : '7'; }
+function setShotRange(v){ state.settings.shotRange = shotRangeKey(v); save(); renderShots(); }
+function setShotSummaryRange(v){ state.settings.shotSummaryRange = (v === '30' ? '30' : '7'); save(); renderShotSummary(); }
+/* Total makes = every tracked make on shooting / finishing / free-throw drills
+   plus the standalone Total Makes column (raw form-shooting volume). */
+function shotSummaryData(range){
+  const r = shotRangeKey(range);
+  let makes = 0, workouts = 0;
+  allSessions().forEach(({ key, session }) => {
+    if (!session || session.type !== 'basketball') return;
+    if (!sessionInShotRange(key, r)) return;
+    workouts++;
+    basketAllDrills(session).forEach(dr => {
+      const st = dr.setType || 'Shooting';
+      if (st !== 'Shooting' && st !== 'Finishing' && st !== 'Free Throws') return;
+      makes += num(dr.makes);
+      makes += num(dr.totalMakes);
+    });
+  });
+  return { makes, workouts };
+}
+function renderShotSummary(){
+  const el = document.getElementById('shot-summary');
+  if (!el) return;
+  const range = shotSummaryRange();
+  const sel = document.getElementById('shotsum-range'); if (sel) sel.value = range;
+  const d = shotSummaryData(range);
+  const label = shotRangeLabel(range);
+  el.innerHTML =
+    '<div class="shot-sum-kpi"><b>' + d.makes + '</b><span>Total Makes · ' + label + '</span></div>' +
+    '<div class="shot-sum-kpi"><b>' + d.workouts + '</b><span>Basketball Workouts Logged · ' + label + '</span></div>';
+}
 function renderShots(){
   const el = document.getElementById('shot-heatmap');
   if (!el) return;
-  const totals = SHOT_ZONES.reduce((t, z) => { const s = zoneStats(z.id); t.m += s.m; t.a += s.a; return t; }, { m: 0, a: 0 });
+  const range = shotRangeKey(state.settings && state.settings.shotRange);
+  const rangeSel = document.getElementById('shot-range');
+  if (rangeSel) rangeSel.value = range;
+  const totals = SHOT_ZONES.reduce((t, z) => { const s = zoneStats(z.id, range); t.m += s.m; t.a += s.a; return t; }, { m: 0, a: 0 });
   const kick = document.getElementById('heat-kicker');
   if (kick) kick.textContent = totals.a ? totals.m + ' / ' + totals.a + ' · ' + Math.round(totals.m / totals.a * 100) + '% overall' : 'No shots logged yet';
   const zoneSvg = id => {
     const g = HEAT_GEOM[id];
     const z = SHOT_ZONES.find(zz => zz.id === id);
     if (!g || !z) return '';
-    const s = zoneStats(id), col = heatColor(s.pct);
+    const s = zoneStats(id, range), col = heatColor(s.pct, z.pts);
     const op = s.a ? '.32' : '.05';
     const shapes = (g.rects || []).map(r => '<rect x="' + r[0] + '" y="' + r[1] + '" width="' + r[2] + '" height="' + r[3] + '" rx="5" fill="' + col + '" fill-opacity="' + op + '" stroke="' + col + '" stroke-opacity=".6"/>').join('') +
       (g.circle ? '<circle cx="' + g.circle[0] + '" cy="' + g.circle[1] + '" r="' + g.circle[2] + '" fill="' + col + '" fill-opacity="' + op + '" stroke="' + col + '" stroke-opacity=".7"/>' : '');
@@ -10536,20 +10638,21 @@ function renderShots(){
       SHOT_ZONES.map(z => zoneSvg(z.id)).join('') +
     '</svg>' +
     '<div class="heat-legend">' +
-      '<span><i style="background:#2ecc71"></i>Hot · ≥ 60%</span>' +
-      '<span><i style="background:#f0a500"></i>Neutral · 45–59%</span>' +
-      '<span><i style="background:#e63946"></i>Cold · &lt; 45%</span>' +
-      '<span class="hint">' + SHOT_ZONES.length + ' analytical zones · click any zone to log shots</span>' +
+      '<span><i style="background:#2ecc71"></i>Hot</span>' +
+      '<span><i style="background:#f0a500"></i>Neutral</span>' +
+      '<span><i style="background:#e63946"></i>Cold</span>' +
+      '<span class="hint">2PT · Hot ≥70 / Neutral 50–69 / Cold &lt;50 · 3PT · Hot ≥60 / Neutral 45–59 / Cold &lt;45 · ' + SHOT_ZONES.length + ' zones — click any zone to log shots</span>' +
     '</div>';
-  renderShotZoneTable();
+  renderShotZoneTable(range);
+  renderShotSummary();
 }
-function renderShotZoneTable(){
+function renderShotZoneTable(range){
   const el = document.getElementById('shot-zone-table');
   if (!el) return;
   el.innerHTML = '<table class="zone-table"><thead><tr><th>Zone</th><th>M / A</th><th>FG%</th><th>Heat</th></tr></thead><tbody>' +
     SHOT_ZONES.map(z => {
-      const s = zoneStats(z.id), col = heatColor(s.pct);
-      const heat = heatLabel(s.pct);
+      const s = zoneStats(z.id, range), col = heatColor(s.pct, z.pts);
+      const heat = heatLabel(s.pct, z.pts);
       return '<tr onclick="openZoneLogModal(\'' + z.id + '\')" style="cursor:pointer">' +
         '<td>' + esc(z.label) + ' <i class="hint">' + z.pts + 'pt</i></td>' +
         '<td>' + s.m + ' / ' + s.a + '</td>' +
@@ -10567,7 +10670,7 @@ function openZoneLogModal(zoneId){
   const drillExtra = (s.a - man.a);
   modalBody.innerHTML =
     '<div class="zone-log">' +
-      '<div class="zone-log-stats"><span class="zl-pct" style="color:' + heatColor(s.pct) + '">' + (s.pct === null ? '—' : s.pct + '%') + '</span>' +
+      '<div class="zone-log-stats"><span class="zl-pct" style="color:' + heatColor(s.pct, z.pts) + '">' + (s.pct === null ? '—' : s.pct + '%') + '</span>' +
         '<span class="zl-sub">' + s.m + ' makes / ' + s.a + ' attempts lifetime · ' + z.pts + '-point zone' + (drillExtra > 0 ? ' (incl. ' + drillExtra + ' from drill spots)' : '') + '</span></div>' +
       '<div class="zone-log-btns">' +
         '<button class="btn" onclick="applyZoneLog(\'' + zoneId + '\',\'make\')">+1 Make</button>' +
