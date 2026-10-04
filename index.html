@@ -1246,6 +1246,7 @@ input[type=range]:focus{ box-shadow:none; }
   .zone-table th{ text-align:left; font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); padding:7px; border-bottom:1px solid var(--line); }
   .zone-table td{ padding:7px; border-bottom:1px solid var(--line); }
   .zone-table tr:hover td{ background:var(--bg3); }
+  .zone-table tr.zone-total td{ border-top:2px solid var(--line); border-bottom:none; color:var(--hi); font-weight:700; }
   .zone-log-stats{ display:flex; flex-direction:column; gap:4px; margin-bottom:14px; }
   .zl-pct{ font-family:var(--mono); font-size:30px; font-weight:800; }
   .zl-sub{ font-size:11.5px; color:var(--muted); }
@@ -1337,8 +1338,13 @@ input[type=range]:focus{ box-shadow:none; }
   .shot-sum-kpi{ display:flex; flex-direction:column; gap:2px; }
   .shot-sum-kpi b{ font-family:var(--mono); font-size:22px; color:var(--bright); line-height:1; }
   .shot-sum-kpi span{ font-size:10px; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); }
-  .shot-summary-range{ display:inline-flex; align-items:center; gap:8px; }
-  .shot-range-sel, .shot-summary-range select{ width:auto; min-width:132px; }
+  .shot-window-controls{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .shot-window-dates{ display:inline-flex; align-items:center; gap:6px; }
+  .shot-window-dates input{ width:auto; }
+  .shot-heat-dist{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-top:12px; font-size:11px; color:var(--muted); }
+  .shd{ display:inline-flex; align-items:center; gap:6px; font-family:var(--mono); }
+  .shd i{ width:11px; height:11px; border-radius:3px; display:inline-block; }
+  .shd.hot i{ background:#2ecc71; } .shd.neutral i{ background:#f0a500; } .shd.cold i{ background:#e63946; } .shd.unrated i{ background:#3a4a5a; }
   .mt-grid .mtd.pre{ background:transparent; border-color:transparent; cursor:default; opacity:.16; pointer-events:none; }
   .rich-toolbar{ display:flex; gap:6px; margin-bottom:6px; }
   .rich-toolbar .chip-btn{ min-width:34px; }
@@ -1568,6 +1574,9 @@ input[type=range]:focus{ box-shadow:none; }
 .ws-saved-item .wss-main b{ display:block; color:var(--hi); font-size:13px; }
 .ws-saved-item .wss-main i{ display:block; font-style:normal; font-size:11px; color:var(--muted); margin-top:2px; }
 .ws-saved-item .wss-meta{ font-size:11px; color:var(--accent); }
+.ws-saved-range{ display:inline-flex; align-items:center; gap:6px; flex-wrap:wrap; }
+.ws-saved-dates{ display:inline-flex; align-items:center; gap:6px; }
+.ws-saved-dates input{ width:auto; }
 .ws-drill-spots{ margin:2px 0 8px 14px; padding:8px 10px; background:var(--bg2); border:1px dashed var(--line); border-radius:var(--r); display:flex; flex-direction:column; gap:6px; }
 .ws-spot-head{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
 .ws-spot-head .kicker{ flex:1 1 100%; }
@@ -1857,7 +1866,7 @@ input[type=range]:focus{ box-shadow:none; }
               <h3>🏋️ Lifting</h3>
               <span class="kicker ws-env-blurb">Heavy Lunch Lifts · Killarney Weekend Sessions · set / rep / RPE · volume</span>
               <span class="kicker" id="ws-date-label-lift"></span>
-              <label class="kicker" style="display:flex;align-items:center;gap:6px;text-transform:none;letter-spacing:.04em">Log date <input type="date" id="ws-date-override-lift" class="mini-input" onchange="setWorkoutDate(this.value)"></label>
+              <label class="kicker" style="display:flex;align-items:center;gap:6px;text-transform:none;letter-spacing:.04em">Log date <input type="date" id="ws-date-override-lift" class="mini-input" onchange="setWorkoutDate('lift',this.value)"></label>
             </div>
             <div id="workout-session-lift"></div>
           </div>
@@ -1870,7 +1879,7 @@ input[type=range]:focus{ box-shadow:none; }
               <h3>🏀 Basketball</h3>
               <span class="kicker ws-env-blurb">Morning Shooting Drills · Gaston Bag / Skills Sessions</span>
               <span class="kicker" id="ws-date-label-basketball"></span>
-              <label class="kicker" style="display:flex;align-items:center;gap:6px;text-transform:none;letter-spacing:.04em">Log date <input type="date" id="ws-date-override-basketball" class="mini-input" onchange="setWorkoutDate(this.value)"></label>
+              <label class="kicker" style="display:flex;align-items:center;gap:6px;text-transform:none;letter-spacing:.04em">Log date <input type="date" id="ws-date-override-basketball" class="mini-input" onchange="setWorkoutDate('basketball',this.value)"></label>
             </div>
             <div style="margin-bottom:12px"><button class="btn live-start" onclick="startLiveWorkout()">🔴 Start Live Workout</button></div>
             <div id="workout-session-basketball"></div>
@@ -1883,27 +1892,27 @@ input[type=range]:focus{ box-shadow:none; }
               </div>
             </div>
             <div class="shot-summary-card">
+              <div class="shot-window-controls">
+                <span class="kicker">WORKOUT WINDOW</span>
+                <button class="chip-btn" id="sw-7" onclick="setShotRange('7')">Past 7 Days</button>
+                <button class="chip-btn" id="sw-30" onclick="setShotRange('30')">Past 30 Days</button>
+                <button class="chip-btn" id="sw-custom" onclick="setShotRange('custom')">Single Day / Custom Range</button>
+                <span class="shot-window-dates" id="sw-dates">
+                  <input type="date" class="mini-input" id="sw-from" title="From" onchange="setShotCustom('from',this.value)">
+                  <input type="date" class="mini-input" id="sw-to" title="To" onchange="setShotCustom('to',this.value)">
+                </span>
+                <button class="chip-btn" id="sw-lifetime" onclick="setShotRange('lifetime')">Lifetime</button>
+              </div>
               <div class="shot-summary-kpis" id="shot-summary"></div>
-              <label class="kicker shot-summary-range">Summary range
-                <select class="mini-input" id="shotsum-range" onchange="setShotSummaryRange(this.value)">
-                  <option value="7">Last 7 Days</option>
-                  <option value="30">Last 30 Days</option>
-                </select>
-              </label>
+              <div class="shot-heat-dist" id="shot-heat-dist"></div>
             </div>
             <div class="heat-wrap">
               <div class="card">
-                <div class="card-head"><h3>Shot Heatmap</h3><span class="kicker" id="heat-kicker"></span>
-                  <select class="mini-input shot-range-sel" id="shot-range" onchange="setShotRange(this.value)" title="Heat-map time frame">
-                    <option value="7">Last 7 Days</option>
-                    <option value="30">Last 30 Days</option>
-                    <option value="lifetime">Lifetime</option>
-                  </select>
-                </div>
+                <div class="card-head"><h3>Shot Heatmap</h3><span class="kicker" id="heat-kicker"></span></div>
                 <div id="shot-heatmap"></div>
               </div>
               <div class="card">
-                <div class="card-head"><h3>Zone Breakdown</h3><span class="kicker">Heat = Hot / Neutral / Cold, banded per shot type — 2PT ≥70% hot · 3PT ≥60% hot</span></div>
+                <div class="card-head"><h3>Spot-Level Breakdown</h3><span class="kicker" id="shot-zone-window"></span></div>
                 <div id="shot-zone-table"></div>
               </div>
             </div>
@@ -1917,7 +1926,7 @@ input[type=range]:focus{ box-shadow:none; }
               <h3>💪 Strength Training</h3>
               <span class="kicker ws-env-blurb">Outdoor Field Plyos · Speed Priming · Home Isometrics · Band / Med-ball</span>
               <span class="kicker" id="ws-date-label-strength"></span>
-              <label class="kicker" style="display:flex;align-items:center;gap:6px;text-transform:none;letter-spacing:.04em">Log date <input type="date" id="ws-date-override-strength" class="mini-input" onchange="setWorkoutDate(this.value)"></label>
+              <label class="kicker" style="display:flex;align-items:center;gap:6px;text-transform:none;letter-spacing:.04em">Log date <input type="date" id="ws-date-override-strength" class="mini-input" onchange="setWorkoutDate('strength',this.value)"></label>
             </div>
             <div id="workout-session-strength"></div>
           </div>
@@ -2425,10 +2434,12 @@ input[type=range]:focus{ box-shadow:none; }
           <button class="sub-tab" data-sv="prefs" onclick="setSettingsView('prefs')">⚙️ Preferences</button>
           <button class="sub-tab" data-sv="backup" onclick="setSettingsView('backup')">💾 Data Backup</button>
           <button class="sub-tab" data-sv="archive" onclick="setSettingsView('archive')">🗄 System Archive</button>
+          <button class="sub-tab" data-sv="trash" onclick="setSettingsView('trash')">🗑 Recently Deleted</button>
         </div>
         <div class="log-sub active" id="sview-prefs"><div id="settings-prefs"></div></div>
         <div class="log-sub" id="sview-backup"><div id="settings-backup"></div></div>
         <div class="log-sub" id="sview-archive"><div id="settings-archive"></div></div>
+        <div class="log-sub" id="sview-trash"><div id="settings-trash"></div></div>
       </section>
 
 
@@ -3129,6 +3140,7 @@ function defaultState(){
     recruiting: [],     // { id, school, lead, coach, role, email, phone, lastContact, notes, filmLink, status }
     routine: { blocks: [] },   // editable daily routine time-blocks
     shotMap: {},               // zoneId -> { m, a } lifetime multi-zone shot chart
+    trash: [],                 // Recently Deleted pile — soft-deleted records, restorable from Settings
     ncaa: { paths: [], selectedNode: 'precalc11' },   // BC -> NCAA mind map
     life: {                    // LIFE MAXX skill sprints, physical combine, leveling, debriefs & network
       sprints: [], debriefs: [], contacts: [],
@@ -3165,6 +3177,12 @@ function defaultState(){
       matrixHideDone: false,  // To-Do Matrix: hide completed
       shotRange: 'lifetime',  // Shot Chart heat-map time frame: 7 | 30 | lifetime
       shotSummaryRange: '7',  // Shooting summary header time frame: 7 | 30
+      shotRangeFrom: '',      // custom window start ('' = default 7 days back)
+      shotRangeTo: '',        // custom window end ('' = today)
+      savedRange: 'day',      // Saved-sessions window: day | 7 | 30 | custom
+      savedRangeFrom: '',     // custom saved-window start ('' = default 7 days back)
+      savedRangeTo: '',       // custom saved-window end ('' = today)
+      workoutDates: { lift: '', basketball: '', strength: '' },  // per-discipline log dates ('' = follow logDate)
       habitSeed: 0            // bucket-seed marker (see seedHabitBuckets)
     }
   };
@@ -3325,6 +3343,7 @@ function mergeState(p){
     shotMap: p.shotMap && typeof p.shotMap === 'object'
       ? Object.fromEntries(Object.entries(p.shotMap).map(([k, v]) => [k, { m: num(v && v.m), a: num(v && v.a) }]))
       : {},
+    trash: Array.isArray(p.trash) ? p.trash.map(normalizeTrashEntry).filter(Boolean) : [],
     ncaa: p.ncaa && typeof p.ncaa === 'object'
       ? {
           selectedNode: p.ncaa.selectedNode || 'precalc11',
@@ -3366,7 +3385,7 @@ function mergeState(p){
           selected: p.brainstorm.selected || ''
         }
       : { maps: [], activeId: '', selected: '' },
-    settings: { ...d.settings, ...(p.settings || {}), schoolClassId: (p.settings && p.settings.schoolClassId) || '', schoolFilter: ['all', 'active', 'archived'].includes(p.settings && p.settings.schoolFilter) ? p.settings.schoolFilter : 'all', recruitFilter: ['all', ...RECRUIT_STATUSES].includes(p.settings && p.settings.recruitFilter) ? p.settings.recruitFilter : 'all', recruitDivFilter: ['all', ...RECRUIT_DIVISIONS].includes(p.settings && p.settings.recruitDivFilter) ? p.settings.recruitDivFilter : 'all', mentalView: ['journal'].includes(p.settings && p.settings.mentalView) ? p.settings.mentalView : 'journal', filmView: ['games', 'plays', 'study', 'scouting', 'playbook'].includes(p.settings && p.settings.filmView) ? p.settings.filmView : 'games', lifeView: (function(){ const v = p.settings && p.settings.lifeView; if (LIFE_VIEWS.includes(v)) return v; if (v === 'sprints' || v === 'stats') return 'combine'; if (v === 'goals') return 'goals'; return 'habits'; })(), workoutEnv: WORKOUT_ENVS.includes(p.settings && p.settings.workoutEnv) ? p.settings.workoutEnv : (WORKOUT_ENVS.includes(p.settings && p.settings.logView) ? p.settings.logView : 'lift'), logView: WORKOUT_ENVS.includes(p.settings && p.settings.logView) ? p.settings.logView : 'lift', routineView: ['schedule', 'log', 'mental'].includes(p.settings && p.settings.routineView) ? p.settings.routineView : 'schedule', routineDay: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', ''].includes(p.settings && p.settings.routineDay) ? p.settings.routineDay : '', settingsView: ['prefs', 'backup', 'archive'].includes(p.settings && p.settings.settingsView) ? p.settings.settingsView : 'prefs', goalTf: ['all', 'short', 'mid', 'long'].includes(p.settings && p.settings.goalTf) ? p.settings.goalTf : 'all', goalCat: ['all', 'athletic', 'academic', 'personal'].includes(p.settings && p.settings.goalCat) ? p.settings.goalCat : 'all', staleDays: Math.max(1, parseInt(p.settings && p.settings.staleDays, 10) || CONTACT_STALE_DAYS), matrixHideDone: !!(p.settings && p.settings.matrixHideDone), shotRange: ['7', '30', 'lifetime'].includes(p.settings && p.settings.shotRange) ? p.settings.shotRange : 'lifetime', shotSummaryRange: (p.settings && p.settings.shotSummaryRange) === '30' ? '30' : '7' }
+    settings: { ...d.settings, ...(p.settings || {}), schoolClassId: (p.settings && p.settings.schoolClassId) || '', schoolFilter: ['all', 'active', 'archived'].includes(p.settings && p.settings.schoolFilter) ? p.settings.schoolFilter : 'all', recruitFilter: ['all', ...RECRUIT_STATUSES].includes(p.settings && p.settings.recruitFilter) ? p.settings.recruitFilter : 'all', recruitDivFilter: ['all', ...RECRUIT_DIVISIONS].includes(p.settings && p.settings.recruitDivFilter) ? p.settings.recruitDivFilter : 'all', mentalView: ['journal'].includes(p.settings && p.settings.mentalView) ? p.settings.mentalView : 'journal', filmView: ['games', 'plays', 'study', 'scouting', 'playbook'].includes(p.settings && p.settings.filmView) ? p.settings.filmView : 'games', lifeView: (function(){ const v = p.settings && p.settings.lifeView; if (LIFE_VIEWS.includes(v)) return v; if (v === 'sprints' || v === 'stats') return 'combine'; if (v === 'goals') return 'goals'; return 'habits'; })(), workoutEnv: WORKOUT_ENVS.includes(p.settings && p.settings.workoutEnv) ? p.settings.workoutEnv : (WORKOUT_ENVS.includes(p.settings && p.settings.logView) ? p.settings.logView : 'lift'), logView: WORKOUT_ENVS.includes(p.settings && p.settings.logView) ? p.settings.logView : 'lift', routineView: ['schedule', 'log', 'mental'].includes(p.settings && p.settings.routineView) ? p.settings.routineView : 'schedule', routineDay: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', ''].includes(p.settings && p.settings.routineDay) ? p.settings.routineDay : '', settingsView: ['prefs', 'backup', 'archive'].includes(p.settings && p.settings.settingsView) ? p.settings.settingsView : 'prefs', goalTf: ['all', 'short', 'mid', 'long'].includes(p.settings && p.settings.goalTf) ? p.settings.goalTf : 'all', goalCat: ['all', 'athletic', 'academic', 'personal'].includes(p.settings && p.settings.goalCat) ? p.settings.goalCat : 'all', staleDays: Math.max(1, parseInt(p.settings && p.settings.staleDays, 10) || CONTACT_STALE_DAYS), matrixHideDone: !!(p.settings && p.settings.matrixHideDone), shotRange: ['7', '30', 'custom', 'lifetime'].includes(p.settings && p.settings.shotRange) ? p.settings.shotRange : 'lifetime', shotSummaryRange: (p.settings && p.settings.shotSummaryRange) === '30' ? '30' : '7', shotRangeFrom: /^\d{4}-\d{2}-\d{2}$/.test((p.settings && p.settings.shotRangeFrom) || '') ? p.settings.shotRangeFrom : '', shotRangeTo: /^\d{4}-\d{2}-\d{2}$/.test((p.settings && p.settings.shotRangeTo) || '') ? p.settings.shotRangeTo : '', savedRange: ['day', '7', '30', 'custom'].includes(p.settings && p.settings.savedRange) ? p.settings.savedRange : 'day', savedRangeFrom: /^\d{4}-\d{2}-\d{2}$/.test((p.settings && p.settings.savedRangeFrom) || '') ? p.settings.savedRangeFrom : '', savedRangeTo: /^\d{4}-\d{2}-\d{2}$/.test((p.settings && p.settings.savedRangeTo) || '') ? p.settings.savedRangeTo : '', workoutDates: normalizeWorkoutDates(p.settings && p.settings.workoutDates) }
   };
   merged.settings.timeWindow = timeWindowFrom(p.settings && p.settings.timeWindow);
   // Baseline data is merged in exactly once, then respected as user-owned.
@@ -3530,7 +3549,7 @@ function renderAll(){
   renderDashboard();
   renderRoutine();
   renderLogFields();
-  renderWorkoutSession(state.settings.logDate);
+  renderWorkoutSession();
   renderLogHistory();
   renderGoals();
   renderRecords();
@@ -3636,6 +3655,13 @@ function deleteSessionFor(key, env, id){
   if (!Object.keys(state.workouts[key]).length) delete state.workouts[key];
 }
 function sessionsFor(key){ const out = []; WORKOUT_ENVS.forEach(e => envSessions(key, e).forEach(s => out.push(s))); return out; }
+/* The day a given session id currently lives on ('' if it isn't stored yet).
+   Lets the editor move a record without trusting a possibly-stale date field. */
+function sessionDateKey(env, id){
+  let found = '';
+  Object.keys(state.workouts || {}).forEach(k => { if (!found && (envSessions(k, env) || []).some(x => x.id === id)) found = k; });
+  return found;
+}
 function allSessions(){ const out = []; Object.entries(state.workouts || {}).forEach(([k, d]) => { if (!d) return; if (d.type){ out.push({ key: k, env: d.type, session: d }); return; } WORKOUT_ENVS.forEach(e => { const v = d[e]; if (!v) return; (Array.isArray(v) ? v : [v]).forEach(s => out.push({ key: k, env: e, session: s })); }); }); return out; }
 function normalizeWorkoutDay(v){
   if (!v || typeof v !== 'object') return {};
@@ -3661,6 +3687,77 @@ function normalizeWorkoutDay(v){
   return day;
 }
 function activeEnv(){ const v = state.settings && state.settings.workoutEnv; return WORKOUT_ENVS.includes(v) ? v : 'lift'; }
+/* V1.1 — Each discipline keeps its own log date so moving one never drags the
+   others. An empty entry falls back to the shared Daily Log date so existing
+   saves behave exactly as before (no migration, no data change). */
+function normalizeWorkoutDates(v){
+  const out = { lift: '', basketball: '', strength: '' };
+  if (v && typeof v === 'object') WORKOUT_ENVS.forEach(e => { if (typeof v[e] === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v[e])) out[e] = v[e]; });
+  return out;
+}
+function workoutDateFor(env){
+  const m = (state.settings && state.settings.workoutDates) || {};
+  const k = m[env];
+  if (typeof k === 'string' && k) return k;
+  return (state.settings && state.settings.logDate) || todayKey();
+}
+function activeWorkoutDate(){ return workoutDateFor(activeEnv()); }
+/* V1.1 — Saved-sessions date window: view & edit a discipline's sessions across
+   a day, the past 7 / 30 days, or a custom range. '' / 'day' keeps the original
+   single-day behaviour. */
+function savedRangeKey(v){ const r = String(v || 'day'); return (r === '7' || r === '30' || r === 'custom') ? r : 'day'; }
+function savedCustomFrom(){
+  const v = state.settings && state.settings.savedRangeFrom;
+  if (typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v)) return v;
+  const d = new Date(); d.setDate(d.getDate() - 6);
+  return dateKey(d);
+}
+function savedCustomTo(){
+  const v = state.settings && state.settings.savedRangeTo;
+  return (typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v)) ? v : todayKey();
+}
+function savedWindowStart(env){
+  const r = savedRangeKey(state.settings && state.settings.savedRange);
+  if (r === 'day') return workoutDateFor(env);
+  if (r === 'custom') return savedCustomFrom();
+  const days = r === '7' ? 7 : 30;
+  const d = new Date(); d.setDate(d.getDate() - (days - 1));
+  return dateKey(d);
+}
+function savedWindowEnd(env){
+  const r = savedRangeKey(state.settings && state.settings.savedRange);
+  if (r === 'day') return workoutDateFor(env);
+  return r === 'custom' ? savedCustomTo() : todayKey();
+}
+function savedKeyInWindow(k, env){
+  const r = savedRangeKey(state.settings && state.settings.savedRange);
+  if (r === 'day') return k === workoutDateFor(env);
+  return !!k && k >= savedWindowStart(env) && k <= savedWindowEnd(env);
+}
+function savedRangeLabel(env){
+  const r = savedRangeKey(state.settings && state.settings.savedRange);
+  if (r === 'day') return fmtDate(workoutDateFor(env));
+  if (r === '7') return 'Past 7 Days';
+  if (r === '30') return 'Past 30 Days';
+  return 'Custom · ' + fmtDate(savedCustomFrom()) + ' – ' + fmtDate(savedCustomTo());
+}
+function savedSessionsInWindow(env){
+  const out = [];
+  Object.keys(state.workouts || {}).forEach(k => { envSessions(k, env).forEach(s => { if (savedKeyInWindow(k, env)) out.push({ key: k, session: s }); }); });
+  out.sort((a, b) => String(b.key).localeCompare(String(a.key)) || String(a.session.id).localeCompare(String(b.session.id)));
+  return out;
+}
+function setSavedRange(v){ state.settings.savedRange = savedRangeKey(v); save(); renderWorkoutSession(); }
+function setSavedCustom(which, value){
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value || '')) return;
+  state.settings.savedRange = 'custom';
+  if (which === 'from') state.settings.savedRangeFrom = value; else state.settings.savedRangeTo = value;
+  if (savedCustomFrom() > savedCustomTo()){
+    if (which === 'from') state.settings.savedRangeTo = savedCustomFrom();
+    else state.settings.savedRangeFrom = savedCustomTo();
+  }
+  save(); renderWorkoutSession();
+}
 function daySummaryLine(key){ return sessionsFor(key).map(s => workoutSummaryLine(s)).filter(Boolean).join(' · '); }
 function blankDrill(setType){
   switch (setType){
@@ -3873,10 +3970,10 @@ function renderWsSets(s){
 }
 function wsEnvEmptyHtml(env){
   const meta = WORKOUT_ENV_META[env] || WORKOUT_ENV_META.lift;
-  const others = sessionsFor(state.settings.logDate).length;
+  const others = sessionsFor(workoutDateFor(env)).length;
   return '<div class="ws-empty">' +
     '<p class="ws-env-blurb">' + esc(meta.blurb) + '</p>' +
-    '<p class="paste-hint" style="margin:12px 0">No ' + esc(meta.label.toLowerCase()) + ' session logged for this date' + (others ? ' — the other disciplines keep their own trackers in their own subsections.' : '. Each discipline tracks independently, so a day can hold all three.') + '</p>' +
+    '<p class="paste-hint" style="margin:12px 0">No ' + esc(meta.label.toLowerCase()) + ' session logged in this window' + (others ? ' — the other disciplines keep their own trackers in their own subsections.' : '. Each discipline tracks independently, so a day can hold all three.') + '</p>' +
     '<div class="ws-actions">' +
       '<button class="btn" style="background:' + meta.color + ';border-color:' + meta.color + ';color:#0b0c10" onclick="openPresetChooser(\'' + env + '\')">' + meta.icon + ' Load ' + esc(meta.label) + ' Preset</button>' +
       '<button class="btn ghost" onclick="openPresetManager(\'' + env + '\')">⚙ Manage Presets</button>' +
@@ -3899,9 +3996,11 @@ function sessionHasData(s){
   if (s.type === 'lift') return (s.exercises || []).some(r => String(r.name || '').trim() || num(r.sets) || num(r.reps) || num(r.weight));
   return (s.items || []).some(r => String(r.name || '').trim() || num(r.sets));
 }
-function wsSavedListHtml(env, key, list){
+function wsSavedListHtml(env, key, entries){
   const meta = WORKOUT_ENV_META[env] || WORKOUT_ENV_META.lift;
-  const rows = (list || []).map(s => {
+  const r = savedRangeKey(state.settings && state.settings.savedRange);
+  const act = v => (r === v ? ' active' : '');
+  const rows = (entries || []).map(({ key: k, session: s }) => {
     const m = sessionMetrics(s);
     const details = s.type === 'basketball'
       ? m.makes + '/' + m.shots + ' shots · ' + m.pct + '%'
@@ -3909,14 +4008,24 @@ function wsSavedListHtml(env, key, list){
       : m.items + ' exercises';
     return '<div class="ws-saved-item">' +
       '<div class="wss-main"><b>' + esc(s.presetName || 'Session') + '</b>' +
-        '<i>' + esc(workoutSummaryLine(s)) + '</i>' +
+        '<i>' + esc(fmtDate(k)) + ' · ' + esc(workoutSummaryLine(s)) + '</i>' +
         '<span class="wss-meta">' + esc(details) + (s.time ? ' · ' + esc(s.time) + ' min' : '') + '</span></div>' +
       '<button class="btn sm" onclick="editSavedSession(\'' + env + '\',\'' + s.id + '\')">✎ Edit</button>' +
       '<button class="icon-btn danger" onclick="deleteSavedSession(\'' + env + '\',\'' + s.id + '\')" title="Delete session">✕</button>' +
     '</div>';
   }).join('');
   return '<div class="ws-saved">' +
-    '<div class="ws-saved-head"><span class="kicker">SAVED ' + esc(meta.label.toUpperCase()) + ' SESSIONS · ' + fmtDate(key) + '</span>' +
+    '<div class="ws-saved-head"><span class="kicker">SAVED ' + esc(meta.label.toUpperCase()) + ' SESSIONS · ' + esc(savedRangeLabel(env)) + '</span>' +
+      '<span class="ws-saved-range">' +
+        '<button class="chip-btn' + act('day') + '" id="swr-day" onclick="setSavedRange(\'day\')">Single Day</button>' +
+        '<button class="chip-btn' + act('7') + '" id="swr-7" onclick="setSavedRange(\'7\')">Past 7 Days</button>' +
+        '<button class="chip-btn' + act('30') + '" id="swr-30" onclick="setSavedRange(\'30\')">Past 30 Days</button>' +
+        '<button class="chip-btn' + act('custom') + '" id="swr-custom" onclick="setSavedRange(\'custom\')">Custom</button>' +
+        '<span class="ws-saved-dates" id="saved-dates" style="display:' + (r === 'custom' ? 'inline-flex' : 'none') + '">' +
+          '<input type="date" class="mini-input" id="saved-from" title="From" value="' + savedCustomFrom() + '" onchange="setSavedCustom(\'from\',this.value)">' +
+          '<input type="date" class="mini-input" id="saved-to" title="To" value="' + savedCustomTo() + '" onchange="setSavedCustom(\'to\',this.value)">' +
+        '</span>' +
+      '</span>' +
       '<button class="btn sm" style="background:' + meta.color + ';border-color:' + meta.color + ';color:#0b0c10" onclick="openPresetChooser(\'' + env + '\')">+ New ' + esc(meta.label) + ' Session</button>' +
       (env === 'basketball' ? '<button class="btn sm" onclick="startLiveWorkout()">🔴 Live</button>' : '') +
     '</div>' +
@@ -3959,61 +4068,121 @@ function wsEditorHtml(s, env, key){
 }
 function renderWorkoutSession(key){
   const env = activeEnv();
+  const activeKey = key || workoutDateFor(env);
+  /* Each discipline shows its OWN date — changing one never relabels another. */
   WORKOUT_ENVS.forEach(e => {
+    const k = (e === env) ? activeKey : workoutDateFor(e);
     const lbl = document.getElementById('ws-date-label-' + e);
-    if (lbl) lbl.textContent = fmtDate(key);
+    if (lbl) lbl.textContent = fmtDate(k);
     const ov = document.getElementById('ws-date-override-' + e);
-    if (ov) ov.value = key;
+    if (ov) ov.value = k;
   });
   /* Only the active discipline renders, so metric element ids never collide. */
   WORKOUT_ENVS.forEach(e => { if (e !== env){ const other = document.getElementById('workout-session-' + e); if (other) other.innerHTML = ''; } });
   const el = document.getElementById('workout-session-' + env);
   if (!el) return;
-  if (wsDraft && wsDraftEnv === env){ el.innerHTML = wsEditorHtml(wsDraft, env, key); return; }
-  el.innerHTML = wsSavedListHtml(env, key, envSessions(key, env));
+  if (wsDraft && wsDraftEnv === env){ el.innerHTML = wsEditorHtml(wsDraft, env, activeKey); return; }
+  const sr = savedRangeKey(state.settings && state.settings.savedRange);
+  const entries = (sr === 'day')
+    ? envSessions(activeKey, env).map(s => ({ key: activeKey, session: s }))
+    : savedSessionsInWindow(env);
+  el.innerHTML = wsSavedListHtml(env, activeKey, entries);
 }
 /* ---------- Draft lifecycle ---------- */
 function saveWorkoutDraft(){
-  const env = activeEnv(), key = state.settings.logDate;
-  const s = activeDraft();
-  if (!s){ toast('No active session to save', 'error'); return; }
-  if (!sessionHasData(s)){ toast('Add some data before saving', 'error'); return; }
+  const env = activeEnv(), key = activeWorkoutDate();
+  const draft = activeDraft();
+  if (!draft){ toast('No active session to save', 'error'); return; }
+  if (!sessionHasData(draft)){ toast('Add some data before saving', 'error'); return; }
   snapshot();
-  s.logDate = key;
+  /* Commit an IMMUTABLE copy — the live draft object is never the stored
+     record, so later form edits can't mutate a saved historical log. */
+  const s = JSON.parse(JSON.stringify(draft));
   if (!s.type) s.type = env;
+  /* In-place edit ONLY when editing a saved session AND the target date is
+     still that session's own date. Every other case — a brand-new entry, or an
+     edit whose datepicker was moved — becomes a NEW record with a fresh unique
+     id bound strictly to the target date. It never rebinds or overwrites the
+     record from another date. */
+  const wasEdit = !!wsDraftEditId;
+  /* Where the record being edited currently lives — independent of any stored
+     date field, so legacy / live-created sessions move correctly too. */
+  const sourceKey = wasEdit ? sessionDateKey(env, wsDraftEditId) : '';
+  const inPlaceEdit = wasEdit && sourceKey === key;
+  const isMove = wasEdit && !!sourceKey && sourceKey !== key;
+  const label = (WORKOUT_ENV_META[env] || {}).label || 'Workout';
+  if (isMove){
+    /* MOVE — re-assign the ORIGINAL entry to the new date and clear it from
+       every other day. The id is preserved (same record, re-bound), so no
+       duplicate is ever created. */
+    s.presetId = s.presetId || null;
+    s.loggedAt = s.loggedAt || new Date().toISOString();
+    const stale = [];
+    Object.keys(state.workouts || {}).forEach(k => {
+      if (k === key) return;
+      if ((envSessions(k, env) || []).some(x => x.id === s.id)){ deleteSessionFor(k, env, s.id); stale.push(k); }
+    });
+    stale.forEach(k => syncSessionToLog(k));
+  } else if (inPlaceEdit){
+    s.presetId = s.presetId || null;
+  } else {
+    /* Brand-new entry: keep the unique id minted at initiation; mint a fresh one
+       only if it already exists on the target date. */
+    const taken = envSessions(key, env).map(x => x.id);
+    if (!s.id || taken.indexOf(s.id) !== -1) s.id = uid();
+    while (taken.indexOf(s.id) !== -1) s.id = uid();   // guarantee uniqueness on this date + discipline
+    s.presetId = s.presetId || null;
+    s.loggedAt = new Date().toISOString();
+  }
+  s.logDate = key;
+  s.date = key;
+  if (!s.loggedAt) s.loggedAt = new Date().toISOString();
   setSessionFor(key, env, s);
   wsDraft = null; wsDraftEnv = null; wsDraftEditId = null;
+  /* Re-sync BOTH the destination and the original date: daily-log labels, shot
+     chart, spot totals and records all refresh dynamically. */
   syncSessionToLog(key);
   save();
   renderWorkoutSession(key);
   renderLogFields(); renderLogHistory(); renderDashboard(); renderShots(); renderRecords();
-  toast('✓ ' + (WORKOUT_ENV_META[env] || {}).label + ' session saved to ' + fmtDate(key));
+  if (isMove) toast('✓ ' + label + ' moved to ' + fmtDate(key) + ' — cleared from ' + fmtDate(sourceKey));
+  else toast('✓ ' + label + ' session saved to ' + fmtDate(key));
 }
 function cancelWorkoutDraft(){
   if (!wsDraft){ return; }
   wsDraft = null; wsDraftEnv = null; wsDraftEditId = null;
-  renderWorkoutSession(state.settings.logDate);
+  renderWorkoutSession();
   toast('Draft discarded');
 }
 function editSavedSession(env, id){
-  const s = envSessions(state.settings.logDate, env).find(x => x.id === id);
+  /* Find the session on whichever day it lives so it can be edited from ANY
+     window (day / 7 / 30 / custom), then bind the editor to that day. */
+  const src = sessionDateKey(env, id);
+  const s = src ? envSessions(src, env).find(x => x.id === id) : null;
   if (!s) return;
+  state.settings.workoutDates = state.settings.workoutDates || { lift: '', basketball: '', strength: '' };
+  state.settings.workoutDates[env] = src;
   wsDraft = JSON.parse(JSON.stringify(s));
   wsDraftEnv = env;
   wsDraftEditId = id;
+  wsDraft.logDate = src;
+  wsDraft.date = src;
   state.settings.workoutEnv = env;
   state.settings.logView = env;
   save(); applyLogView();
-  renderWorkoutSession(state.settings.logDate);
-  toast('Editing saved session — Save to apply changes');
+  renderWorkoutSession();
+  toast('Editing session from ' + fmtDate(src) + ' — Save to apply changes');
 }
 function deleteSavedSession(env, id){
   snapshot();
-  deleteSessionFor(state.settings.logDate, env, id);
+  const k = sessionDateKey(env, id) || activeWorkoutDate();
+  const s = (envSessions(k, env) || []).find(x => x.id === id);
+  if (s) trashItem('workout', s.presetName || 'Session', ((WORKOUT_ENV_META[env] || {}).label || 'Workout') + ' · ' + fmtDate(k), { env, key: k, session: JSON.parse(JSON.stringify(s)) });
+  deleteSessionFor(k, env, id);
   if (wsDraftEditId === id){ wsDraft = null; wsDraftEnv = null; wsDraftEditId = null; }
-  syncSessionToLog(state.settings.logDate);
+  syncSessionToLog(k);
   save();
-  renderWorkoutSession(state.settings.logDate);
+  renderWorkoutSession();
   renderLogFields(); renderLogHistory(); renderDashboard(); renderShots(); renderRecords();
   toast('Session deleted');
 }
@@ -4107,14 +4276,14 @@ function onWsInput(e){
   /* Draft edits persist locally but attach to the Daily Log only on Save. */
   save();
   renderSessionMetrics(s);
-  if (full) renderWorkoutSession(state.settings.logDate);
+  if (full) renderWorkoutSession();
 }
 /* ---------- Basketball draft structure helpers ---------- */
 function addWsSet(){
   const s = activeDraft(); if (!s) return;
   snapshot();
   s.sets = basketSets(s); s.sets.push(blankSet('Shooting'));
-  save(); renderWorkoutSession(state.settings.logDate);
+  save(); renderWorkoutSession();
 }
 function addWsDrill(si){
   const s = activeDraft(); if (!s) return;
@@ -4122,7 +4291,7 @@ function addWsDrill(si){
   snapshot();
   set.drills = set.drills || [];
   set.drills.push(blankDrill(set.setType));
-  save(); renderWorkoutSession(state.settings.logDate);
+  save(); renderWorkoutSession();
 }
 function moveWsSet(si, delta){
   const s = activeDraft(); if (!s) return;
@@ -4130,40 +4299,41 @@ function moveWsSet(si, delta){
   if (target < 0 || target >= sets.length) return;
   snapshot();
   const tmp = sets[si]; sets[si] = sets[target]; sets[target] = tmp;
-  save(); renderWorkoutSession(state.settings.logDate);
+  save(); renderWorkoutSession();
 }
-function setWorkoutDate(value){
+/* V1.1 — The date control selects WHICH DAY the discipline is working on. It
+   NEVER relocates saved sessions, so picking “Today” to log a new entry can
+   never mutate or re-bind a record from another date. Each save commits an
+   immutable per-date log; editing a saved session commits in place when its
+   own date is unchanged, and otherwise adds a fresh record (leaving the
+   original untouched). */
+function setWorkoutDate(env, value){
+  if (WORKOUT_ENVS.indexOf(env) === -1){ value = env; env = activeEnv(); }
   const next = value || todayKey();
-  if (next === state.settings.logDate) return;
-  const current = state.settings.logDate;
-  const d = state.workouts[current];
-  if (d){
-    snapshot();
-    delete state.workouts[current];
-    state.workouts[next] = d;
-    sessionsFor(next).forEach(x => { x.logDate = next; });
-    if (state.logs[current]) delete state.logs[current].workoutLabel;
-    syncSessionToLog(next);
-    state.settings.logDate = next;
-    save();
-    renderWorkoutSession(next); renderLogFields(); renderLogHistory(); renderDashboard();
-    toast('✓ Workout moved to ' + fmtDate(next));
-  } else {
-    state.settings.logDate = next; save(); renderWorkoutSession(next); renderLogFields();
-  }
+  const current = workoutDateFor(env);
+  state.settings.workoutDates = state.settings.workoutDates || { lift: '', basketball: '', strength: '' };
+  if (next === current && state.settings.workoutDates[env] === next) return;
+  snapshot();
+  state.settings.workoutDates[env] = next;
+  /* A fresh (un-committed) draft follows the chosen date; an edit keeps its own
+     date until Save (which then commits a NEW record and keeps the original). */
+  if (wsDraft && wsDraftEnv === env && !wsDraftEditId){ wsDraft.logDate = next; wsDraft.date = next; }
+  save();
+  renderWorkoutSession(next); renderLogFields(); renderLogHistory(); renderDashboard();
+  toast('✓ ' + ((WORKOUT_ENV_META[env] || {}).label || 'Workout') + ' date → ' + fmtDate(next));
 }
 function removeWsSet(si){
   const s = activeDraft(); if (!s) return;
   snapshot();
   basketSets(s).splice(si, 1);
-  save(); renderWorkoutSession(state.settings.logDate);
+  save(); renderWorkoutSession();
 }
 function removeWsDrill(si, di){
   const s = activeDraft(); if (!s) return;
   const set = basketSets(s)[si]; if (!set) return;
   snapshot();
   (set.drills || []).splice(di, 1);
-  save(); renderWorkoutSession(state.settings.logDate);
+  save(); renderWorkoutSession();
 }
 /* ---------- Spot-level shot rows ---------- */
 function addDrillSpot(si, di){
@@ -4174,7 +4344,7 @@ function addDrillSpot(si, di){
   row.spots = row.spots || [];
   row.spots.push({ spot: BB_SPOT_LIST[0], makes: '', attempts: '' });
   syncDrillSpots(row);
-  save(); renderWorkoutSession(state.settings.logDate);
+  save(); renderWorkoutSession();
   toast('Spot row added — data syncs to the Shot Chart on Save');
 }
 function removeDrillSpot(si, di, pi){
@@ -4185,7 +4355,7 @@ function removeDrillSpot(si, di, pi){
   row.spots.splice(pi, 1);
   if (!row.spots.length){ delete row.spots; row.attempts = ''; row.makes = ''; }
   else syncDrillSpots(row);
-  save(); renderWorkoutSession(state.settings.logDate);
+  save(); renderWorkoutSession();
 }
 function clearDrillSpots(si, di){
   const s = activeDraft(); if (!s) return;
@@ -4193,20 +4363,20 @@ function clearDrillSpots(si, di){
   const row = (set.drills || [])[di]; if (!row) return;
   snapshot();
   delete row.spots; row.attempts = ''; row.makes = '';
-  save(); renderWorkoutSession(state.settings.logDate);
+  save(); renderWorkoutSession();
 }
 /* ---------- Non-basketball draft rows ---------- */
 function addWsRow(){
   const s = activeDraft(); if (!s || s.type === 'basketball') return;
   snapshot();
   sessionRows(s).push(blankRow(s.type));
-  save(); renderWorkoutSession(state.settings.logDate);
+  save(); renderWorkoutSession();
 }
 function removeWsRow(i){
   const s = activeDraft(); if (!s || s.type === 'basketball') return;
   snapshot();
   sessionRows(s).splice(i, 1);
-  save(); renderWorkoutSession(state.settings.logDate);
+  save(); renderWorkoutSession();
 }
 function clearWorkoutSession(){ cancelWorkoutDraft(); }
 function changeWsPreset(){
@@ -4214,7 +4384,7 @@ function changeWsPreset(){
   openPresetChooser(s ? s.type : activeEnv());
 }
 function createPresetFromWorkout(){
-  const key = state.settings.logDate;
+  const key = activeWorkoutDate();
   const session = activeDraft();
   if (!session){ toast('Start a workout session before creating a preset', 'error'); return; }
   const name = window.prompt('Preset name', session.presetName || 'New Workout Preset');
@@ -4251,7 +4421,7 @@ function createPresetFromWorkout(){
 
 /* ---------- Preset chooser ---------- */
 function openPresetChooser(type){
-  const key = state.settings.logDate;
+  const key = workoutDateFor(type);
   const list = state.presets[type] || [];
   const t = TYPE_META[type] || TYPE_META.basketball;
   document.getElementById('modal-title').textContent = 'Load ' + t.label + ' Preset — ' + fmtDate(key);
@@ -4277,12 +4447,15 @@ function loadPresetSession(type, id){
   wsDraft = p ? sessionFromPreset(p) : blankSession(type);
   wsDraftEnv = type;
   wsDraftEditId = null;
+  /* Bind the fresh draft explicitly to the discipline's chosen date. */
+  wsDraft.logDate = workoutDateFor(type);
+  wsDraft.date = workoutDateFor(type);
   state.settings.workoutEnv = type;
   state.settings.logView = type;
   save();
   closeModal();
   applyLogView();
-  renderWorkoutSession(state.settings.logDate);
+  renderWorkoutSession();
   toast('Draft ready — edit it, then click 💾 Save Session');
 }
 function loadBlankSession(type){
@@ -4574,6 +4747,8 @@ function editPreset(id){
 }
 function deletePreset(id){
   snapshot();
+  const p = (state.presets[pmType] || []).find(x => x.id === id);
+  if (p) trashItem('preset', p.name || 'Preset', (TYPE_META[pmType] ? TYPE_META[pmType].label : 'Workout') + ' preset', { type: pmType, preset: JSON.parse(JSON.stringify(p)) });
   state.presets[pmType] = (state.presets[pmType] || []).filter(x => x.id !== id);
   if (pmDraft && pmDraft.id === id) pmDraft = null;
   save();
@@ -4893,6 +5068,8 @@ function deleteTodo(id){
   snapshot();
   const loc = todoLocation(id);
   if (!loc) return;
+  const item = (state.todos[loc.bucket] || [])[loc.index];
+  if (item) trashItem('todo', item.text || 'To-Do', (item.category || '') + (item.scheduledDate ? ' · ' + fmtDate(item.scheduledDate) : ''), { bucket: loc.bucket, item: JSON.parse(JSON.stringify(item)) });
   state.todos[loc.bucket].splice(loc.index, 1);
   save();
   renderTodos();
@@ -4916,7 +5093,7 @@ function setLogDate(which){
   state.settings.logDate = dateKey(d);
   save();
   renderLogFields();
-  renderWorkoutSession(state.settings.logDate);
+  renderWorkoutSession();
   renderLogHistory();
 }
 
@@ -5226,7 +5403,7 @@ function setLogView(v){
   save();
   applyLogView();
   if (v === 'records') renderRecords();
-  if (WORKOUT_ENVS.includes(v)){ renderWorkoutSession(state.settings.logDate); if (v === 'basketball') renderShots(); }
+  if (WORKOUT_ENVS.includes(v)){ renderWorkoutSession(); if (v === 'basketball') renderShots(); }
 }
 function applyLogView(){
   const v = state.settings.logView || 'lift';
@@ -5949,6 +6126,7 @@ function addHabit(){
 function removeHabit(id){
   snapshot();
   const h = state.habits.find(x => x.id === id);
+  if (h) trashItem('habit', h.label, (h.type || 'good') === 'bad' ? 'Bad habit' : 'Good habit', { habit: JSON.parse(JSON.stringify(h)) });
   state.habits = state.habits.filter(x => x.id !== id);
   save();
   renderHabitsPanel();
@@ -6877,6 +7055,7 @@ function cancelEditSchool(){
 function deleteSchool(id){
   snapshot();
   const a = state.school.find(x => x.id === id);
+  if (a) trashItem('assignment', a.assignment || a.course || 'Assignment', (a.course || '') + (a.status ? ' · ' + a.status : ''), { assignment: JSON.parse(JSON.stringify(a)) });
   state.school = state.school.filter(x => x.id !== id);
   if (state.settings.editSchool === id) state.settings.editSchool = null;
   save();
@@ -9351,6 +9530,7 @@ function deleteCoach(id){
   const c = state.recruiting.find(x => x.id === cid);
   if (!c) return;
   snapshot();
+  trashItem('coach', c.school || c.coach || 'Recruit', (c.coach || '') + (c.status ? ' · ' + c.status : ''), { coach: JSON.parse(JSON.stringify(c)) });
   state.recruiting = state.recruiting.filter(x => x.id !== cid);
   coachModalId = null;
   save();
@@ -9369,7 +9549,7 @@ function bindEvents(){
     state.settings.logDate = e.target.value || todayKey();
     save();
     renderLogFields();
-    renderWorkoutSession(state.settings.logDate);
+    renderWorkoutSession();
     renderLogHistory();
   });
   document.getElementById('log-search').addEventListener('input', renderLogHistory);
@@ -9593,7 +9773,7 @@ function liveState(){
   if (!state.live || typeof state.live !== 'object') state.live = {};
   const l = state.live;
   l.active = !!l.active;
-  if (!l.dateKey) l.dateKey = state.settings.logDate || todayKey();
+  if (!l.dateKey) l.dateKey = activeWorkoutDate() || todayKey();
   if (typeof l.location !== 'string') l.location = 'DT';
   if (typeof l.note !== 'string') l.note = '';
   if (typeof l.drill !== 'string') l.drill = '';
@@ -9682,7 +9862,7 @@ function startLiveWorkout(){
   l.drillStartAt = Date.now();
   l.restEndsAt = 0;
   l.mentalDismissed = false;
-  l.dateKey = state.settings.logDate || todayKey();
+  l.dateKey = activeWorkoutDate() || todayKey();
   liveInitAudio();
   save();
   openLiveOverlay();
@@ -9834,7 +10014,7 @@ function finishLiveWorkout(){
   const chunks = l.chunks.filter(c => num(c.attempts) > 0 || num(c.reps) > 0);
   if (!chunks.length){ toast('Log at least one make, miss or rep first', 'error'); return; }
   snapshot();
-  const key = l.dateKey || state.settings.logDate || todayKey();
+  const key = l.dateKey || activeWorkoutDate() || todayKey();
   /* Time is optional: with the stopwatch off nothing is added to the session duration. */
   const mins = l.timerOn ? Math.max(1, Math.round(liveSessionMs() / 60000)) : 0;
   const groups = {};
@@ -10555,29 +10735,61 @@ const HEAT_GEOM = {
    ============================================================ */
 function shotRangeKey(range){
   const r = String(range || 'lifetime');
-  return (r === '7' || r === '30' || r === 'lifetime') ? r : 'lifetime';
+  return (r === '7' || r === '30' || r === 'custom' || r === 'lifetime') ? r : 'lifetime';
+}
+function shotCustomFrom(){
+  const v = state.settings && state.settings.shotRangeFrom;
+  if (typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v)) return v;
+  const d = new Date(); d.setDate(d.getDate() - 6);
+  return dateKey(d);
+}
+function shotCustomTo(){
+  const v = state.settings && state.settings.shotRangeTo;
+  return (typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v)) ? v : todayKey();
 }
 function shotRangeStart(range){
   const r = shotRangeKey(range);
   if (r === 'lifetime') return '';
+  if (r === 'custom') return shotCustomFrom();
   const days = r === '7' ? 7 : 30;
   const d = new Date(); d.setDate(d.getDate() - (days - 1));
   return dateKey(d);
 }
+function shotRangeEnd(range){
+  const r = shotRangeKey(range);
+  if (r === 'lifetime') return '';
+  return r === 'custom' ? shotCustomTo() : todayKey();
+}
 function sessionInShotRange(key, range){
   const r = shotRangeKey(range);
   if (r === 'lifetime') return true;
-  return !!key && key >= shotRangeStart(r) && key <= todayKey();
+  const s = shotRangeStart(r), e = shotRangeEnd(r);
+  return !!key && (!s || key >= s) && (!e || key <= e);
 }
-function shotRangeLabel(range){ const r = shotRangeKey(range); return r === '7' ? 'Last 7 Days' : (r === '30' ? 'Last 30 Days' : 'Lifetime'); }
-function shotSummaryRange(){ const v = state.settings && state.settings.shotSummaryRange; return v === '30' ? '30' : '7'; }
+function shotRangeLabel(range){
+  const r = shotRangeKey(range);
+  if (r === '7') return 'Past 7 Days';
+  if (r === '30') return 'Past 30 Days';
+  if (r === 'custom') return 'Custom · ' + fmtDate(shotCustomFrom()) + ' – ' + fmtDate(shotCustomTo());
+  return 'Lifetime';
+}
 function setShotRange(v){ state.settings.shotRange = shotRangeKey(v); save(); renderShots(); }
-function setShotSummaryRange(v){ state.settings.shotSummaryRange = (v === '30' ? '30' : '7'); save(); renderShotSummary(); }
-/* Total makes = every tracked make on shooting / finishing / free-throw drills
-   plus the standalone Total Makes column (raw form-shooting volume). */
+function setShotCustom(which, value){
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value || '')) return;
+  state.settings.shotRange = 'custom';
+  if (which === 'from') state.settings.shotRangeFrom = value; else state.settings.shotRangeTo = value;
+  /* Keep the pair ordered; a single day is simply from === to. */
+  if (shotCustomFrom() > shotCustomTo()){
+    if (which === 'from') state.settings.shotRangeTo = shotCustomFrom();
+    else state.settings.shotRangeFrom = shotCustomTo();
+  }
+  save(); renderShots();
+}
+/* Aggregated window analytics: total volume (M / A), overall FG%, workouts
+   logged, and Total Makes (tracked + the standalone raw Total Makes column). */
 function shotSummaryData(range){
   const r = shotRangeKey(range);
-  let makes = 0, workouts = 0;
+  let makes = 0, attempts = 0, totalMakes = 0, workouts = 0;
   allSessions().forEach(({ key, session }) => {
     if (!session || session.type !== 'basketball') return;
     if (!sessionInShotRange(key, r)) return;
@@ -10586,21 +10798,56 @@ function shotSummaryData(range){
       const st = dr.setType || 'Shooting';
       if (st !== 'Shooting' && st !== 'Finishing' && st !== 'Free Throws') return;
       makes += num(dr.makes);
-      makes += num(dr.totalMakes);
+      attempts += num(dr.attempts);
+      totalMakes += num(dr.makes) + num(dr.totalMakes);
     });
   });
-  return { makes, workouts };
+  return { makes, attempts, totalMakes, workouts, pct: attempts ? Math.round(makes / attempts * 100) : null };
+}
+/* Hot / Neutral / Cold zone distribution for the window, using the per-type
+   efficiency bands (2pt vs 3pt). */
+function shotHeatDistribution(range){
+  const c = { hot: 0, neutral: 0, cold: 0, unrated: 0 };
+  SHOT_ZONES.forEach(z => {
+    const s = zoneStats(z.id, range);
+    if (s.pct === null){ c.unrated++; return; }
+    const h = heatLabel(s.pct, z.pts);
+    if (h === 'Hot') c.hot++; else if (h === 'Neutral') c.neutral++; else c.cold++;
+  });
+  return c;
+}
+function syncShotWindowControls(range){
+  const r = shotRangeKey(range);
+  [['sw-7', '7'], ['sw-30', '30'], ['sw-custom', 'custom'], ['sw-lifetime', 'lifetime']].forEach(pair => {
+    const b = document.getElementById(pair[0]); if (b) b.classList.toggle('active', r === pair[1]);
+  });
+  const wrap = document.getElementById('sw-dates');
+  if (wrap && wrap.style) wrap.style.display = (r === 'custom') ? 'inline-flex' : 'none';
+  const from = document.getElementById('sw-from'), to = document.getElementById('sw-to');
+  if (from) from.value = shotCustomFrom();
+  if (to) to.value = shotCustomTo();
 }
 function renderShotSummary(){
   const el = document.getElementById('shot-summary');
   if (!el) return;
-  const range = shotSummaryRange();
-  const sel = document.getElementById('shotsum-range'); if (sel) sel.value = range;
+  const range = shotRangeKey(state.settings && state.settings.shotRange);
+  syncShotWindowControls(range);
   const d = shotSummaryData(range);
-  const label = shotRangeLabel(range);
   el.innerHTML =
-    '<div class="shot-sum-kpi"><b>' + d.makes + '</b><span>Total Makes · ' + label + '</span></div>' +
-    '<div class="shot-sum-kpi"><b>' + d.workouts + '</b><span>Basketball Workouts Logged · ' + label + '</span></div>';
+    '<div class="shot-sum-kpi"><b>' + d.makes + ' / ' + d.attempts + '</b><span>Total Volume · M / A</span></div>' +
+    '<div class="shot-sum-kpi"><b>' + (d.pct === null ? '—' : d.pct + '%') + '</b><span>Overall FG%</span></div>' +
+    '<div class="shot-sum-kpi"><b>' + d.workouts + '</b><span>Workouts Logged</span></div>' +
+    '<div class="shot-sum-kpi"><b>' + d.totalMakes + '</b><span>Total Makes (incl. raw)</span></div>';
+  const distEl = document.getElementById('shot-heat-dist');
+  if (distEl){
+    const c = shotHeatDistribution(range);
+    distEl.innerHTML =
+      '<span class="shd hot"><i></i>Hot ' + c.hot + '</span>' +
+      '<span class="shd neutral"><i></i>Neutral ' + c.neutral + '</span>' +
+      '<span class="shd cold"><i></i>Cold ' + c.cold + '</span>' +
+      (c.unrated ? '<span class="shd unrated"><i></i>Unrated ' + c.unrated + '</span>' : '') +
+      '<span class="hint">' + esc(shotRangeLabel(range)) + '</span>';
+  }
 }
 function renderShots(){
   const el = document.getElementById('shot-heatmap');
@@ -10646,20 +10893,40 @@ function renderShots(){
   renderShotZoneTable(range);
   renderShotSummary();
 }
+/* Spot-level breakdown for the active window: explicit makes (volume) and
+   attempts columns, FG%, and the per-type Hot/Neutral/Cold status, sorted best
+   FG% first (unrated spots last) with an All-Spots totals row. */
 function renderShotZoneTable(range){
   const el = document.getElementById('shot-zone-table');
   if (!el) return;
-  el.innerHTML = '<table class="zone-table"><thead><tr><th>Zone</th><th>M / A</th><th>FG%</th><th>Heat</th></tr></thead><tbody>' +
-    SHOT_ZONES.map(z => {
-      const s = zoneStats(z.id, range), col = heatColor(s.pct, z.pts);
-      const heat = heatLabel(s.pct, z.pts);
-      return '<tr onclick="openZoneLogModal(\'' + z.id + '\')" style="cursor:pointer">' +
-        '<td>' + esc(z.label) + ' <i class="hint">' + z.pts + 'pt</i></td>' +
-        '<td>' + s.m + ' / ' + s.a + '</td>' +
-        '<td style="color:' + col + ';font-weight:700">' + (s.pct === null ? '—' : s.pct + '%') + '</td>' +
-        '<td><span class="cat-badge" style="color:' + col + ';background:' + rgba(col, .13) + ';border-color:' + rgba(col, .45) + '">' + heat + '</span></td>' +
-      '</tr>';
-    }).join('') + '</tbody></table>';
+  const r = shotRangeKey(range);
+  const win = document.getElementById('shot-zone-window');
+  if (win) win.textContent = shotRangeLabel(r) + ' · sorted by FG%';
+  const rows = SHOT_ZONES.map(z => ({ z, s: zoneStats(z.id, r) }));
+  rows.sort((a, b) => {
+    const ap = a.s.pct, bp = b.s.pct;
+    if (ap === null && bp === null) return 0;
+    if (ap === null) return 1;
+    if (bp === null) return -1;
+    return bp - ap;
+  });
+  const tot = rows.reduce((t, x) => { t.m += x.s.m; t.a += x.s.a; return t; }, { m: 0, a: 0 });
+  const body = rows.map(({ z, s }) => {
+    const col = heatColor(s.pct, z.pts);
+    const heat = heatLabel(s.pct, z.pts);
+    return '<tr onclick="openZoneLogModal(\'' + z.id + '\')" style="cursor:pointer">' +
+      '<td>' + esc(z.label) + '</td>' +
+      '<td><i class="hint">' + z.pts + 'pt</i></td>' +
+      '<td style="font-weight:700">' + s.m + '</td>' +
+      '<td>' + s.a + '</td>' +
+      '<td style="color:' + col + ';font-weight:700">' + (s.pct === null ? '—' : s.pct + '%') + '</td>' +
+      '<td><span class="cat-badge" style="color:' + col + ';background:' + rgba(col, .13) + ';border-color:' + rgba(col, .45) + '">' + heat + '</span></td>' +
+    '</tr>';
+  }).join('');
+  el.innerHTML = '<table class="zone-table"><thead><tr><th>Spot / Zone</th><th>Type</th><th>Makes</th><th>Att</th><th>FG%</th><th>Heat</th></tr></thead><tbody>' +
+    body +
+    '<tr class="zone-total"><td>All Spots</td><td></td><td>' + tot.m + '</td><td>' + tot.a + '</td><td>' + (tot.a ? Math.round(tot.m / tot.a * 100) + '%' : '—') + '</td><td></td></tr>' +
+    '</tbody></table>';
 }
 function openZoneLogModal(zoneId){
   const z = SHOT_ZONES.find(x => x.id === zoneId);
@@ -11301,6 +11568,10 @@ function habitMidnightWatch(){
   const prev = habitDayStamp;
   habitDayStamp = now;
   if (state.settings.logDate === prev) state.settings.logDate = now;
+  /* Disciplines that were simply following “today” roll over with it; an
+     explicitly chosen workout date is left untouched. */
+  if (state.settings.workoutDates) WORKOUT_ENVS.forEach(e => { if (state.settings.workoutDates[e] === prev) state.settings.workoutDates[e] = ''; });
+  renderWorkoutSession();
   renderHabits();
   renderRoutine();
   renderLogFields();
@@ -12016,8 +12287,116 @@ function bindBrainstormEvents(){
 /* ============================================================
    V1.0 — SYSTEM SETTINGS (Preferences · Data Backup · System Archive)
    ============================================================ */
+/* ============================================================
+   Recently Deleted — soft-delete pile (all deletes land here first)
+   ============================================================ */
+function normalizeTrashEntry(t){
+  if (!t || typeof t !== 'object') return null;
+  return {
+    id: (typeof t.id === 'string' && t.id) ? t.id : ('trash-' + uid()),
+    kind: String(t.kind || 'item'),
+    label: String(t.label || 'Deleted item'),
+    meta: String(t.meta || ''),
+    deletedAt: (typeof t.deletedAt === 'string') ? t.deletedAt : '',
+    data: (t.data && typeof t.data === 'object') ? t.data : {}
+  };
+}
+function trashCount(){ return (state.trash || []).length; }
+function trashItem(kind, label, meta, data){
+  state.trash = Array.isArray(state.trash) ? state.trash : [];
+  state.trash.unshift({ id: 'trash-' + uid(), kind: String(kind || 'item'), label: String(label || 'Deleted item'), meta: String(meta || ''), deletedAt: new Date().toISOString(), data: data || {} });
+  if (state.trash.length > 300) state.trash.length = 300;
+}
+/* Re-insert a soft-deleted record into its original home. */
+function applyTrashRestore(t){
+  const d = t.data || {};
+  if (t.kind === 'workout'){
+    const env = d.env, key = d.key, sess = d.session;
+    if (!env || !key || !sess) return false;
+    setSessionFor(key, env, sess);
+    syncSessionToLog(key);
+    return true;
+  }
+  if (t.kind === 'habit'){
+    const h = d.habit; if (!h) return false;
+    state.habits = state.habits || [];
+    if (!state.habits.some(x => x.id === h.id)) state.habits.push(h);
+    return true;
+  }
+  if (t.kind === 'assignment'){
+    const a = d.assignment; if (!a) return false;
+    state.school = state.school || [];
+    if (!state.school.some(x => x.id === a.id)) state.school.push(a);
+    return true;
+  }
+  if (t.kind === 'preset'){
+    const type = d.type, preset = d.preset; if (!type || !preset) return false;
+    state.presets = state.presets || {};
+    state.presets[type] = state.presets[type] || [];
+    if (!state.presets[type].some(x => x.id === preset.id)) state.presets[type].push(preset);
+    persistWorkoutPresets();
+    return true;
+  }
+  if (t.kind === 'todo'){
+    const bucket = d.bucket, item = d.item; if (!bucket || !item) return false;
+    state.todos = state.todos || {};
+    state.todos[bucket] = state.todos[bucket] || [];
+    state.todos[bucket].push(item);
+    return true;
+  }
+  if (t.kind === 'coach'){
+    const c = d.coach; if (!c) return false;
+    state.recruiting = state.recruiting || [];
+    if (!state.recruiting.some(x => x.id === c.id)) state.recruiting.push(c);
+    return true;
+  }
+  return false;
+}
+function restoreTrash(id){
+  const t = (state.trash || []).find(x => x.id === id);
+  if (!t) return;
+  snapshot();
+  if (!applyTrashRestore(t)){ toast('Could not restore this item', 'error'); return; }
+  state.trash = state.trash.filter(x => x.id !== id);
+  save();
+  renderAll();
+  renderSettings();
+  toast('✓ Restored ' + t.label);
+}
+function purgeTrash(id){
+  const before = trashCount();
+  snapshot();
+  state.trash = (state.trash || []).filter(x => x.id !== id);
+  if (state.trash.length === before) return;
+  save(); renderSettings(); toast('Deleted for good');
+}
+function emptyTrash(){
+  if (!trashCount()){ toast('The deleted pile is already empty'); return; }
+  if (!window.confirm('Permanently delete ' + trashCount() + ' item(s)? This cannot be undone.')) return;
+  snapshot();
+  state.trash = [];
+  save(); renderSettings(); toast('🗑 Deleted pile emptied');
+}
+function renderSettingsTrash(){
+  const el = document.getElementById('settings-trash');
+  if (!el) return;
+  const trash = state.trash || [];
+  const kindLabel = { workout: 'Workout', habit: 'Habit', assignment: 'Assignment', preset: 'Preset', todo: 'To-Do', coach: 'Recruiting' };
+  const delDate = t => { const d = t && t.deletedAt ? new Date(t.deletedAt) : null; return (d && !isNaN(d.getTime())) ? fmtDate(dateKey(d)) : ''; };
+  el.innerHTML =
+    '<div class="card"><div class="card-head"><h3>Recently Deleted</h3><span class="kicker">' + trash.length + ' item' + (trash.length === 1 ? '' : 's') + '</span></div>' +
+      '<p class="page-sub">Deleted workouts, habits, assignments and more land here first — nothing is gone for good until you empty the pile. Restore anything below.</p>' +
+      '<div class="backup-actions"><button class="btn ghost" onclick="emptyTrash()">🗑 Empty deleted pile</button></div>' +
+      (trash.length
+        ? '<div class="arch-list" style="margin-top:14px">' + trash.map(t =>
+            '<div class="arch-row"><span><b>' + esc(t.label) + '</b><i>' + esc((kindLabel[t.kind] || 'Item') + (t.meta ? ' · ' + t.meta : '') + (delDate(t) ? ' · deleted ' + delDate(t) : '')) + '</i></span>' +
+            '<span style="display:inline-flex;gap:6px"><button class="chip-btn" onclick="restoreTrash(\'' + t.id + '\')">Restore</button>' +
+            '<button class="chip-btn" onclick="purgeTrash(\'' + t.id + '\')">Delete forever</button></span></div>').join('') + '</div>'
+        : '<div class="hint" style="margin-top:14px">Nothing in the deleted pile.</div>') +
+    '</div>';
+}
 function setSettingsView(v){
-  if (!['prefs', 'backup', 'archive'].includes(v)) v = 'prefs';
+  if (!['prefs', 'backup', 'archive', 'trash'].includes(v)) v = 'prefs';
   state.settings.settingsView = v;
   save();
   applySettingsView();
@@ -12025,7 +12404,9 @@ function setSettingsView(v){
 function applySettingsView(){
   const v = state.settings.settingsView || 'prefs';
   $$('#settings-subtabs .sub-tab').forEach(b => b.classList.toggle('active', b.dataset.sv === v));
-  const map = { prefs: 'sview-prefs', backup: 'sview-backup', archive: 'sview-archive' };
+  const tb = document.querySelector('#settings-subtabs .sub-tab[data-sv="trash"]');
+  if (tb) tb.textContent = '🗑 Recently Deleted' + (trashCount() ? ' (' + trashCount() + ')' : '');
+  const map = { prefs: 'sview-prefs', backup: 'sview-backup', archive: 'sview-archive', trash: 'sview-trash' };
   Object.entries(map).forEach(([k, id]) => {
     const el = document.getElementById(id);
     if (el) el.classList.toggle('active', k === v);
@@ -12043,7 +12424,7 @@ function setPref(key, value){
   if (key === 'pmType') pmType = value;
   if (key === 'workoutEnv'){ state.settings.logView = value; }
   save();
-  if (key === 'workoutEnv'){ applyLogView(); renderWorkoutSession(state.settings.logDate); }
+  if (key === 'workoutEnv'){ applyLogView(); renderWorkoutSession(); }
   renderSettings();
   renderDashboard();
   toast('Preference saved');
@@ -12224,6 +12605,7 @@ function renderSettings(){
   renderSettingsPrefs();
   renderSettingsBackup();
   renderSettingsArchive();
+  renderSettingsTrash();
 }
 
 
