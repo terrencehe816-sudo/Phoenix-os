@@ -5563,6 +5563,8 @@ function addLiftRecord(){
 }
 function deleteLiftRecord(id){
   snapshot();
+  const r = (state.records.lifts || []).find(x => x.id === id);
+  if (r) trashItem('liftRec', (r.exercise || 'Lift record'), (r.weight ? fmtNum(r.weight) + ' lbs' : '') + (r.weight && r.reps ? ' × ' + r.reps : ''), { record: JSON.parse(JSON.stringify(r)), index: idxOf(state.records.lifts, id) });
   state.records.lifts = state.records.lifts.filter(r => r.id !== id);
   save();
   renderRecords();
@@ -5588,6 +5590,8 @@ function addShotRecord(){
 }
 function deleteShotRecord(id){
   snapshot();
+  const r = (state.records.shooting || []).find(x => x.id === id);
+  if (r) trashItem('shotRec', (r.name || 'Shooting record'), (r.makes || 0) + '/' + (r.attempts || 0) + ' · ' + (r.pct || 0) + '%', { record: JSON.parse(JSON.stringify(r)), index: idxOf(state.records.shooting, id) });
   state.records.shooting = state.records.shooting.filter(r => r.id !== id);
   save();
   renderRecords();
@@ -5692,6 +5696,8 @@ function editRankTier(id){
 }
 function deleteRankTier(id){
   snapshot();
+  const r = (state.records.rankTiers || []).find(t => t.id === id);
+  if (r) trashItem('rankTier', (r.exercise || 'Rank tier'), (r.sets ? r.sets + '×' + (r.reps || '') : ''), { tier: JSON.parse(JSON.stringify(r)), index: idxOf(state.records.rankTiers, id) });
   state.records.rankTiers = state.records.rankTiers.filter(t => t.id !== id);
   save();
   openRankTiers();
@@ -6420,6 +6426,8 @@ function saveClassEdit(id){
 }
 function deleteClassCat(id){
   snapshot();
+  const cc = (state.classCats || []).find(c => c.id === id);
+  if (cc) trashItem('class', (cc.label || 'Class'), (cc.semester || 's1').toUpperCase(), { classItem: JSON.parse(JSON.stringify(cc)), index: idxOf(state.classCats, id) });
   state.classCats = (state.classCats || []).filter(c => c.id !== id);
   ccEditId = null;
   if (state.settings.schoolClassId === id) state.settings.schoolClassId = '';
@@ -6759,7 +6767,10 @@ function saveVolunteer(){
 function deleteVolunteer(id){
   snapshot();
   const x = xcState();
-  x.volunteerHours = x.volunteerHours.filter(r => r.id !== (id || volModalId));
+  const vid = id || volModalId;
+  const r = x.volunteerHours.find(v => v.id === vid);
+  if (r) trashItem('volunteer', (r.org || r.place || 'Volunteer entry'), (num(r.hours) ? fmtNum(r.hours) + ' hrs' : ''), { record: JSON.parse(JSON.stringify(r)), index: idxOf(x.volunteerHours, vid) });
+  x.volunteerHours = x.volunteerHours.filter(r => r.id !== vid);
   save(); closeModal(); renderExtracurricular();
   toast('Volunteer entry deleted');
 }
@@ -7244,6 +7255,8 @@ function saveGame(){
 }
 function deleteGame(){
   snapshot();
+  const g = state.film.games.find(x => x.id === gameModalId);
+  if (g) trashItem('filmGame', (g.opponent || 'Game'), (g.date ? fmtDate(g.date) : ''), { game: JSON.parse(JSON.stringify(g)), index: idxOf(state.film.games, gameModalId) });
   state.film.games = state.film.games.filter(x => x.id !== gameModalId);
   save(); closeModal(); renderFilmGames();
   toast('Game deleted');
@@ -7385,6 +7398,7 @@ function loadPlay(id){
 function deletePlay(id){
   snapshot();
   const p = state.film.plays.find(x => x.id === id);
+  if (p) trashItem('filmPlay', (p.name || 'Play'), (p.type || ''), { play: JSON.parse(JSON.stringify(p)), index: idxOf(state.film.plays, id) });
   state.film.plays = state.film.plays.filter(x => x.id !== id);
   if (playDraft && playDraft.id === id) playDraft = null;
   save(); renderFilmPlays();
@@ -8313,6 +8327,8 @@ function editStudyNote(id){
 function deleteStudyNote(id){
   snapshot();
   const n = studyList().find(x => x.id === id);
+  const bucket = state.settings.studyView === 'team' ? 'team' : 'player';
+  if (n) trashItem('studyNote', (n.title || 'Study note'), (n.opp || n.level || bucket), { note: JSON.parse(JSON.stringify(n)), bucket, index: idxOf(studyList(), id) });
   const arr = studyList();
   const idx = arr.findIndex(x => x.id === id);
   if (idx >= 0) arr.splice(idx, 1);
@@ -8787,7 +8803,10 @@ function saveInvestment(){
 }
 function deleteInvestment(id){
   snapshot();
-  state.finance.investments = (state.finance.investments || []).filter(x => x.id !== (id || investModalId));
+  const iid = id || investModalId;
+  const v = (state.finance.investments || []).find(x => x.id === iid);
+  if (v) trashItem('investment', (v.name || v.asset || 'Investment'), (v.amount ? '$' + fmtNum(v.amount) : ''), { investment: JSON.parse(JSON.stringify(v)), index: idxOf(state.finance.investments, iid) });
+  state.finance.investments = (state.finance.investments || []).filter(x => x.id !== iid);
   save(); closeModal(); renderFinance();
   toast('Investment removed');
 }
@@ -8854,7 +8873,10 @@ function saveTx(){
 }
 function deleteTx(id){
   snapshot();
-  state.finance.transactions = state.finance.transactions.filter(x => x.id !== (id || txModalId));
+  const tid = id || txModalId;
+  const v = state.finance.transactions.find(x => x.id === tid);
+  if (v) trashItem('tx', (v.desc || 'Transaction'), (v.type === 'income' ? '+' : '-') + '$' + fmtNum(v.amount), { tx: JSON.parse(JSON.stringify(v)), index: idxOf(state.finance.transactions, tid) });
+  state.finance.transactions = state.finance.transactions.filter(x => x.id !== tid);
   save(); closeModal(); renderFinance();
   toast('Transaction deleted');
 }
@@ -8895,7 +8917,10 @@ function saveSavings(){
 }
 function deleteSavings(id){
   snapshot();
-  state.finance.savings = state.finance.savings.filter(x => x.id !== (id || savModalId));
+  const sid = id || savModalId;
+  const v = state.finance.savings.find(x => x.id === sid);
+  if (v) trashItem('savings', (v.name || 'Savings goal'), (v.target ? 'target $' + fmtNum(v.target) : ''), { goal: JSON.parse(JSON.stringify(v)), index: idxOf(state.finance.savings, sid) });
+  state.finance.savings = state.finance.savings.filter(x => x.id !== sid);
   save(); closeModal(); renderFinance();
   toast('Savings goal deleted');
 }
@@ -9123,6 +9148,8 @@ function deleteMilestone(gid, mid){
   snapshot();
   const g = state.goals.find(x => x.id === gid);
   if (!g) return;
+  const m = (g.milestones || []).find(x => x.id === mid);
+  if (m) trashItem('milestone', (m.text || 'Milestone'), (g.title || 'Goal'), { goalId: gid, milestone: JSON.parse(JSON.stringify(m)), index: idxOf(g.milestones, mid) });
   g.milestones = (g.milestones || []).filter(x => x.id !== mid);
   save();
   renderGoals();
@@ -9212,6 +9239,8 @@ function addGoal(){
 }
 function deleteGoal(id){
   snapshot();
+  const g = state.goals.find(x => x.id === id);
+  if (g) trashItem('goal', (g.title || 'Goal'), ((g.milestones || []).length + ' milestone(s)'), { goal: JSON.parse(JSON.stringify(g)), index: idxOf(state.goals, id) });
   state.goals = state.goals.filter(g => g.id !== id);
   save();
   renderGoals();
@@ -9441,6 +9470,8 @@ function deleteInteraction(coachId, intId){
   const c = (state.recruiting || []).find(x => x.id === coachId);
   if (!c) return;
   snapshot();
+  const it = (c.interactions || []).find(i => i.id === intId);
+  if (it) trashItem('interaction', (it.type || 'Interaction'), (c.school || c.name || 'Coach'), { coachId, interaction: JSON.parse(JSON.stringify(it)), index: idxOf(c.interactions, intId) });
   c.interactions = (c.interactions || []).filter(i => i.id !== intId);
   save();
   renderRecruiting();
@@ -9989,6 +10020,8 @@ function dismissMentalBanner(){ liveState().mentalDismissed = true; save(); rend
 function removeLiveChunk(name, category){
   const l = liveState();
   snapshot();
+  const removed = l.chunks.filter(c => c.name === name && c.category === category);
+  if (removed.length) trashItem('liveChunk', (removed[0].name || 'Live chunk'), (category || ''), { chunks: JSON.parse(JSON.stringify(removed)) });
   l.chunks = l.chunks.filter(c => !(c.name === name && c.category === category));
   save();
   renderLive();
@@ -10652,6 +10685,8 @@ function deleteHabitCat(id){
   if (HABIT_BUCKETS.length <= 1){ toast('Keep at least one category', 'error'); return; }
   snapshot();
   const fallback = HABIT_BUCKETS.find(x => x.id !== id);
+  const movedIds = state.habits.filter(h => habitBucketOf(h) === id).map(h => h.id);
+  trashItem('habitCat', (b.label || 'Habit category'), (movedIds.length + ' habit' + (movedIds.length === 1 ? '' : 's') + ' reassigned'), { bucket: JSON.parse(JSON.stringify(b)), index: idxOf(HABIT_BUCKETS, id), habitIds: movedIds });
   state.habits.forEach(h => { if (habitBucketOf(h) === id) h.bucket = fallback.id; });
   HABIT_BUCKETS = HABIT_BUCKETS.filter(x => x.id !== id);
   state.habitBuckets = HABIT_BUCKETS.map(x => ({ ...x }));
@@ -11032,6 +11067,8 @@ function addScoutNote(){
 function deleteScoutNote(id){
   snapshot();
   const s = mentalState().scouting;
+  const n = (s.notes || []).find(x => x.id === id);
+  if (n) trashItem('scoutNote', (n.text || 'Scouting note'), (n.stamp || ''), { note: JSON.parse(JSON.stringify(n)), index: idxOf(s.notes, id) });
   s.notes = s.notes.filter(n => n.id !== id);
   save();
   renderScouting();
@@ -11158,7 +11195,10 @@ function saveMatchup(){
 function deleteMatchup(id){
   snapshot();
   const s = mentalState().scouting;
-  s.matchups = s.matchups.filter(y => y.id !== (id || matchupModalId));
+  const mid = id || matchupModalId;
+  const m = (s.matchups || []).find(y => y.id === mid);
+  if (m) trashItem('matchup', (m.name || m.opponent || 'Matchup card'), (m.team || m.position || ''), { matchup: JSON.parse(JSON.stringify(m)), index: idxOf(s.matchups, mid) });
+  s.matchups = s.matchups.filter(y => y.id !== mid);
   save();
   closeModal();
   renderMatchups();
@@ -11241,7 +11281,10 @@ function savePlaybook(){
 function deletePlaybook(id){
   snapshot();
   const m = mentalState();
-  m.playbook = m.playbook.filter(y => y.id !== (id || playbookModalId));
+  const pid = id || playbookModalId;
+  const p = (m.playbook || []).find(y => y.id === pid);
+  if (p) trashItem('playbook', (p.name || p.title || 'Playbook entry'), (p.cat || p.category || ''), { entry: JSON.parse(JSON.stringify(p)), index: idxOf(m.playbook, pid) });
+  m.playbook = m.playbook.filter(y => y.id !== pid);
   save();
   closeModal();
   renderPlaybook();
@@ -11375,6 +11418,8 @@ function saveNcaaPath(){
 function deleteNcaaPath(id){
   snapshot();
   const st = ncaaState();
+  const p = (st.paths || []).find(x => x.id === id);
+  if (p) trashItem('ncaaPath', (p.name || 'NCAA path'), (p.target || ''), { path: JSON.parse(JSON.stringify(p)), index: idxOf(st.paths, id) });
   st.paths = st.paths.filter(p => p.id !== id);
   save();
   renderNcaa();
@@ -11496,6 +11541,8 @@ function saveSprint(){
 function deleteSprint(id){
   snapshot();
   const l = lifeState();
+  const s = (l.sprints || []).find(x => x.id === id);
+  if (s) trashItem('sprint', (s.skill || 'Skill sprint'), (s.days ? s.days + ' days' : ''), { sprint: JSON.parse(JSON.stringify(s)), index: idxOf(l.sprints, id) });
   l.sprints = l.sprints.filter(s => s.id !== id);
   save();
   renderSprints();
@@ -12307,6 +12354,16 @@ function trashItem(kind, label, meta, data){
   state.trash.unshift({ id: 'trash-' + uid(), kind: String(kind || 'item'), label: String(label || 'Deleted item'), meta: String(meta || ''), deletedAt: new Date().toISOString(), data: data || {} });
   if (state.trash.length > 300) state.trash.length = 300;
 }
+/* Splice a record back into an array at its original slot (or the tail if the
+   stored index is out of range / missing). Skips items already present by id. */
+function reinsertAt(arr, item, index){
+  if (!Array.isArray(arr) || !item) return false;
+  if (arr.some(x => x && x.id === item.id)) return true;
+  const i = (typeof index === 'number' && index >= 0 && index <= arr.length) ? index : arr.length;
+  arr.splice(i, 0, item);
+  return true;
+}
+function idxOf(arr, id){ const i = (arr || []).findIndex(x => x && x.id === id); return i < 0 ? (arr || []).length : i; }
 /* Re-insert a soft-deleted record into its original home. */
 function applyTrashRestore(t){
   const d = t.data || {};
@@ -12350,6 +12407,131 @@ function applyTrashRestore(t){
     if (!state.recruiting.some(x => x.id === c.id)) state.recruiting.push(c);
     return true;
   }
+  /* V1.1 — records, academics, extracurricular, film, notes */
+  if (t.kind === 'liftRec'){
+    const r = d.record; if (!r) return false;
+    state.records = state.records || {}; state.records.lifts = state.records.lifts || [];
+    return reinsertAt(state.records.lifts, r, d.index);
+  }
+  if (t.kind === 'shotRec'){
+    const r = d.record; if (!r) return false;
+    state.records = state.records || {}; state.records.shooting = state.records.shooting || [];
+    return reinsertAt(state.records.shooting, r, d.index);
+  }
+  if (t.kind === 'rankTier'){
+    const r = d.tier; if (!r) return false;
+    state.records = state.records || {}; state.records.rankTiers = state.records.rankTiers || [];
+    return reinsertAt(state.records.rankTiers, r, d.index);
+  }
+  if (t.kind === 'class'){
+    const c = d.classItem; if (!c) return false;
+    state.classCats = state.classCats || [];
+    return reinsertAt(state.classCats, c, d.index);
+  }
+  if (t.kind === 'volunteer'){
+    const v = d.record; if (!v) return false;
+    const x = xcState();
+    x.volunteerHours = x.volunteerHours || [];
+    return reinsertAt(x.volunteerHours, v, d.index);
+  }
+  if (t.kind === 'filmGame'){
+    const g = d.game; if (!g) return false;
+    state.film = state.film || {}; state.film.games = state.film.games || [];
+    return reinsertAt(state.film.games, g, d.index);
+  }
+  if (t.kind === 'filmPlay'){
+    const p = d.play; if (!p) return false;
+    state.film = state.film || {}; state.film.plays = state.film.plays || [];
+    return reinsertAt(state.film.plays, p, d.index);
+  }
+  if (t.kind === 'studyNote'){
+    const n = d.note; if (!n) return false;
+    state.film = state.film || {}; state.film.study = state.film.study || { team: [], player: [] };
+    const arr = (d.bucket === 'team') ? (state.film.study.team = state.film.study.team || []) : (state.film.study.player = state.film.study.player || []);
+    return reinsertAt(arr, n, d.index);
+  }
+  if (t.kind === 'investment'){
+    const v = d.investment; if (!v) return false;
+    state.finance = state.finance || {}; state.finance.investments = state.finance.investments || [];
+    return reinsertAt(state.finance.investments, v, d.index);
+  }
+  if (t.kind === 'tx'){
+    const v = d.tx; if (!v) return false;
+    state.finance = state.finance || {}; state.finance.transactions = state.finance.transactions || [];
+    return reinsertAt(state.finance.transactions, v, d.index);
+  }
+  if (t.kind === 'savings'){
+    const v = d.goal; if (!v) return false;
+    state.finance = state.finance || {}; state.finance.savings = state.finance.savings || [];
+    return reinsertAt(state.finance.savings, v, d.index);
+  }
+  if (t.kind === 'milestone'){
+    const m = d.milestone; if (!m) return false;
+    const g = (state.goals || []).find(x => x.id === d.goalId);
+    if (!g) return false;
+    g.milestones = g.milestones || [];
+    return reinsertAt(g.milestones, m, d.index);
+  }
+  if (t.kind === 'goal'){
+    const g = d.goal; if (!g) return false;
+    state.goals = state.goals || [];
+    return reinsertAt(state.goals, g, d.index);
+  }
+  if (t.kind === 'interaction'){
+    const it = d.interaction; if (!it) return false;
+    const c = (state.recruiting || []).find(x => x.id === d.coachId);
+    if (!c) return false;
+    c.interactions = c.interactions || [];
+    return reinsertAt(c.interactions, it, d.index);
+  }
+  if (t.kind === 'liveChunk'){
+    const l = liveState();
+    l.chunks = l.chunks || [];
+    (d.chunks || []).forEach(c => { if (c && !l.chunks.some(x => x.name === c.name && x.category === c.category)) l.chunks.push(c); });
+    return true;
+  }
+  if (t.kind === 'habitCat'){
+    const b = d.bucket; if (!b) return false;
+    HABIT_BUCKETS = HABIT_BUCKETS || [];
+    if (!HABIT_BUCKETS.some(x => x.id === b.id)){
+      const i = (typeof d.index === 'number' && d.index >= 0 && d.index <= HABIT_BUCKETS.length) ? d.index : HABIT_BUCKETS.length;
+      HABIT_BUCKETS.splice(i, 0, b);
+    }
+    (d.habitIds || []).forEach(hid => { const h = (state.habits || []).find(x => x.id === hid); if (h) h.bucket = b.id; });
+    state.habitBuckets = HABIT_BUCKETS.map(x => ({ ...x }));
+    syncHabitBuckets();
+    return true;
+  }
+  if (t.kind === 'scoutNote'){
+    const n = d.note; if (!n) return false;
+    const s = mentalState().scouting;
+    s.notes = s.notes || [];
+    return reinsertAt(s.notes, n, d.index);
+  }
+  if (t.kind === 'matchup'){
+    const m = d.matchup; if (!m) return false;
+    const s = mentalState().scouting;
+    s.matchups = s.matchups || [];
+    return reinsertAt(s.matchups, m, d.index);
+  }
+  if (t.kind === 'playbook'){
+    const p = d.entry; if (!p) return false;
+    const m = mentalState();
+    m.playbook = m.playbook || [];
+    return reinsertAt(m.playbook, p, d.index);
+  }
+  if (t.kind === 'ncaaPath'){
+    const p = d.path; if (!p) return false;
+    const st = ncaaState();
+    st.paths = st.paths || [];
+    return reinsertAt(st.paths, p, d.index);
+  }
+  if (t.kind === 'sprint'){
+    const s = d.sprint; if (!s) return false;
+    const l = lifeState();
+    l.sprints = l.sprints || [];
+    return reinsertAt(l.sprints, s, d.index);
+  }
   return false;
 }
 function restoreTrash(id){
@@ -12381,7 +12563,12 @@ function renderSettingsTrash(){
   const el = document.getElementById('settings-trash');
   if (!el) return;
   const trash = state.trash || [];
-  const kindLabel = { workout: 'Workout', habit: 'Habit', assignment: 'Assignment', preset: 'Preset', todo: 'To-Do', coach: 'Recruiting' };
+  const kindLabel = { workout: 'Workout', habit: 'Habit', assignment: 'Assignment', preset: 'Preset', todo: 'To-Do', coach: 'Recruiting',
+    liftRec: 'Lift Record', shotRec: 'Shooting Record', rankTier: 'Rank Tier', class: 'Class', volunteer: 'Volunteer Hours',
+    filmGame: 'Film Game', filmPlay: 'Film Play', studyNote: 'Study Note', investment: 'Investment', tx: 'Transaction',
+    savings: 'Savings Goal', milestone: 'Milestone', goal: 'Goal', interaction: 'Coach Interaction', liveChunk: 'Live Session Chunk',
+    habitCat: 'Habit Category', scoutNote: 'Scouting Note', matchup: 'Matchup Card', playbook: 'Playbook Entry',
+    ncaaPath: 'NCAA Path', sprint: 'Skill Sprint' };
   const delDate = t => { const d = t && t.deletedAt ? new Date(t.deletedAt) : null; return (d && !isNaN(d.getTime())) ? fmtDate(dateKey(d)) : ''; };
   el.innerHTML =
     '<div class="card"><div class="card-head"><h3>Recently Deleted</h3><span class="kicker">' + trash.length + ' item' + (trash.length === 1 ? '' : 's') + '</span></div>' +
