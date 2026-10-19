@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0b0c10">
+<title>PHOENIX OS V2.0</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%3E%3Cdefs%3E%3ClinearGradient%20id%3D%27g%27%20x1%3D%2712%27%20y1%3D%272%27%20x2%3D%2712%27%20y2%3D%2722%27%20gradientUnits%3D%27userSpaceOnUse%27%3E%3Cstop%20stop-color%3D%27%2366fcf1%27%2F%3E%3Cstop%20offset%3D%271%27%20stop-color%3D%27%231ea89e%27%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Cpath%20fill%3D%27url%28%23g%29%27%20d%3D%27M12%207c-2.2%201.5-3.4%203.4-3.4%205.8a3.4%203.4%200%200%200%206.8%200c0-2.4-1.2-4.3-3.4-5.8z%27%2F%3E%3Cpath%20fill%3D%27url%28%23g%29%27%20d%3D%27M9.2%206.6%206.7%204.9c-.9%201.1-.7%202.1.7%203.1-.7%201-.4%202%20.6%203-1.6%200-2.5.8-2.8%202.3l1.9.4c.2-1.2%201-1.8%202.4-1.9-.5-1.7-.2-3.1%201.5-4.4z%27%2F%3E%3Cpath%20fill%3D%27url%28%23g%29%27%20d%3D%27M14.8%206.6l2.5-1.7c.9%201.1.7%202.1-.7%203.1.7%201%20.4%202-.6%203%201.6%200%202.5.8%202.8%202.3l-1.9.4c-.2-1.2-1-1.8-2.4-1.9.5-1.7.2-3.1-1.5-4.4z%27%2F%3E%3Ccircle%20cx%3D%2712%27%20cy%3D%274.9%27%20r%3D%271.3%27%20fill%3D%27url%28%23g%29%27%2F%3E%3C%2Fsvg%3E">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside id="sidebar">
+    <div class="brand">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="phx" x1="12" y1="2" x2="12" y2="22" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#66fcf1"/><stop offset="1" stop-color="#1ea89e"/>
+          </linearGradient>
+        </defs>
+        <!-- rising flame-tail -->
+        <path fill="url(#phx)" opacity=".85" d="M12 14c-1 1.2-.9 2.4.3 3.5-.9.3-1.4.9-1.5 1.8L12 19.7l1.2-.4c-.1-.9-.6-1.5-1.5-1.8 1.2-1.1 1.3-2.3.3-3.5z"/>
+        <!-- body -->
+        <path fill="url(#phx)" d="M12 7c-2.2 1.5-3.4 3.4-3.4 5.8a3.4 3.4 0 0 0 6.8 0c0-2.4-1.2-4.3-3.4-5.8z"/>
+        <!-- left wing -->
+        <path fill="url(#phx)" d="M9.2 6.6 6.7 4.9c-.9 1.1-.7 2.1.7 3.1-.7 1-.4 2 .6 3-1.6 0-2.5.8-2.8 2.3l1.9.4c.2-1.2 1-1.8 2.4-1.9-.5-1.7-.2-3.1 1.5-4.4z"/>
+        <!-- right wing -->
+        <path fill="url(#phx)" d="M14.8 6.6l2.5-1.7c.9 1.1.7 2.1-.7 3.1.7 1 .4 2-.6 3 1.6 0 2.5.8 2.8 2.3l-1.9.4c-.2-1.2-1-1.8-2.4-1.9.5-1.7.2-3.1-1.5-4.4z"/>
+        <!-- head + crest -->
+        <circle cx="12" cy="4.9" r="1.3" fill="url(#phx)"/>
+        <path fill="url(#phx)" d="M12 1.8c.7.9 1.2 1.6 1.2 2.5a1.2 1.2 0 0 1-2.4 0c0-.9.5-1.6 1.2-2.5z"/>
+      </svg>
+      <div>
+        <h1>PHOENIX<br>OPERATING SYSTEM</h1>
+        <div class="brand-sub">PHOENIX OS V2.0 · DAILY COMMAND CENTER</div>
+      </div>
+    </div>
+
+    <nav id="nav">
+      <button class="nav-btn active" data-tab="dashboard" onclick="switchTab('dashboard')"><span class="nav-num">01</span><span>🏠 Dashboard</span></button>
+      <button class="nav-btn" data-tab="routine" onclick="switchTab('routine')"><span class="nav-num">02</span><span>📅 Daily Routine</span></button>
+      <button class="nav-btn" data-tab="log" onclick="switchTab('log')"><span class="nav-num">03</span><span>🏋️ Workouts</span></button>
+      <button class="nav-btn" data-tab="school" onclick="switchTab('school')"><span class="nav-num">04</span><span>📚 School</span></button>
+      <button class="nav-btn" data-tab="film" onclick="switchTab('film')"><span class="nav-num">05</span><span>🎥 Film Study</span></button>
+      <button class="nav-btn" data-tab="finance" onclick="switchTab('finance')"><span class="nav-num">06</span><span>💰 Finance Tracker</span></button>
+      <button class="nav-btn" data-tab="life" onclick="switchTab('life')"><span class="nav-num">07</span><span>⚡ Life Maxx</span></button>
+      <button class="nav-btn" data-tab="brainstorm" onclick="switchTab('brainstorm')"><span class="nav-num">08</span><span>🧠 Brainstorm</span></button>
+      <button class="nav-btn" data-tab="recruiting" onclick="switchTab('recruiting')"><span class="nav-num">09</span><span>🎯 Recruiting CRM</span></button>
+      <button class="nav-btn" data-tab="settings" onclick="switchTab('settings')"><span class="nav-num">10</span><span>⚙️ System Settings</span></button>
+      <button class="nav-btn" data-tab="mobile" onclick="switchTab('mobile')"><span class="nav-num">11</span><span>📲 Mobile Sync</span></button>
+    </nav>
+
+    <div class="side-util">
+      <div style="display:flex;gap:6px">
+        <button class="util-btn" id="btn-undo" onclick="undo()" disabled title="Undo (Ctrl+Z)">↶ Undo</button>
+        <button class="util-btn" id="btn-redo" onclick="redo()" disabled title="Redo (Ctrl+Y)">↷ Redo</button>
+      </div>
+      <button class="util-btn" onclick="exportJSON()">⬇&nbsp; Export JSON</button>
+      <button class="util-btn ghost" onclick="document.getElementById('importFile').click()">⬆&nbsp; Import JSON</button>
+      <div class="local-chip" title="All data is stored in this browser's localStorage"><span class="local-dot"></span>Local storage only</div>
+      <div class="save-status"><span class="dot" id="save-dot"></span> Auto-saved locally</div>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main id="main">
+    <header id="topbar">
+      <div>
+        <h2 id="topbar-title">Dashboard</h2>
+        <p id="topbar-date"></p>
+      </div>
+      <div class="clock-shell">
+        <span class="beta-label">V2.0</span>
+        <div class="clock" id="clock" aria-label="Live digital clock">--:--:--</div>
+      </div>
+    </header>
+
+    <div id="view">
+
+      <!-- ============ TAB 1: DASHBOARD ============ -->
+      <section id="tab-dashboard" class="tab active">
+        <div class="card-head-row">
+          <div>
+            <h2 class="page-title">Weekly Overview</h2>
+            <p class="page-sub">Academics, athletics, habits and recruiting for the current week.</p>
+          </div>
+          <button class="btn" onclick="openNotionExport()">⇪ Export to Notion</button>
+        </div>
+        <div class="dash-grid">
+
+          <div class="card dash-focus-card">
+            <div class="card-head">
+              <h3>Today's High-Level Focus</h3>
+              <span class="kicker" id="dash-focus-kicker"></span>
+            </div>
+            <div id="dash-focus"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <h3>Workout Summary</h3>
+              <span class="kicker" id="dash-workout-meta"></span>
+            </div>
+            <div id="dash-workout"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <h3>Shooting % Summary</h3>
+              <span class="kicker">7-Day / 30-Day</span>
+            </div>
+            <div id="dash-shooting"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <h3>Upcoming Deadlines</h3>
+              <span class="kicker" id="dash-dl-count"></span>
+            </div>
+            <div id="dash-deadlines"></div>
+          </div>
+
+          <div class="card card-goals">
+            <div class="card-head">
+              <h3>Goal Progress</h3>
+              <span class="kicker">All Active Goals</span>
+            </div>
+            <div id="dash-goals"></div>
+          </div>
+
+
+        </div>
+      </section>
+
+      <!-- ============ TAB 2: DAILY ROUTINE ============ -->
+      <section id="tab-routine" class="tab">
+        <div class="sub-tabs" id="routine-subtabs">
+          <button class="sub-tab" data-rview="schedule" onclick="setRoutineView('schedule')">🕐 Fixed Schedule</button>
+          <button class="sub-tab" data-rview="log" onclick="setRoutineView('log')">📝 Daily Log</button>
+          <button class="sub-tab" data-rview="mental" onclick="setRoutineView('mental')">🧠 Mental Game / Wind-Down</button>
+        </div>
+
+        <!-- VIEW: FIXED SCHEDULE -->
+        <div class="log-sub active" id="rview-schedule">
+          <div class="card-head-row">
+            <div>
+              <h2 class="page-title">Daily Routine</h2>
+              <p class="page-sub">Fixed sleep window and class timetable — the operational backbone of every day. Habit tracking now lives in Life Maxx.</p>
+            </div>
+          </div>
+          <div id="routine-sleep"></div>
+          <div class="card" style="margin-top:16px">
+            <div class="card-head"><h3>Daily Timetable</h3><span class="kicker" id="routine-tt-kicker"></span></div>
+            <div id="routine-schedule"></div>
+          </div>
+        </div>
+
+        <!-- VIEW: DAILY LOG ENTRY -->
+        <div class="log-sub" id="rview-log">
+          <div class="log-grid">
+          <div>
+            <!-- Daily Log Entry card -->
+            <div class="card">
+              <div class="card-head">
+                <h3>Daily Log Entry</h3>
+                <div class="date-picker">
+                  <div class="date-chips">
+                    <button type="button" class="chip-btn" onclick="setLogDate('yesterday')">Yesterday</button>
+                    <button type="button" class="chip-btn" onclick="setLogDate('today')">Today</button>
+                  </div>
+                  <input type="date" id="log-date">
+                </div>
+              </div>
+
+              <div id="log-form">
+                <div class="draft-banner" id="log-draft-banner"></div>
+                <div class="ws-attached" style="display:none" id="log-workout-line"></div>
+
+                <div class="log-grid-2">
+                  <div class="field compact-field sleep-field">
+                    <label for="log-bed">Bedtime</label>
+                    <input type="time" id="log-bed" class="mini-input">
+                  </div>
+                  <div class="field compact-field sleep-field">
+                    <label for="log-wake">Wakeup Time</label>
+                    <input type="time" id="log-wake" class="mini-input">
+                  </div>
+                  <div class="field compact-field sleep-field">
+                    <label>Net Sleep</label>
+                    <div class="sleep-dur empty" id="sleep-dur">—</div>
+                    <i class="sleep-hint">wake − bed − 15 min</i>
+                  </div>
+                  <div class="field compact-field" id="weighin-wrap" style="display:none">
+                    <label for="log-weighin">Weigh-In (lbs)</label>
+                    <input type="number" id="log-weighin" class="mini-input" min="0" step="0.1" placeholder="Sunday only">
+                  </div>
+                  <div class="field compact-field">
+                    <label>Daily Score (1–10)</label>
+                    <div class="score-row">
+                      <input type="range" id="log-score" min="1" max="10" step="1" value="5">
+                      <output id="log-score-val">5</output>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="log-section recovery-block">
+                  <div class="log-label">RECOVERY SCORE <span class="hint">CNS / sleep 1–10</span> <span class="kicker" id="recovery-kicker"></span></div>
+                  <div id="log-recovery"></div>
+                </div>
+
+                <div class="log-section reflect-block">
+                  <div class="log-label">DAILY REFLECTION / WINS LOG <span class="hint">Night shutdown routine</span></div>
+                  <div class="reflect-grid">
+                    <div class="field">
+                      <label for="log-win">1 · What went well?</label>
+                      <textarea id="log-win" rows="2" placeholder="The win worth remembering..."></textarea>
+                    </div>
+                    <div class="field">
+                      <label for="log-adjust">2 · What needs adjustment?</label>
+                      <textarea id="log-adjust" rows="2" placeholder="One thing to fix tomorrow..."></textarea>
+                    </div>
+                    <div class="field">
+                      <label for="log-notes">3 · Notes</label>
+                      <textarea id="log-notes" rows="2" placeholder="Anything else on your mind..."></textarea>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="log-meta">
+                  <span class="dot" id="log-save-dot"></span>
+                  <span>Every keystroke auto-saves to localStorage</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <h3>Historical Logs</h3>
+              <span class="kicker" id="hist-count"></span>
+            </div>
+            <input type="search" id="log-search" placeholder="Search wins, workouts, notes..." style="margin-bottom:14px">
+            <div id="log-history"></div>
+          </div>
+
+        </div>
+        </div>
+
+
+        <!-- VIEW 8A: JOURNALING -->
+        <div class="log-sub" id="rview-mental">
+          <div class="card-head-row">
+            <div>
+              <h2 class="page-title">Journaling</h2>
+              <p class="page-sub">Daily entries link straight to your Daily Log history, plus a structured weekly review.</p>
+            </div>
+            <button class="btn sm" onclick="switchTab('log');setLogView('entry')">✎ Open Daily Log</button>
+          </div>
+          <div class="mental-grid">
+            <div class="card">
+              <div class="card-head"><h3>Daily Entries</h3><span class="kicker" id="journal-kicker"></span></div>
+              <div id="journal-daily"></div>
+            </div>
+            <div class="card">
+              <div class="card-head"><h3>Weekly Journaling</h3><span class="kicker" id="journal-week"></span></div>
+              <div id="journal-weekly"></div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ============ TAB 3: WORKOUTS ============ -->
+      <section id="tab-log" class="tab">
+        <div id="log-subtabs" class="sub-tabs">
+          <button class="sub-tab" data-lv="lift" onclick="setLogView('lift')">🏋️ Lifting</button>
+          <button class="sub-tab" data-lv="basketball" onclick="setLogView('basketball')">🏀 Basketball</button>
+          <button class="sub-tab" data-lv="strength" onclick="setLogView('strength')">💪 Strength</button>
+          <button class="sub-tab" data-lv="records" onclick="setLogView('records')">🏆 Records</button>
+        </div>
+
+        <!-- Mobile Text Sync moved to its own section (11) — laptop ⇄ phone transfer -->
+        <div class="card">
+          <div class="card-head">
+            <h3>📲 Mobile Sync</h3>
+            <span class="kicker">section 11 · laptop ⇄ phone</span>
+          </div>
+          <p class="paste-hint" style="margin-bottom:10px">Phone notes and both-way data transfer now have their own section, so nothing is buried in the workout tracker.</p>
+          <button class="btn sm" onclick="switchTab('mobile')">Open Mobile Sync →</button>
+        </div>
+
+        <!-- VIEW: LIFTING (independent tracker) -->
+        <div class="log-sub active" id="log-view-lift">
+          <div class="card">
+            <div class="card-head">
+              <h3>🏋️ Lifting</h3>
+              <span class="kicker ws-env-blurb">Heavy Lunch Lifts · Killarney Weekend Sessions · set / rep / RPE · volume</span>
+              <span class="kicker" id="ws-date-label-lift"></span>
+              <label class="kicker" style="display:flex;align-items:center;gap:6px;text-transform:none;letter-spacing:.04em">Log date <input type="date" id="ws-date-override-lift" class="mini-input" onchange="setWorkoutDate('lift',this.value)"></label>
+            </div>
+            <div id="workout-session-lift"></div>
+          </div>
+        </div>
+
+        <!-- VIEW: BASKETBALL (independent tracker + embedded Shot Chart) -->
+        <div class="log-sub" id="log-view-basketball">
+          <div class="card">
+            <div class="card-head">
+              <h3>🏀 Basketball</h3>
+              <span class="kicker ws-env-blurb">Morning Shooting Drills · Gaston Bag / Skills Sessions</span>
+              <span class="kicker" id="ws-date-label-basketball"></span>
+              <label class="kicker" style="display:flex;align-items:center;gap:6px;text-transform:none;letter-spacing:.04em">Log date <input type="date" id="ws-date-override-basketball" class="mini-input" onchange="setWorkoutDate('basketball',this.value)"></label>
+            </div>
+            <div style="margin-bottom:12px"><button class="btn live-start" onclick="startLiveWorkout()">🔴 Start Live Workout</button></div>
+            <div id="workout-session-basketball"></div>
+          </div>
+          <div class="card" style="margin-top:16px">
+            <div class="card-head-row" style="margin-bottom:0">
+              <div>
+                <h2 class="page-title">🎯 Shot Chart — Granular Heatmap</h2>
+                <p class="page-sub">Tracked makes / attempts across 14 analytical floor zones. Hot-hand colors update automatically; click any zone to log shots.</p>
+              </div>
+            </div>
+            <div class="shot-summary-card">
+              <div class="shot-window-controls">
+                <span class="kicker">WORKOUT WINDOW</span>
+                <button class="chip-btn" id="sw-7" onclick="setShotRange('7')">Past 7 Days</button>
+                <button class="chip-btn" id="sw-30" onclick="setShotRange('30')">Past 30 Days</button>
+                <button class="chip-btn" id="sw-custom" onclick="setShotRange('custom')">Single Day / Custom Range</button>
+                <span class="shot-window-dates" id="sw-dates">
+                  <input type="date" class="mini-input" id="sw-from" title="From" onchange="setShotCustom('from',this.value)">
+                  <input type="date" class="mini-input" id="sw-to" title="To" onchange="setShotCustom('to',this.value)">
+                </span>
+                <button class="chip-btn" id="sw-lifetime" onclick="setShotRange('lifetime')">Lifetime</button>
+              </div>
+              <div class="shot-summary-kpis" id="shot-summary"></div>
+              <div class="shot-heat-dist" id="shot-heat-dist"></div>
+            </div>
+            <div class="heat-wrap">
+              <div class="card">
+                <div class="card-head"><h3>Shot Heatmap</h3><span class="kicker" id="heat-kicker"></span></div>
+                <div id="shot-heatmap"></div>
+              </div>
+              <div class="card">
+                <div class="card-head"><h3>Spot-Level Breakdown</h3><span class="kicker" id="shot-zone-window"></span></div>
+                <div id="shot-zone-table"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEW: STRENGTH TRAINING (independent tracker) -->
+        <div class="log-sub" id="log-view-strength">
+          <div class="card">
+            <div class="card-head">
+              <h3>💪 Strength Training</h3>
+              <span class="kicker ws-env-blurb">Outdoor Field Plyos · Speed Priming · Home Isometrics · Band / Med-ball</span>
+              <span class="kicker" id="ws-date-label-strength"></span>
+              <label class="kicker" style="display:flex;align-items:center;gap:6px;text-transform:none;letter-spacing:.04em">Log date <input type="date" id="ws-date-override-strength" class="mini-input" onchange="setWorkoutDate('strength',this.value)"></label>
+            </div>
+            <div id="workout-session-strength"></div>
+          </div>
+        </div>
+
+        <!-- VIEW: RECORDS -->
+        <div class="log-sub" id="log-view-records">
+          <div id="records-view"></div>
+        </div>
+
+      </section>
+
+      <!-- ============ TAB 3: SCHOOL ============ -->
+      <section id="tab-school" class="tab">
+        <div class="school-tabs">
+          <button class="chip-btn active" id="sview-btn-assign" onclick="setSchoolView('assign')">Assignments</button>
+          <button class="chip-btn" id="sview-btn-tt" onclick="setSchoolView('tt')">🗓 Timetable</button>
+          <button class="chip-btn" id="sview-btn-classes" onclick="setSchoolView('classes')">▦ Classes</button>
+          <button class="chip-btn" id="sview-btn-xc" onclick="setSchoolView('xc')">🎖 Extracurricular</button>
+          <button class="chip-btn" id="sview-btn-ncaa" onclick="setSchoolView('ncaa')">🧭 BC→NCAA Map</button>
+        </div>
+        <div class="school-toolbar" style="margin-bottom:14px">
+          <span class="kicker">SEMESTER VIEW</span>
+          <button class="chip-btn" id="sem-s1" onclick="setSchoolSem('s1')">Semester 1 (S1)</button>
+          <button class="chip-btn" id="sem-s2" onclick="setSchoolSem('s2')">Semester 2 (S2)</button>
+        </div>
+        <div id="sview-assign">
+        <div class="school-layout">
+
+          <div class="card">
+            <div class="card-head"><h3 id="school-form-head">Add Assignment</h3></div>
+            <div class="school-form-row">
+              <div class="field"><label>Course (Class)</label><input id="s-course" list="school-cats" placeholder="e.g. Pre-Calculus 11"></div>
+              <div class="field"><label>Assignment</label><input id="s-assign" placeholder="e.g. Ch. 7 Quiz"></div>
+            </div>
+            <div class="school-form-row">
+              <div class="field"><label>Due Date</label><input type="date" id="s-due"></div>
+              <div class="field"><label>Category</label>
+                <select id="s-cat"><option>Homework</option><option>Quiz</option><option>Test</option><option>Project</option><option>Presentation</option><option>Other</option></select>
+              </div>
+            </div>
+            <div class="school-form-row">
+              <div class="field"><label>Priority</label>
+                <select id="s-prio"><option>Low</option><option>Medium</option><option selected>High</option></select>
+              </div>
+              <div class="field"><label>Status</label>
+                <select id="s-status">
+                  <option>Not Started</option><option>In Progress</option><option>Finished</option><option>Handed In</option><option>Completed</option>
+                </select>
+              </div>
+            </div>
+            <div class="school-form-row">
+              <div class="field"><label>Weight (% final)</label><input type="number" id="s-weight" min="0" max="100" placeholder="e.g. 20"></div>
+              <div class="field"><label>Score / Grade</label><input type="number" id="s-score" min="0" max="100" placeholder="e.g. 87 (optional)"></div>
+            </div>
+            <div class="field">
+              <label>Description / Expanded Notes <span class="hint">**bold** · _italic_ · - bullets</span></label>
+              <div class="rich-toolbar">
+                <button type="button" class="chip-btn" onclick="richWrap('s-desc','**')"><b>B</b></button>
+                <button type="button" class="chip-btn" onclick="richWrap('s-desc','_')"><i>I</i></button>
+                <button type="button" class="chip-btn" onclick="richWrap('s-desc','- ')">• List</button>
+                <button type="button" class="chip-btn" onclick="richWrap('s-desc','> ')">❝ Quote</button>
+              </div>
+              <textarea id="s-desc" rows="3" placeholder="Rubric, page numbers, sub-steps, what a strong answer looks like..."></textarea>
+            </div>
+            <button class="btn" style="width:100%" onclick="saveSchool()">Save Assignment</button>
+            <div class="school-toolbar" id="school-editbar" style="display:none">
+              <span class="paste-hint" style="color:var(--amber)">Editing an assignment.</span>
+              <button class="chip-btn" type="button" onclick="cancelEditSchool()">✕ Cancel Edit</button>
+            </div>
+
+            <div class="log-label" style="margin-top:18px;padding-top:14px;border-top:1px dashed var(--line)">CLASS CATEGORIES</div>
+            <div class="cc-add">
+              <input id="cc-class-input" placeholder="Class name" onkeydown="if(event.key==='Enter'){event.preventDefault();addClassCat()}" oninput="syncDayLock('cc-class-input','cc-days')">
+              <input id="cc-room" placeholder="Room #">
+              <input id="cc-teacher" placeholder="Teacher">
+              <input id="cc-credits" type="number" min="0" max="10" step="0.5" value="4" title="Credits (default 4)" placeholder="Credits">
+              <select id="cc-period">
+                <option value="p1">Period 1</option>
+                <option value="p2">Period 2</option>
+                <option value="p3">Period 3</option>
+                <option value="p4">Period 4</option>
+                <option value="off">Off-Time</option>
+              </select>
+              <label class="cc-sem-field" title="Classes only appear in the semester they are assigned to"><span>Semester</span>
+                <select id="cc-sem">
+                  <option value="s1">Semester 1</option><option value="s2">Semester 2</option>
+                </select>
+              </label>
+              <button class="btn sm" onclick="addClassCat()">+ Add Class</button>
+            </div>
+            <div class="cc-days-row" id="cc-days">
+              <span class="kicker">Days</span>
+              <button type="button" class="day-chip" data-day="Mon" onclick="toggleClassDay('cc-days','Mon')">Mon</button>
+              <button type="button" class="day-chip" data-day="Tue" onclick="toggleClassDay('cc-days','Tue')">Tue</button>
+              <button type="button" class="day-chip" data-day="Wed" onclick="toggleClassDay('cc-days','Wed')">Wed</button>
+              <button type="button" class="day-chip" data-day="Thu" onclick="toggleClassDay('cc-days','Thu')">Thu</button>
+              <button type="button" class="day-chip" data-day="Fri" onclick="toggleClassDay('cc-days','Fri')">Fri</button>
+              <span class="day-lock" style="display:none">🔒 Thursdays only</span>
+            </div>
+            <div id="class-cat-list"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <h3>Assignments <span class="kicker" id="school-sem-name">S1</span></h3>
+              <div class="school-toolbar">
+                <input type="search" class="school-search" id="school-search" placeholder="Search course / assignment...">
+              </div>
+            </div>
+            <div class="school-toolbar" style="margin-bottom:8px">
+              <span class="kicker">TYPE</span>
+              <button class="chip-btn" id="scat-all" onclick="setSchoolCat('all')">All Types</button>
+              <button class="chip-btn" id="scat-Homework" onclick="setSchoolCat('Homework')">Homework</button>
+              <button class="chip-btn" id="scat-Quiz" onclick="setSchoolCat('Quiz')">Quiz</button>
+              <button class="chip-btn" id="scat-Test" onclick="setSchoolCat('Test')">Test</button>
+              <button class="chip-btn" id="scat-Project" onclick="setSchoolCat('Project')">Project</button>
+              <button class="chip-btn" id="scat-Presentation" onclick="setSchoolCat('Presentation')">Presentation</button>
+              <button class="chip-btn" id="scat-Other" onclick="setSchoolCat('Other')">Other</button>
+            </div>
+            <div class="school-toolbar" style="margin-bottom:12px">
+              <button class="chip-btn" id="sfilter-all" onclick="setSchoolFilter('all')">All</button>
+              <button class="chip-btn" id="sfilter-active" onclick="setSchoolFilter('active')">Active</button>
+              <button class="chip-btn" id="sfilter-archived" onclick="setSchoolFilter('archived')">Archived</button>
+              <select id="filter-cat" onchange="renderSchool()" style="width:auto"><option value="">All Courses</option></select>
+              <select id="filter-prio" onchange="renderSchool()" style="width:auto"><option value="">All Priority</option><option>High</option><option>Medium</option><option>Low</option></select>
+              <select id="filter-due" onchange="renderSchool()" style="width:auto"><option value="asc">Due: Earliest →</option><option value="desc">Due: Latest →</option></select>
+              <span class="kicker" id="school-count"></span>
+            </div>
+            <div id="school-table"></div>
+          </div>
+
+        </div>
+        <datalist id="school-cats"></datalist>
+        </div>
+
+        <div id="sview-tt" style="display:none">
+          <div class="card">
+            <div class="card-head"><h3>Weekly Timetable</h3><span class="kicker" id="tt-count"></span></div>
+            <div id="school-timetable"></div>
+          </div>
+        </div>
+
+        <div id="sview-classes" style="display:none">
+          <div class="card">
+            <div class="card-head">
+              <div><h3>Classes</h3><p class="page-sub">Dynamic Class Manager — add, edit or remove courses and set their meeting days. Select a class to view grades, metadata, and assignment history.</p></div>
+              <div style="display:flex;align-items:center;gap:10px"><span class="kicker" id="classes-count"></span><button class="btn sm" onclick="openClassEditor()">＋ Add Class</button></div>
+            </div>
+            <div id="school-classes"></div>
+          </div>
+        </div>
+
+        <div id="sview-class-detail" style="display:none">
+          <div class="card" id="school-class-detail"></div>
+        </div>
+
+        <div id="sview-xc" style="display:none">
+          <div class="card-head-row">
+            <div>
+              <h2 class="page-title">Extracurricular</h2>
+              <p class="page-sub">Volunteer hours tracker and total graduation credits earned.</p>
+            </div>
+            <button class="btn" onclick="openVolunteerModal()">+ Log Volunteer Hours</button>
+          </div>
+          <div id="xc-kpis" class="xc-kpi-row"></div>
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-head"><h3>GPA Tracker</h3><span class="kicker" id="gpa-kicker"></span></div>
+            <div id="xc-gpa"></div>
+          </div>
+          <div class="xc-grid">
+            <div class="card">
+              <div class="card-head"><h3>Volunteer Hours</h3><span class="kicker" id="xc-hours-kicker"></span></div>
+              <div class="school-form-row" style="max-width:420px">
+                <div class="field"><label>Goal Hours <span class="hint">target to reach</span></label><input type="number" min="0" step="1" id="xc-goal" oninput="saveXcSettings()" placeholder="40"></div>
+                <div class="field"><label>Extracurricular Credits</label><input type="number" min="0" step="0.5" id="xc-credits" oninput="saveXcSettings()" placeholder="0"></div>
+              </div>
+              <div id="xc-volunteer-table"></div>
+            </div>
+            <div class="card">
+              <div class="card-head"><h3>Graduation Credits</h3><span class="kicker">Courses + extracurricular</span></div>
+              <div id="xc-credits-summary"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BC → NCAA 1-DIRECTION FLOW MIND MAP -->
+        <div id="sview-ncaa" style="display:none">
+          <div class="card-head-row">
+            <div>
+              <h2 class="page-title">BC → NCAA 1-Direction Flow Map</h2>
+              <p class="page-sub">Directed path from Grade 10–12 BC Ministry courses into the NCAA D1/D2 16-core requirements. Build your own sequential path below.</p>
+            </div>
+          </div>
+          <div class="ncaa-layout">
+            <div class="card" style="overflow:auto">
+              <div class="card-head"><h3>Course → Core Flow</h3><span class="kicker" id="ncaa-kicker"></span></div>
+              <div id="ncaa-flow"></div>
+            </div>
+            <div>
+              <div class="card" style="margin-bottom:16px">
+                <div class="card-head"><h3>Node Details</h3><span class="kicker">Click a course node</span></div>
+                <div id="ncaa-detail"></div>
+              </div>
+              <div class="card">
+                <div class="card-head"><h3>Custom Path Builder</h3><button class="btn sm" onclick="openNcaaPathModal()">+ New Path</button></div>
+                <div id="ncaa-paths"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ TAB 5: FILM STUDY ============ -->
+      <section id="tab-film" class="tab">
+        <div class="sub-tabs" id="film-subtabs">
+          <button class="sub-tab" data-fview="games" onclick="setFilmView('games')">My Games</button>
+          <button class="sub-tab" data-fview="plays" onclick="setFilmView('plays')">🎯 Plays</button>
+          <button class="sub-tab" data-fview="study" onclick="setFilmView('study')">🎬 Video Vault</button>
+          <button class="sub-tab" data-fview="scouting" onclick="setFilmView('scouting')">Scouting Reports</button>
+          <button class="sub-tab" data-fview="playbook" onclick="setFilmView('playbook')">Playbook</button>
+        </div>
+
+        <!-- VIEW 5A: MY GAMES -->
+        <div class="log-sub" id="fview-games">
+          <div class="card-head-row">
+            <div>
+              <h2 class="page-title">My Games</h2>
+              <p class="page-sub">Season-by-season game log, scores, and opponent notes.</p>
+            </div>
+            <button class="btn" onclick="openGameModal()">+ Add Game</button>
+          </div>
+          <div id="film-games"></div>
+        </div>
+
+        <!-- VIEW 5B: TEAM PLAYS -->
+        <div class="log-sub" id="fview-plays">
+          <div class="card-head-row">
+            <div>
+              <h2 class="page-title">Team Plays</h2>
+              <p class="page-sub">Build and animate tactical plays on an interactive court board.</p>
+            </div>
+            <button class="btn" onclick="newPlay()">+ New Play</button>
+          </div>
+          <div id="film-plays"></div>
+        </div>
+
+        <!-- VIEW 5C: FILM STUDY -->
+        <div class="log-sub" id="fview-study">
+          <div class="sub-tabs" id="study-subtabs" style="margin-top:0">
+            <button class="sub-tab" data-sview="player" onclick="setStudyView('player')">Player Study</button>
+            <button class="sub-tab" data-sview="team" onclick="setStudyView('team')">Team Study</button>
+          </div>
+          <div id="film-study"></div>
+        </div>
+
+        <!-- VIEW 5D: SCOUTING REPORTS (consolidated into Film Study) -->
+        <div class="log-sub" id="fview-scouting">
+          <div class="card-head-row">
+            <div>
+              <h2 class="page-title">Film Study &amp; Opponent Scouting</h2>
+              <p class="page-sub">Break down video with timestamped notes and build Player ID cards — identity, vitals and scouting breakdown.</p>
+            </div>
+            <button class="btn" onclick="openMatchupModal()">+ New Player ID</button>
+          </div>
+          <div class="mental-grid">
+            <div class="card">
+              <div class="card-head"><h3>Video &amp; Timestamped Notes</h3><span class="kicker" id="scout-kicker"></span></div>
+              <div id="scout-panel"></div>
+            </div>
+            <div class="card">
+              <div class="card-head"><h3>Player ID Cards</h3><span class="kicker" id="matchup-kicker"></span></div>
+              <div id="matchup-list"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEW 5E: MASTER PLAYBOOK LIBRARY (consolidated into Film Study) -->
+        <div class="log-sub" id="fview-playbook">
+          <div class="card-head-row">
+            <div>
+              <h2 class="page-title">Master Playbook Library</h2>
+              <p class="page-sub">Categorized repository of offenses, press / press break, SLOB/BLOB and defense — with simplified tactical boards.</p>
+            </div>
+            <button class="btn" onclick="openPlaybookModal()">+ Add Play</button>
+          </div>
+          <div id="playbook-panel"></div>
+        </div>
+      </section>
+
+      <!-- ============ TAB 6: FINANCE TRACKER ============ -->
+      <section id="tab-finance" class="tab">
+        <div class="card-head-row">
+          <div>
+            <h2 class="page-title">Finance Tracker</h2>
+            <p class="page-sub">Multi-year banking engine for student-athletes — Grade 10 through Grade 12.</p>
+          </div>
+          <button class="btn" onclick="openTxModal()">+ Log Transaction</button>
+        </div>
+        <div class="fin-year-chips">
+          <span class="kicker">ACADEMIC YEAR VIEW</span>
+          <button class="chip-btn" id="finy-g10" onclick="setFinYear('g10')">Grade 10</button>
+          <button class="chip-btn" id="finy-g11" onclick="setFinYear('g11')">Grade 11</button>
+          <button class="chip-btn" id="finy-g12" onclick="setFinYear('g12')">Grade 12</button>
+          <button class="chip-btn" id="finy-all" onclick="setFinYear('all')">All-Time</button>
+          <span class="kicker" style="margin-left:12px">I AM IN</span>
+          <select id="fin-mygrade" onchange="setFinGrade(this.value)" style="width:auto">
+            <option value="g10">Grade 10</option>
+            <option value="g11">Grade 11</option>
+            <option value="g12">Grade 12</option>
+          </select>
+        </div>
+        <div id="finance-kpis"></div>
+        <div class="card fin-trend-card">
+          <div class="card-head"><h3>Cash Flow &amp; Net Worth Trend</h3><span class="kicker" id="fin-trend-kicker"></span></div>
+          <div id="finance-trend"></div>
+        </div>
+        <div class="fin-sections">
+
+          <!-- SECTION A — INCOME -->
+          <div class="card">
+            <div class="card-head fin-sec-head">
+              <div>
+                <h3><span class="fin-sec-tag fin-sec-a">Section A</span> Income &amp; Allowance Tracker</h3>
+                <p class="page-sub">Jobs · Allowance · NIL / Sponsorships · Prize Money</p>
+              </div>
+              <button class="btn sm" onclick="openTxModal(null,'income')">+ Log Income</button>
+            </div>
+            <div id="fin-income-block"></div>
+          </div>
+
+          <!-- SECTION B — EXPENSES -->
+          <div class="card">
+            <div class="card-head fin-sec-head">
+              <div>
+                <h3><span class="fin-sec-tag fin-sec-b">Section B</span> Athlete Expense Categories</h3>
+                <p class="page-sub">Gear / Shoes · Training &amp; Coaching Fees · Travel / Fuel · Nutrition · Tournament Fees</p>
+              </div>
+              <button class="btn sm" onclick="openTxModal(null,'expense')">+ Log Expense</button>
+            </div>
+            <div id="fin-expense-block"></div>
+            <div class="log-label" style="margin-top:18px">SPENDING BY CATEGORY <span class="hint">Current month</span></div>
+            <div id="finance-cats"></div>
+          </div>
+
+          <!-- SECTION C — SAVINGS & BUDGET -->
+          <div class="card">
+            <div class="card-head fin-sec-head">
+              <div>
+                <h3><span class="fin-sec-tag fin-sec-c">Section C</span> Savings Goals &amp; Budget</h3>
+                <p class="page-sub">Big-ticket targets: summer travel ball, personal trainer, new shoes.</p>
+              </div>
+              <button class="btn sm" onclick="openSavingsModal()">+ New Goal</button>
+            </div>
+            <div id="fin-budget"></div>
+            <div id="finance-savings" style="margin-top:14px"></div>
+          </div>
+
+          <!-- SECTION D — INVESTING & WEALTH -->
+          <div class="card">
+            <div class="card-head fin-sec-head">
+              <div>
+                <h3><span class="fin-sec-tag fin-sec-d">Section D</span> Investing &amp; Wealth</h3>
+                <p class="page-sub">Beginner-friendly portfolio tracking — index funds, savings, stocks and compound growth.</p>
+              </div>
+              <button class="btn sm" onclick="openInvestmentModal()">+ Log Investment</button>
+            </div>
+            <div id="fin-portfolio"></div>
+            <div class="log-label" style="margin-top:18px">ASSET BREAKDOWN <span class="hint">by category</span></div>
+            <div id="fin-assets"></div>
+            <div class="log-label" style="margin-top:18px">COMPOUND INTEREST CALCULATOR <span class="hint">5 to 10 years</span></div>
+            <div id="fin-compound"></div>
+            <div class="log-label" style="margin-top:18px">SIMPLE INVESTMENT LOG</div>
+            <div id="fin-invest-table"></div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ============ TAB 7: RECRUITING CRM ============ -->
+      <section id="tab-recruiting" class="tab">
+        <div class="card-head-row">
+          <div>
+            <h2 class="page-title">Recruiting CRM</h2>
+            <p class="page-sub">Coach &amp; school pipeline — track outreach, dialogue, offers and commitments.</p>
+          </div>
+          <button class="btn" onclick="openCoachModal()">+ New Coach / School</button>
+        </div>
+        <div class="rec-filter" id="rec-filter"></div>
+        <div class="rec-board" id="recruiting-board"></div>
+      </section>
+
+      <!-- ============ TAB 7: LIFE MAXX ============ -->
+      <section id="tab-life" class="tab">
+        <div class="sub-tabs" id="life-subtabs">
+          <button class="sub-tab" data-lview="habits" onclick="setLifeView('habits')">⚡ Categories View</button>
+          <button class="sub-tab" data-lview="monthly" onclick="setLifeView('monthly')">📅 Monthly Tracker</button>
+          <button class="sub-tab" data-lview="goals" onclick="setLifeView('goals')">🎯 Goals Engine</button>
+          <button class="sub-tab" data-lview="combine" onclick="setLifeView('combine')">📏 Physical Combine</button>
+        </div>
+
+        <!-- VIEW: HABIT CATEGORIES -->
+        <div class="log-sub" id="lview-habits">
+          <div class="card-head-row">
+            <div>
+              <h2 class="page-title">Habit Categories</h2>
+              <p class="page-sub">Physical &amp; Recovery · Sleep Hygiene · Nutrition &amp; Fuel · Mindset. Check-ins reset automatically at midnight and every bucket keeps its own streak and history.</p>
+            </div>
+            <button class="btn sm" onclick="openHabitModal()">+ New Habit</button>
+          </div>
+          <div id="habit-buckets"></div>
+        </div>
+
+        <!-- VIEW: MONTHLY TRACKER -->
+        <div class="log-sub" id="lview-monthly">
+          <div class="card-head-row">
+            <div>
+              <h2 class="page-title">Monthly Tracker</h2>
+              <p class="page-sub">Historical completion matrix and active streak analytics for every habit — the single source of truth for habit history.</p>
+            </div>
+          </div>
+          <div id="habits-view"></div>
+        </div>
+
+
+        <div class="log-sub" id="lview-goals">
+          <div class="card-head-row">
+            <div>
+              <h2 class="page-title">Goals Engine</h2>
+              <p class="page-sub">Dual-view matrix — filter by timeframe and category. Every goal carries a target deadline, a progress bar and linked sub-habits.</p>
+            </div>
+            <button class="btn" onclick="addGoal()">+ New Goal</button>
+          </div>
+          <div class="goal-toggles">
+            <div class="gt-row"><span class="kicker">TIMEFRAME VIEW</span><div class="gt-chips" id="goal-tf-chips"></div></div>
+            <div class="gt-row"><span class="kicker">CATEGORY VIEW</span><div class="gt-chips" id="goal-cat-chips"></div></div>
+          </div>
+          <div class="goals-grid" id="goals-grid"></div>
+        </div>
+
+
+        <!-- VIEW: PHYSICAL COMBINE (moved from Workouts in V1.2) -->
+        <div class="log-sub" id="lview-combine">
+          <div class="card-head-row">
+            <div>
+              <h2 class="page-title">Physical Combine</h2>
+              <p class="page-sub">Biometric baseline — height, weight, wingspan, reach and vertical. Measured, not estimated.</p>
+            </div>
+            <button class="btn sm" onclick="saveCombine()">Save Measurements</button>
+          </div>
+          <div id="life-combine"></div>
+          <div class="card" style="margin-top:16px">
+            <div class="card-head"><h3>Combine History</h3><span class="kicker" id="combine-hist-kicker"></span></div>
+            <div id="combine-history"></div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ============ TAB 8: BRAINSTORM (MIND MAPPING ENGINE) ============ -->
+      <section id="tab-brainstorm" class="tab">
+        <div class="card-head-row">
+          <div>
+            <h2 class="page-title">Brainstorm — Mind Mapping Engine</h2>
+            <p class="page-sub">Floating node generation, root branching, branch folding, Phoenix OS deep-links and rich attachments.</p>
+          </div>
+          <div class="bm-head-actions">
+            <select id="bm-map-select" class="mini-input" onchange="bmSelectMap(this.value)" aria-label="Active mind map"></select>
+            <button class="btn sm" onclick="bmNewMap()">+ Map</button>
+            <button class="btn sm ghost" onclick="bmRenameMap()">✎ Rename</button>
+            <button class="icon-btn danger" onclick="bmDeleteMap()" title="Delete this map">✕</button>
+          </div>
+        </div>
+        <div class="bm-toolbar">
+          <span class="kicker">LAYOUT</span>
+          <button class="chip-btn" id="bm-layout-mind" onclick="bmSetLayout('mind')">🧠 Standard Mind Map</button>
+          <button class="chip-btn" id="bm-layout-org" onclick="bmSetLayout('org')">🏢 Org Structure</button>
+          <button class="chip-btn" id="bm-layout-tree" onclick="bmSetLayout('tree')">⚖️ Decision / Argument Tree</button>
+          <span class="bm-sep"></span>
+          <span class="kicker">CANVAS</span>
+          <button class="chip-btn" onclick="bmZoom(-1)">−</button>
+          <button class="chip-btn" id="bm-zoom-label" onclick="bmFit()">100%</button>
+          <button class="chip-btn" onclick="bmZoom(1)">+</button>
+          <button class="chip-btn" onclick="bmFit()">⤢ Fit</button>
+        </div>
+        <div class="bm-hint"><b>Tab</b> child · <b>Enter</b> sibling · <b>Delete</b> remove · <b>Space</b> fold/unfold branch · drag a node to place it · drag empty canvas to pan · double-click to rename</div>
+        <div class="bm-stage" id="bm-stage">
+          <div class="bm-canvas" id="bm-canvas">
+            <svg class="bm-edges" id="bm-edges"></svg>
+            <div class="bm-nodes" id="bm-nodes"></div>
+          </div>
+          <div class="bm-actions" id="bm-actions">
+            <button class="bm-act" onclick="bmAddChild()" title="Add child sub-node (Tab)">＋ Child</button>
+            <button class="bm-act" onclick="bmAddSibling()" title="Add sibling node (Enter)">＋ Sibling</button>
+            <button class="bm-act" onclick="bmOpenLinkPicker()" title="Attach a Phoenix OS deep-link">🔗 Link</button>
+            <button class="bm-act danger" onclick="bmDeleteSelected()" title="Delete node (Del)">🗑 Delete</button>
+          </div>
+        </div>
+        <div class="bm-inspector" id="bm-inspector"></div>
+      </section>
+
+      <!-- ============ TAB 10: SYSTEM SETTINGS ============ -->
+      <section id="tab-settings" class="tab">
+        <div class="sub-tabs" id="settings-subtabs">
+          <button class="sub-tab" data-sv="prefs" onclick="setSettingsView('prefs')">⚙️ Preferences</button>
+          <button class="sub-tab" data-sv="backup" onclick="setSettingsView('backup')">💾 Data Backup</button>
+          <button class="sub-tab" data-sv="archive" onclick="setSettingsView('archive')">🗄 System Archive</button>
+          <button class="sub-tab" data-sv="trash" onclick="setSettingsView('trash')">🗑 Recently Deleted</button>
+        </div>
+        <div class="log-sub active" id="sview-prefs"><div id="settings-prefs"></div></div>
+        <div class="log-sub" id="sview-backup"><div id="settings-backup"></div></div>
+        <div class="log-sub" id="sview-archive"><div id="settings-archive"></div></div>
+        <div class="log-sub" id="sview-trash"><div id="settings-trash"></div></div>
+      </section>
+
+      <!-- ============ TAB 11: MOBILE SYNC (laptop ⇄ phone) ============ -->
+      <section id="tab-mobile" class="tab">
+        <div class="card msync-hero">
+          <div class="card-head">
+            <h3>📲 Mobile Sync</h3>
+            <span class="kicker">text transfer · no account, no server</span>
+          </div>
+          <p class="paste-hint" style="margin-bottom:10px">Everything in this app lives in the browser it runs in, so your laptop and phone each hold their own copy. This section moves data between them as plain text — build a block here, send it to yourself in a note, paste it into this same section on the other device. Nothing leaves your devices except through whatever you use to send the text.</p>
+          <div class="msync-steps">
+            <span><b>1</b> Build below</span>
+            <span><b>2</b> ⧉ Copy</span>
+            <span><b>3</b> Send it to the other device</span>
+            <span><b>4</b> Paste + import there</span>
+          </div>
+        </div>
+
+        <!-- OUT — laptop → phone -->
+        <div class="card ws-sync-card">
+          <div class="card-head">
+            <h3>⇧ Laptop → Phone</h3>
+            <span class="kicker" id="msync-out-info">nothing built yet</span>
+          </div>
+          <div class="msync-chiprow">
+            <span class="kicker">INCLUDE</span>
+            <button class="chip-btn msync-scope active" data-ms="today" onclick="setMsyncScope('today')">Today</button>
+            <button class="chip-btn msync-scope" data-ms="week" onclick="setMsyncScope('week')">Last 7 days</button>
+            <button class="chip-btn msync-scope" data-ms="all" onclick="setMsyncScope('all')">All workouts</button>
+            <span class="msync-sep"></span>
+            <span class="kicker">AS</span>
+            <button class="chip-btn msync-mode active" data-mm="lines" onclick="setMsyncMode('lines')">Workout lines</button>
+            <button class="chip-btn msync-mode" data-mm="code" onclick="setMsyncMode('code')">Full backup code</button>
+          </div>
+          <textarea id="msync-out" class="msync-out" readonly placeholder="Choose what to include, then press ⇩ Build text."></textarea>
+          <div class="ws-actions">
+            <button class="btn" onclick="msyncBuild()">⇩ Build text</button>
+            <button class="btn ghost" onclick="msyncCopy()">⧉ Copy</button>
+            <button class="btn ghost sm" onclick="msyncDownload()">⬇ Save .txt</button>
+          </div>
+          <div class="ws-sync-help" style="margin-top:10px">
+            <b>WHAT TRAVELS</b>
+            <span><i>Workout lines</i> — one line per logged workout, carrying its sets, drill order, categories, RPE, spot rows and its own id, so pasting them back reproduces the workout exactly and re-pasting updates it instead of duplicating it.</span>
+            <span><i>Full backup code</i> — your whole app (school, goals, habits, playbook, presets) packed into one line. The code is compressed, so it is roughly a quarter of the length a plain copy would be; older <i>PHOENIX1-</i> codes still import.</span>
+            <em>Either way it is plain text — it survives Notes, Messages, email, AirDrop and a QR-free copy/paste. A code that gets line-wrapped on the way still imports.</em>
+          </div>
+        </div>
+
+        <!-- IN — phone → laptop (all original sync features) -->
+        <div class="card ws-sync-card">
+          <div class="card-head">
+            <h3>⇩ Phone → Laptop</h3>
+            <span class="kicker">one workout per line · court spots supported</span>
+          </div>
+          <p class="paste-hint" style="margin-bottom:8px">Paste notes from your phone — or a compressed backup code built on it. Workout lines become their own saved workouts (never one giant combined day block), and a line copied out of this section pastes back <b>exactly</b>: same drill order, same set types, categories, RPE, individual lift sets and spot rows. The id in each line means pasting the same block twice updates those workouts in place instead of duplicating them.</p>
+          <div class="ws-sync-grid">
+            <textarea id="msync-input" rows="6" oninput="msyncInputHint()" placeholder="Basketball | 2026-10-18 | Short Corner Left 4/6; Top of Key 3/5&#10;Lift | 2026-10-18 | Bench Press 135x5, 135x5, 140x3&#10;Strength | 2026-10-18 | Box Jumps 3x10&#10;or paste a backup code (PHOENIX2-…)"></textarea>
+            <div class="ws-sync-help">
+              <b>HAND-TYPED (quickest)</b>
+              <span><i>Basketball</i> | date | Short Corner Left 4/6; Top of Key 3/5</span>
+              <span><i>Lift</i> | date | Bench Press 135x5, 135x5, 140x3</span>
+              <span><i>Strength</i> | date | Box Jumps 3x10</span>
+              <em>Date is optional — omitted lines land on the discipline's current log date.</em>
+              <b>EXPORTED (exact)</b>
+              <span><i>header</i> id=… / name=… / loc=… / time=… / notes=… / log=…</span>
+              <span><i>set</i> @Shooting rpe=7 → one block per set, in order</span>
+              <span><i>drill</i> Name att=… mk=… cat=… · flags pr / sec / spots</span>
+              <span><i>sets</i> 135x5,140x3 → one token per set · x8 = a set with no weight</span>
+              <span><i>spot</i> Left Wing 6/10 → sits directly under its own drill</span>
+              <em>Values needing it are written ~url-encoded; a code (PHOENIX2- or PHOENIX1-) or raw JSON is detected automatically.</em>
+            </div>
+          </div>
+          <div id="msync-input-hint" class="msync-hint"></div>
+          <div class="ws-actions" style="margin-top:0">
+            <button class="btn" onclick="msyncImport()">⇪ Import now</button>
+            <button class="btn ghost" onclick="msyncMerge()">⇄ Merge workouts</button>
+            <button class="btn ghost sm" onclick="loadMobileSyncSample()">Load Sample</button>
+            <button class="btn ghost sm" onclick="clearMobileSync()">Clear</button>
+            <button class="btn ghost sm" onclick="exportJSON()">⬇ Backup first</button>
+          </div>
+          <div id="msync-result" class="ws-sync-result"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <h3>⇄ Transfer Log</h3>
+            <span class="kicker">this session only · not saved</span>
+          </div>
+          <div class="msync-log" id="msync-log"></div>
+        </div>
+      </section>
+
+
+    </div>
+  </main>
+</div>
+
+<!-- ============ MODAL (Preset Manager / Chooser) ============ -->
+<div id="modal-overlay" class="hidden" onclick="if(event.target===this)closeModal()">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-head">
+      <h3 id="modal-title">Preset Manager</h3>
+      <button class="icon-btn" onclick="closeModal()" title="Close">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<datalist id="lift-splits">
+  <option value=""></option>
+</datalist>
+
+<datalist id="spots-list">
+  <option value="Left Corner"></option>
+  <option value="Right Corner"></option>
+  <option value="Short Corner"></option>
+  <option value="Short Corner Left"></option>
+  <option value="Short Corner Right"></option>
+  <option value="Wing"></option>
+  <option value="Wing Left"></option>
+  <option value="Wing Right"></option>
+  <option value="Top of Key"></option>
+  <option value="Elbow Left"></option>
+  <option value="Elbow Right"></option>
+  <option value="Free Throw"></option>
+  <option value="Mid-Range Center"></option>
+  <option value="Paint"></option>
+</datalist>
+
+<input type="file" id="importFile" accept=".json,application/json" hidden>
+
+<!-- ============ LIVE WORKOUT MODE OVERLAY ============ -->
+<div id="live-overlay" class="hidden" role="dialog" aria-modal="true" aria-label="Live workout mode"></div>
+
+<div id="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
