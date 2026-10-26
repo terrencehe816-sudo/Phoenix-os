@@ -11,6 +11,8 @@
 <title>PHOENIX OS V2.0</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%3E%3Cdefs%3E%3ClinearGradient%20id%3D%27g%27%20x1%3D%2712%27%20y1%3D%272%27%20x2%3D%2712%27%20y2%3D%2722%27%20gradientUnits%3D%27userSpaceOnUse%27%3E%3Cstop%20stop-color%3D%27%2366fcf1%27%2F%3E%3Cstop%20offset%3D%271%27%20stop-color%3D%27%231ea89e%27%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Cpath%20fill%3D%27url%28%23g%29%27%20d%3D%27M12%207c-2.2%201.5-3.4%203.4-3.4%205.8a3.4%203.4%200%200%200%206.8%200c0-2.4-1.2-4.3-3.4-5.8z%27%2F%3E%3Cpath%20fill%3D%27url%28%23g%29%27%20d%3D%27M9.2%206.6%206.7%204.9c-.9%201.1-.7%202.1.7%203.1-.7%201-.4%202%20.6%203-1.6%200-2.5.8-2.8%202.3l1.9.4c.2-1.2%201-1.8%202.4-1.9-.5-1.7-.2-3.1%201.5-4.4z%27%2F%3E%3Cpath%20fill%3D%27url%28%23g%29%27%20d%3D%27M14.8%206.6l2.5-1.7c.9%201.1.7%202.1-.7%203.1.7%201%20.4%202-.6%203%201.6%200%202.5.8%202.8%202.3l-1.9.4c-.2-1.2-1-1.8-2.4-1.9.5-1.7.2-3.1-1.5-4.4z%27%2F%3E%3Ccircle%20cx%3D%2712%27%20cy%3D%274.9%27%20r%3D%271.3%27%20fill%3D%27url%28%23g%29%27%2F%3E%3C%2Fsvg%3E">
   <link rel="stylesheet" href="styles.css">
+  <!-- Supabase JS v2 (UMD build exposes window.supabase). Deferred so it never blocks first paint. -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 </head>
 <body>
 
@@ -51,10 +53,9 @@
       <button class="nav-btn" data-tab="film" onclick="switchTab('film')"><span class="nav-num">05</span><span>🎥 Film Study</span></button>
       <button class="nav-btn" data-tab="finance" onclick="switchTab('finance')"><span class="nav-num">06</span><span>💰 Finance Tracker</span></button>
       <button class="nav-btn" data-tab="life" onclick="switchTab('life')"><span class="nav-num">07</span><span>⚡ Life Maxx</span></button>
-      <button class="nav-btn" data-tab="brainstorm" onclick="switchTab('brainstorm')"><span class="nav-num">08</span><span>🧠 Brainstorm</span></button>
-      <button class="nav-btn" data-tab="recruiting" onclick="switchTab('recruiting')"><span class="nav-num">09</span><span>🎯 Recruiting CRM</span></button>
-      <button class="nav-btn" data-tab="settings" onclick="switchTab('settings')"><span class="nav-num">10</span><span>⚙️ System Settings</span></button>
-      <button class="nav-btn" data-tab="mobile" onclick="switchTab('mobile')"><span class="nav-num">11</span><span>📲 Mobile Sync</span></button>
+      <button class="nav-btn" data-tab="recruiting" onclick="switchTab('recruiting')"><span class="nav-num">08</span><span>🎯 Recruiting CRM</span></button>
+      <button class="nav-btn" data-tab="settings" onclick="switchTab('settings')"><span class="nav-num">09</span><span>⚙️ System Settings</span></button>
+      <button class="nav-btn" data-tab="mobile" onclick="switchTab('mobile')"><span class="nav-num">10</span><span>📲 Mobile Sync</span></button>
     </nav>
 
     <div class="side-util">
@@ -286,11 +287,11 @@
           <button class="sub-tab" data-lv="records" onclick="setLogView('records')">🏆 Records</button>
         </div>
 
-        <!-- Mobile Text Sync moved to its own section (11) — laptop ⇄ phone transfer -->
+        <!-- Mobile Text Sync moved to its own section (10) — laptop ⇄ phone transfer -->
         <div class="card">
           <div class="card-head">
             <h3>📲 Mobile Sync</h3>
-            <span class="kicker">section 11 · laptop ⇄ phone</span>
+            <span class="kicker">section 10 · laptop ⇄ phone</span>
           </div>
           <p class="paste-hint" style="margin-bottom:10px">Phone notes and both-way data transfer now have their own section, so nothing is buried in the workout tracker.</p>
           <button class="btn sm" onclick="switchTab('mobile')">Open Mobile Sync →</button>
@@ -301,7 +302,7 @@
           <div class="card">
             <div class="card-head">
               <h3>🏋️ Lifting</h3>
-              <span class="kicker ws-env-blurb">Heavy Lunch Lifts · Killarney Weekend Sessions · set / rep / RPE · volume</span>
+              <span class="kicker ws-env-blurb">Heavy Lunch Lifts · Killarney Weekend Sessions · per-set weight &amp; reps · RPE · volume</span>
               <span class="kicker" id="ws-date-label-lift"></span>
               <label class="kicker" style="display:flex;align-items:center;gap:6px;text-transform:none;letter-spacing:.04em">Log date <input type="date" id="ws-date-override-lift" class="mini-input" onchange="setWorkoutDate('lift',this.value)"></label>
             </div>
@@ -823,70 +824,74 @@
 
       </section>
 
-      <!-- ============ TAB 8: BRAINSTORM (MIND MAPPING ENGINE) ============ -->
-      <section id="tab-brainstorm" class="tab">
-        <div class="card-head-row">
-          <div>
-            <h2 class="page-title">Brainstorm — Mind Mapping Engine</h2>
-            <p class="page-sub">Floating node generation, root branching, branch folding, Phoenix OS deep-links and rich attachments.</p>
-          </div>
-          <div class="bm-head-actions">
-            <select id="bm-map-select" class="mini-input" onchange="bmSelectMap(this.value)" aria-label="Active mind map"></select>
-            <button class="btn sm" onclick="bmNewMap()">+ Map</button>
-            <button class="btn sm ghost" onclick="bmRenameMap()">✎ Rename</button>
-            <button class="icon-btn danger" onclick="bmDeleteMap()" title="Delete this map">✕</button>
-          </div>
-        </div>
-        <div class="bm-toolbar">
-          <span class="kicker">LAYOUT</span>
-          <button class="chip-btn" id="bm-layout-mind" onclick="bmSetLayout('mind')">🧠 Standard Mind Map</button>
-          <button class="chip-btn" id="bm-layout-org" onclick="bmSetLayout('org')">🏢 Org Structure</button>
-          <button class="chip-btn" id="bm-layout-tree" onclick="bmSetLayout('tree')">⚖️ Decision / Argument Tree</button>
-          <span class="bm-sep"></span>
-          <span class="kicker">CANVAS</span>
-          <button class="chip-btn" onclick="bmZoom(-1)">−</button>
-          <button class="chip-btn" id="bm-zoom-label" onclick="bmFit()">100%</button>
-          <button class="chip-btn" onclick="bmZoom(1)">+</button>
-          <button class="chip-btn" onclick="bmFit()">⤢ Fit</button>
-        </div>
-        <div class="bm-hint"><b>Tab</b> child · <b>Enter</b> sibling · <b>Delete</b> remove · <b>Space</b> fold/unfold branch · drag a node to place it · drag empty canvas to pan · double-click to rename</div>
-        <div class="bm-stage" id="bm-stage">
-          <div class="bm-canvas" id="bm-canvas">
-            <svg class="bm-edges" id="bm-edges"></svg>
-            <div class="bm-nodes" id="bm-nodes"></div>
-          </div>
-          <div class="bm-actions" id="bm-actions">
-            <button class="bm-act" onclick="bmAddChild()" title="Add child sub-node (Tab)">＋ Child</button>
-            <button class="bm-act" onclick="bmAddSibling()" title="Add sibling node (Enter)">＋ Sibling</button>
-            <button class="bm-act" onclick="bmOpenLinkPicker()" title="Attach a Phoenix OS deep-link">🔗 Link</button>
-            <button class="bm-act danger" onclick="bmDeleteSelected()" title="Delete node (Del)">🗑 Delete</button>
-          </div>
-        </div>
-        <div class="bm-inspector" id="bm-inspector"></div>
-      </section>
-
-      <!-- ============ TAB 10: SYSTEM SETTINGS ============ -->
+      <!-- ============ TAB 9: SYSTEM SETTINGS ============ -->
       <section id="tab-settings" class="tab">
         <div class="sub-tabs" id="settings-subtabs">
           <button class="sub-tab" data-sv="prefs" onclick="setSettingsView('prefs')">⚙️ Preferences</button>
-          <button class="sub-tab" data-sv="backup" onclick="setSettingsView('backup')">💾 Data Backup</button>
+          <button class="sub-tab" data-sv="backup" onclick="setSettingsView('backup')">☁️ Data &amp; Sync</button>
           <button class="sub-tab" data-sv="archive" onclick="setSettingsView('archive')">🗄 System Archive</button>
           <button class="sub-tab" data-sv="trash" onclick="setSettingsView('trash')">🗑 Recently Deleted</button>
         </div>
         <div class="log-sub active" id="sview-prefs"><div id="settings-prefs"></div></div>
-        <div class="log-sub" id="sview-backup"><div id="settings-backup"></div></div>
+        <div class="log-sub" id="sview-backup">
+          <div id="settings-backup">
+            <div class="card sync-panel">
+              <div class="card-head">
+                <h3>☁ Data Management &amp; Sync</h3>
+                <span class="sync-status"><i class="sync-dot" id="sync-dot"></i><span id="sync-status-text">Not connected</span></span>
+              </div>
+              <p class="page-sub">Everything is written to this browser instantly. With <b>auto-sync</b> on, each edit is queued and uploaded in the background — offline edits wait on this device and retry with backoff. <b>Sync Data</b> runs the same pull → merge → push on demand. <b>Export Data</b> writes a full JSON backup you can restore on any device.</p>
+              <div class="sync-actions">
+                <button class="btn sync-btn" id="btn-sync" onclick="syncData()"><span class="sync-spinner" aria-hidden="true"></span><span id="sync-btn-label">☁ Sync Data</span></button>
+                <button class="btn ghost" onclick="exportData()">⭳ Export Data (JSON)</button>
+                <button class="btn ghost" onclick="document.getElementById('importFile').click()">⭱ Import Data (JSON)</button>
+              </div>
+              <div class="sync-last" id="sync-last">Cloud sync is off — add your Supabase project, or export a backup.</div>
+              <div class="sync-auto-row">
+                <label class="sync-toggle">
+                  <input type="checkbox" id="sync-auto" onchange="setSyncAuto(this.checked)">
+                  <span class="sync-switch" aria-hidden="true"></span>
+                  <span class="sync-toggle-text">Auto-sync after edits <em>background · offline queue · retry</em></span>
+                </label>
+                <button class="btn ghost sm sync-retry" id="sync-retry" onclick="retrySyncNow()" hidden>↻ Retry now</button>
+              </div>
+              <div class="sync-queue" id="sync-queue" role="status" aria-live="polite"></div>
+              <details class="sync-setup" id="sync-setup">
+                <summary>Cloud connection <span class="kicker">Supabase</span></summary>
+                <div class="sync-grid">
+                  <label class="sync-field">Project URL<input class="sync-input" id="sync-url" type="url" placeholder="https://yourproject.supabase.co" autocomplete="off" spellcheck="false"></label>
+                  <label class="sync-field">Anon public key<input class="sync-input" id="sync-anon" type="password" placeholder="eyJhbGciOiJIUzI1NiIs…" autocomplete="off" spellcheck="false"></label>
+                  <label class="sync-field">Sync key <em>shared secret · same on every device</em><input class="sync-input" id="sync-workspace" type="text" placeholder="Generate a key, then copy it to your phone" autocomplete="off" spellcheck="false"></label>
+                </div>
+                <div class="sync-actions">
+                  <button class="btn sm" onclick="saveSyncSetup()">Save connection</button>
+                  <button class="btn ghost sm" onclick="generateSyncKey()">Generate sync key</button>
+                  <button class="btn ghost sm" onclick="disconnectSync()">Disconnect</button>
+                </div>
+                <p class="paste-hint">The anon key is meant to be public — your row is protected by the database policy below, locked to the sync key. Keep the sync key private: anyone who has it can read that row. Sync merges by id, so an item deleted on one device can return if another device still has it.</p>
+              </details>
+              <details class="sync-setup" id="sync-sql-wrap">
+                <summary>Database setup SQL <span class="kicker">run once</span></summary>
+                <pre class="sync-sql" id="sync-sql"></pre>
+                <div class="sync-actions"><button class="btn ghost sm" onclick="copySyncSql()">⧉ Copy SQL</button></div>
+                <p class="paste-hint">Supabase → SQL Editor → paste → Run. It creates <b>public.phoenix_sync</b> and a policy that only exposes the row for your sync key.</p>
+              </details>
+            </div>
+            <div id="settings-stats"></div>
+          </div>
+        </div>
         <div class="log-sub" id="sview-archive"><div id="settings-archive"></div></div>
         <div class="log-sub" id="sview-trash"><div id="settings-trash"></div></div>
       </section>
 
-      <!-- ============ TAB 11: MOBILE SYNC (laptop ⇄ phone) ============ -->
+      <!-- ============ TAB 10: MOBILE SYNC (laptop ⇄ phone) ============ -->
       <section id="tab-mobile" class="tab">
         <div class="card msync-hero">
           <div class="card-head">
             <h3>📲 Mobile Sync</h3>
-            <span class="kicker">text transfer · no account, no server</span>
+            <span class="kicker">text transfer · offline fallback</span>
           </div>
-          <p class="paste-hint" style="margin-bottom:10px">Everything in this app lives in the browser it runs in, so your laptop and phone each hold their own copy. This section moves data between them as plain text — build a block here, send it to yourself in a note, paste it into this same section on the other device. Nothing leaves your devices except through whatever you use to send the text.</p>
+          <p class="paste-hint" style="margin-bottom:10px">Everything in this app lives in the browser it runs in, so your laptop and phone each hold their own copy. This section moves data between them as plain text — build a block here, send it to yourself in a note, paste it into this same section on the other device. Nothing leaves your devices except through whatever you use to send the text. For automatic two-way sync instead, connect Supabase under <b>System Settings → Data &amp; Sync</b>.</p>
           <div class="msync-steps">
             <span><b>1</b> Build below</span>
             <span><b>2</b> ⧉ Copy</span>

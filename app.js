@@ -12,12 +12,12 @@ const CATEGORIES = {
   skiing:     { label: 'Skiing / Coaching',  color: '#9d4edd' },
   life:       { label: 'Life / Recovery',    color: '#e63946' }
 };
-const TITLES = { dashboard: '🏠 Dashboard', routine: '📅 Daily Routine', log: '🏋️ Workouts', school: '📚 School', film: '🎥 Film Study', finance: '💰 Finance Tracker', life: '⚡ Life Maxx', brainstorm: '🧠 Brainstorm', recruiting: '🎯 Recruiting CRM', settings: '⚙️ System Settings', mobile: '📲 Mobile Sync' };
-/* Production nav — eleven sections, in order. Retired tabs are mapped forward so
-   a legacy save can never land on a missing view. Section 11 (Mobile Sync) owns
+const TITLES = { dashboard: '🏠 Dashboard', routine: '📅 Daily Routine', log: '🏋️ Workouts', school: '📚 School', film: '🎥 Film Study', finance: '💰 Finance Tracker', life: '⚡ Life Maxx', recruiting: '🎯 Recruiting CRM', settings: '⚙️ System Settings', mobile: '📲 Mobile Sync' };
+/* Production nav — ten sections, in order. Retired tabs are mapped forward so
+   a legacy save can never land on a missing view. Section 10 (Mobile Sync) owns
    every laptop ⇄ phone transfer: workout-line import, text export and the whole-app
    backup code. */
-const NAV_SECTIONS = ['dashboard', 'routine', 'log', 'school', 'film', 'finance', 'life', 'brainstorm', 'recruiting', 'settings', 'mobile'];
+const NAV_SECTIONS = ['dashboard', 'routine', 'log', 'school', 'film', 'finance', 'life', 'recruiting', 'settings', 'mobile'];
 const LEGACY_TAB_MAP = { goals: 'life', mental: 'routine' };
 function normalizeTab(name){ return NAV_SECTIONS.includes(name) ? name : (LEGACY_TAB_MAP[name] || 'dashboard'); }
 const WEEKLY_PROMPTS = [
@@ -361,6 +361,10 @@ const safeUrl = value => /^https?:\/\//i.test(String(value || '').trim()) ? Stri
 
 const LS_KEY = 'phoenix-os-v2';
 const WORKOUT_PRESETS_KEY = 'workout_presets';
+const SYNC_CONFIG_KEY = 'phoenix-sync-config';
+const SYNC_META_KEY = 'phoenix-sync-meta';
+const SYNC_QUEUE_KEY = 'phoenix-sync-queue';
+const SYNC_TABLE = 'phoenix_sync';
 const DAY_ABBR = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
@@ -622,7 +626,7 @@ function mergePresetCollections(primary, secondary){
   };
   ['basketball', 'lift', 'strength'].forEach(type => {
     (Array.isArray(secondary && secondary[type]) ? secondary[type] : []).forEach(raw => {
-      const preset = migrateSessionPreset({ ...raw, type: raw.type || type });
+      const preset = normalizeLiftPreset(migrateSessionPreset({ ...raw, type: raw.type || type }));
       const exists = out[type].some(x => (x.id && preset.id && x.id === preset.id) ||
         (x.name && preset.name && x.name.trim().toLowerCase() === preset.name.trim().toLowerCase()));
       if (!exists) out[type].push(preset);
@@ -681,11 +685,6 @@ function defaultState(){
     logs: {},           // dateKey -> journal entry
     todos: {},          // dateKey -> task list (retired V1.2 — retained, exportable in System Archive)
     goals: [],          // blank until user creates goals
-    brainstorm: {       // V1.0 mind-mapping engine
-      maps: [],         // { id, name, layout, nodes: [{ id, parent, text, x, y, collapsed, color, link, note, metrics, logs }] }
-      activeId: '',     // active map id (a starter map is created on demand)
-      selected: ''      // selected node id
-    },
     records: { lifts: [], shooting: [], rankTiers: [] },  // Gym PRs + shooting record highs + custom rank tiers
     film: {
       games: [],        // { id, season, club, date, opponent, scoreUs, scoreThem, videoUrl, oppNotes, notes }
@@ -830,7 +829,7 @@ function mergeState(p){
       : d.mental,
     presets: mergePresetCollections({
       basketball: Array.isArray(p.presets && p.presets.basketball) ? p.presets.basketball.map(x => migrateSessionPreset({ ...x, notes: x.notes || '' })) : [],
-      lift:       Array.isArray(p.presets && p.presets.lift)       ? p.presets.lift.map(x => ({ ...x, notes: x.notes || '' }))       : [],
+      lift:       Array.isArray(p.presets && p.presets.lift)       ? p.presets.lift.map(x => normalizeLiftPreset({ ...x, notes: x.notes || '' }))       : [],
       strength:   Array.isArray(p.presets && p.presets.strength)   ? p.presets.strength.map(x => ({ ...x, notes: x.notes || '' }))   : []
     }, p.workout_presets),
     workouts:     p.workouts && typeof p.workouts === 'object'
@@ -930,25 +929,6 @@ function mergeState(p){
           combine: p.life.combine && typeof p.life.combine === 'object' ? { ...p.life.combine } : {}
         }
       : d.life,
-    brainstorm: p.brainstorm && typeof p.brainstorm === 'object'
-      ? {
-          maps: Array.isArray(p.brainstorm.maps) ? p.brainstorm.maps.map(mp => ({
-            id: mp.id || uid(), name: mp.name || 'Mind Map',
-            layout: ['mind', 'org', 'tree'].includes(mp.layout) ? mp.layout : 'mind',
-            zoom: Number.isFinite(+mp.zoom) ? +mp.zoom : 1,
-            pan: { x: Number.isFinite(+(mp.pan && mp.pan.x)) ? +mp.pan.x : 0, y: Number.isFinite(+(mp.pan && mp.pan.y)) ? +mp.pan.y : 0 },
-            nodes: Array.isArray(mp.nodes) ? mp.nodes.map(nd => ({
-              id: nd.id || uid(), parent: nd.parent || '', text: nd.text || '',
-              x: Number.isFinite(+nd.x) ? +nd.x : 0, y: Number.isFinite(+nd.y) ? +nd.y : 0,
-              collapsed: !!nd.collapsed, color: nd.color || '', link: nd.link || '', note: nd.note || '',
-              metrics: Array.isArray(nd.metrics) ? nd.metrics.map(m2 => ({ id: m2.id || uid(), label: m2.label || '', value: m2.value === undefined || m2.value === null ? 0 : m2.value })) : [],
-              logs: Array.isArray(nd.logs) ? nd.logs.map(l => ({ id: l.id || uid(), at: l.at || '', text: l.text || '' })) : []
-            })) : []
-          })) : [],
-          activeId: p.brainstorm.activeId || '',
-          selected: p.brainstorm.selected || ''
-        }
-      : { maps: [], activeId: '', selected: '' },
     settings: { ...d.settings, ...(p.settings || {}), schoolClassId: (p.settings && p.settings.schoolClassId) || '', schoolFilter: ['all', 'active', 'archived'].includes(p.settings && p.settings.schoolFilter) ? p.settings.schoolFilter : 'all', recruitFilter: ['all', ...RECRUIT_STATUSES].includes(p.settings && p.settings.recruitFilter) ? p.settings.recruitFilter : 'all', recruitDivFilter: ['all', ...RECRUIT_DIVISIONS].includes(p.settings && p.settings.recruitDivFilter) ? p.settings.recruitDivFilter : 'all', mentalView: ['journal'].includes(p.settings && p.settings.mentalView) ? p.settings.mentalView : 'journal', filmView: ['games', 'plays', 'study', 'scouting', 'playbook'].includes(p.settings && p.settings.filmView) ? p.settings.filmView : 'games', lifeView: (function(){ const v = p.settings && p.settings.lifeView; if (LIFE_VIEWS.includes(v)) return v; if (v === 'sprints' || v === 'stats') return 'combine'; if (v === 'goals') return 'goals'; return 'habits'; })(), workoutEnv: WORKOUT_ENVS.includes(p.settings && p.settings.workoutEnv) ? p.settings.workoutEnv : (WORKOUT_ENVS.includes(p.settings && p.settings.logView) ? p.settings.logView : 'lift'), logView: WORKOUT_ENVS.includes(p.settings && p.settings.logView) ? p.settings.logView : 'lift', routineView: ['schedule', 'log', 'mental'].includes(p.settings && p.settings.routineView) ? p.settings.routineView : 'schedule', routineDay: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', ''].includes(p.settings && p.settings.routineDay) ? p.settings.routineDay : '', settingsView: ['prefs', 'backup', 'archive'].includes(p.settings && p.settings.settingsView) ? p.settings.settingsView : 'prefs', goalTf: ['all', 'short', 'mid', 'long'].includes(p.settings && p.settings.goalTf) ? p.settings.goalTf : 'all', goalCat: ['all', 'athletic', 'academic', 'personal'].includes(p.settings && p.settings.goalCat) ? p.settings.goalCat : 'all', staleDays: Math.max(1, parseInt(p.settings && p.settings.staleDays, 10) || CONTACT_STALE_DAYS), matrixHideDone: !!(p.settings && p.settings.matrixHideDone), shotRange: ['7', '30', 'custom', 'lifetime'].includes(p.settings && p.settings.shotRange) ? p.settings.shotRange : 'lifetime', shotSummaryRange: (p.settings && p.settings.shotSummaryRange) === '30' ? '30' : '7', shotRangeFrom: /^\d{4}-\d{2}-\d{2}$/.test((p.settings && p.settings.shotRangeFrom) || '') ? p.settings.shotRangeFrom : '', shotRangeTo: /^\d{4}-\d{2}-\d{2}$/.test((p.settings && p.settings.shotRangeTo) || '') ? p.settings.shotRangeTo : '', savedRange: ['day', '7', '30', 'custom'].includes(p.settings && p.settings.savedRange) ? p.settings.savedRange : 'day', savedRangeFrom: /^\d{4}-\d{2}-\d{2}$/.test((p.settings && p.settings.savedRangeFrom) || '') ? p.settings.savedRangeFrom : '', savedRangeTo: /^\d{4}-\d{2}-\d{2}$/.test((p.settings && p.settings.savedRangeTo) || '') ? p.settings.savedRangeTo : '', workoutDates: normalizeWorkoutDates(p.settings && p.settings.workoutDates) }
   };
   merged.settings.timeWindow = timeWindowFrom(p.settings && p.settings.timeWindow);
@@ -980,12 +960,14 @@ function save(){
   saveT = setTimeout(flushSave, 80);
 }
 function flushSave(){
-  clearTimeout(saveT);
-  try {
+  clearTimeout(saveT);  try {
     localStorage.setItem(LS_KEY, JSON.stringify(state));
     persistWorkoutPresets();
     flashSaved();
-  } catch (e) {
+    /* Every writer in the app funnels through here, so this is the single
+       hook that puts a local edit on the background sync queue. */
+    markSyncDirty('edit');
+  } catch (e){
     console.warn(e);
     toast('⚠ Storage error — export a backup!', 'error');
   }
@@ -1054,35 +1036,740 @@ function updateUndoRedoButtons(){
   if (r){ r.disabled = !redoStack.length; r.classList.toggle('disabled', !redoStack.length); }
 }
 
-/* ---------- Export / Import ---------- */
-function exportJSON(){
-  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'phoenix-os-backup-' + todayKey() + '.json';
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
-  toast('✓ Backup exported — ' + a.download);
+/* ============================================================
+   DATA MANAGEMENT — JSON backup + Supabase cloud sync (V2.0)
+   ============================================================ */
+
+/* ---------- Export (JSON file) ---------- */
+function backupEnvelope(){
+  flushSave();
+  let primary = state;
+  let presets = state.presets;
+  try { primary = JSON.parse(localStorage.getItem(LS_KEY) || 'null') || primary; } catch (e){}
+  try { presets = JSON.parse(localStorage.getItem(WORKOUT_PRESETS_KEY) || 'null') || presets; } catch (e){}
+  return {
+    app: 'PHOENIX OS',
+    version: '2.0',
+    exportedAt: new Date().toISOString(),
+    keys: {
+      [LS_KEY]: primary,
+      [WORKOUT_PRESETS_KEY]: presets
+    }
+  };
 }
-function importJSON(file){
-  snapshot();
+function exportData(){
+  try {
+    const envelope = backupEnvelope();
+    const json = JSON.stringify(envelope, null, 2);
+    const name = 'phoenix-os-backup-' + todayKey() + '.json';
+    const blob = new Blob([json], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    toast('✓ Data exported — ' + name);
+    return { name, bytes: json.length };
+  } catch (e){
+    console.error('Export failed', e);
+    toast('✗ Export failed', 'error');
+    return null;
+  }
+}
+/* Kept for the topbar and Mobile Sync buttons that predate the V2.0 panel. */
+function exportJSON(){ return exportData(); }
+
+/* ---------- Import (JSON file) ---------- */
+function backupSessionCount(data){
+  const days = (data && data.workouts) || {};
+  return Object.values(days).reduce((total, day) => {
+    if (!day || typeof day !== 'object') return total;
+    if (day.type) return total + 1;
+    return total + WORKOUT_ENVS.reduce((n, env) => n + (Array.isArray(day[env]) ? day[env].length : (day[env] ? 1 : 0)), 0);
+  }, 0);
+}
+/* Accepts the V2.0 envelope, the Mobile Sync JSON shape, and raw V1/V2 saves. */
+function backupStateFromPayload(raw){
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) throw new Error('That file is not a Phoenix OS backup.');
+  let candidate = null;
+  let presets = null;
+  [raw.keys, raw.data].forEach(box => {
+    if (!box || typeof box !== 'object' || Array.isArray(box)) return;
+    if (box[LS_KEY] && typeof box[LS_KEY] === 'object' && !Array.isArray(box[LS_KEY])) candidate = box[LS_KEY];
+    if (box[WORKOUT_PRESETS_KEY]) presets = box[WORKOUT_PRESETS_KEY];
+  });
+  if (!candidate && raw.state && typeof raw.state === 'object' && !Array.isArray(raw.state)) candidate = raw.state;
+  const markers = ['workouts', 'logs', 'school', 'goals', 'habits', 'settings', 'classCats', 'film', 'finance'];
+  if (!candidate && markers.some(k => k in raw)) candidate = raw;
+  if (!candidate) throw new Error('No Phoenix OS data found in that file.');
+  if (markers.filter(k => k in candidate).length < 2) throw new Error('Backup structure is incomplete — open a file exported by Phoenix OS.');
+  if (candidate.workouts !== undefined && (typeof candidate.workouts !== 'object' || Array.isArray(candidate.workouts))) throw new Error('Backup workouts are malformed.');
+  if (candidate.logs !== undefined && (typeof candidate.logs !== 'object' || Array.isArray(candidate.logs))) throw new Error('Backup logs are malformed.');
+  if (candidate.settings !== undefined && (typeof candidate.settings !== 'object' || Array.isArray(candidate.settings))) throw new Error('Backup settings are malformed.');
+  const next = mergeState(candidate);
+  if (presets) next.presets = mergePresetCollections(next.presets, presets);
+  return { state: next, exportedAt: typeof raw.exportedAt === 'string' ? raw.exportedAt : '' };
+}
+function importData(event){
+  const input = event && event.target;
+  const file = input && input.files && input.files[0];
+  if (!file) return;
+  importBackupFile(file, () => { if (input) input.value = ''; });
+}
+function importJSON(file){ importBackupFile(file, null); }
+function importBackupFile(file, done){
   const reader = new FileReader();
+  const finish = () => { if (done) done(); };
+  reader.onerror = () => { toast('✗ Could not read that file', 'error'); finish(); };
   reader.onload = () => {
     try {
-      const data = JSON.parse(reader.result);
-      if (!data || typeof data !== 'object') throw new Error('invalid');
-      state = mergeState(data);
+      const parsed = JSON.parse(String(reader.result || ''));
+      const incoming = backupStateFromPayload(parsed);
+      const sessions = backupSessionCount(incoming.state);
+      const assignments = (incoming.state.school || []).length;
+      const summary = sessions + ' workout session' + (sessions === 1 ? '' : 's') + ' · ' + assignments + ' assignment' + (assignments === 1 ? '' : 's');
+      if (!window.confirm('Replace this device\u2019s data with "' + file.name + '"?\n\nContains ' + summary + '\n\nUndo (Ctrl+Z) puts the current data back.')){
+        toast('Import cancelled');
+        return;
+      }
+      snapshot();
+      state = incoming.state;
       flushSave();
       renderAll();
       closeModal();
-      toast('✓ Backup imported successfully');
-    } catch (err) {
-      toast('✗ Invalid backup file', 'error');
+      toast('✓ Data imported — ' + summary);
+    } catch (err){
+      const msg = err instanceof SyntaxError
+        ? 'That file is not valid JSON.'
+        : (err && err.message ? err.message : 'Invalid backup file');
+      toast('✗ ' + msg, 'error');
+    } finally {
+      finish();
     }
   };
   reader.readAsText(file);
+}
+
+/* ---------- Cloud connection (Supabase) ---------- */
+let syncBusy = false;
+function readSyncConfig(){
+  try {
+    const cfg = JSON.parse(localStorage.getItem(SYNC_CONFIG_KEY) || 'null');
+    if (!cfg || typeof cfg !== 'object' || Array.isArray(cfg)) return null;
+    return {
+      url: typeof cfg.url === 'string' ? cfg.url : '',
+      anonKey: typeof cfg.anonKey === 'string' ? cfg.anonKey : '',
+      workspace: typeof cfg.workspace === 'string' ? cfg.workspace : '',
+      deviceId: typeof cfg.deviceId === 'string' ? cfg.deviceId : '',
+      /* Auto-sync is opt-out once a connection exists: absent means on. */
+      auto: cfg.auto !== false
+    };
+  } catch (e){ return null; }
+}
+function writeSyncConfig(cfg){
+  try { localStorage.setItem(SYNC_CONFIG_KEY, JSON.stringify(cfg)); }
+  catch (e){ toast('✗ Browser storage is full — cannot save the connection', 'error'); }
+}
+function syncReady(cfg){ return !!(cfg && /^https?:\/\/[^\s]+$/i.test(cfg.url) && cfg.anonKey.length > 20 && /^[A-Za-z0-9_-]{8,64}$/.test(cfg.workspace)); }
+function readSyncMeta(){
+  try {
+    const m = JSON.parse(localStorage.getItem(SYNC_META_KEY) || '{}');
+    return m && typeof m === 'object' ? m : {};
+  } catch (e){ return {}; }
+}
+function writeSyncMeta(patch){
+  try { localStorage.setItem(SYNC_META_KEY, JSON.stringify({ ...readSyncMeta(), ...patch })); } catch (e){}
+}
+function newSyncToken(bytes){
+  try {
+    const buf = new Uint8Array(bytes);
+    crypto.getRandomValues(buf);
+    return Array.from(buf, b => b.toString(16).padStart(2, '0')).join('');
+  } catch (e){
+    let out = '';
+    for (let i = 0; i < bytes * 2; i++) out += Math.floor(Math.random() * 16).toString(16);
+    return out;
+  }
+}
+function syncDeviceName(){
+  const ua = navigator.userAgent || '';
+  const os = /iPhone|iPad|iPod/i.test(ua) ? 'iOS' : /Android/i.test(ua) ? 'Android' : /Mac/i.test(ua) ? 'Mac' : /Windows/i.test(ua) ? 'Windows' : 'Web';
+  const browser = /Edg\//.test(ua) ? 'Edge' : /Chrome\//.test(ua) ? 'Chrome' : /Firefox\//.test(ua) ? 'Firefox' : /Safari\//.test(ua) ? 'Safari' : 'Browser';
+  return os + ' · ' + browser;
+}
+function syncHost(url){ try { return new URL(url).host; } catch (e){ return url; } }
+function maskKey(k){ return k && k.length > 10 ? k.slice(0, 4) + '…' + k.slice(-4) : (k || ''); }
+function syncWhen(iso){
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '—';
+  const mins = Math.floor((Date.now() - d.getTime()) / 60000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return mins + ' min ago';
+  if (mins < 1440) return Math.floor(mins / 60) + ' hr ago';
+  return fmtDate(dateKey(d)) + ' · ' + fmtTime(pad(d.getHours()) + ':' + pad(d.getMinutes()));
+}
+function syncSql(key){
+  const k = key || 'YOUR_SYNC_KEY';
+  return [
+    '-- Phoenix OS cloud sync — run once in Supabase → SQL Editor',
+    'create table if not exists public.' + SYNC_TABLE + ' (',
+    '  sync_key text primary key,',
+    '  payload jsonb not null,',
+    '  device text,',
+    '  updated_at timestamptz not null default now()',
+    ');',
+    'alter table public.' + SYNC_TABLE + ' enable row level security;',
+    'grant select, insert, update on public.' + SYNC_TABLE + ' to anon;',
+    '',
+    'drop policy if exists "phoenix sync read" on public.' + SYNC_TABLE + ';',
+    'create policy "phoenix sync read" on public.' + SYNC_TABLE + ' for select',
+    "  using (sync_key = '" + k + "');",
+    '',
+    'drop policy if exists "phoenix sync insert" on public.' + SYNC_TABLE + ';',
+    'create policy "phoenix sync insert" on public.' + SYNC_TABLE + ' for insert',
+    "  with check (sync_key = '" + k + "');",
+    '',
+    'drop policy if exists "phoenix sync update" on public.' + SYNC_TABLE + ';',
+    'create policy "phoenix sync update" on public.' + SYNC_TABLE + ' for update',
+    "  using (sync_key = '" + k + "') with check (sync_key = '" + k + "');"
+  ].join('\n');
+}
+function renderSyncSql(){
+  const el = document.getElementById('sync-sql');
+  if (!el) return;
+  const input = document.getElementById('sync-workspace');
+  const cfg = readSyncConfig();
+  const key = (input && input.value.trim()) || (cfg && cfg.workspace) || '';
+  el.textContent = /^[A-Za-z0-9_-]{8,64}$/.test(key)
+    ? syncSql(key)
+    : '-- Generate a sync key above (or paste the one from your other device)\n-- and the policy SQL locked to that key appears here.';
+}
+function fillSyncForm(force){
+  const cfg = readSyncConfig();
+  [['sync-url', cfg && cfg.url], ['sync-anon', cfg && cfg.anonKey], ['sync-workspace', cfg && cfg.workspace]].forEach(([id, value]) => {
+    const el = document.getElementById(id);
+    if (el && (force || (!el.value && document.activeElement !== el))) el.value = value || '';
+  });
+  renderSyncSql();
+}
+function renderSyncStatus(){
+  const dot = document.getElementById('sync-dot');
+  const label = document.getElementById('sync-status-text');
+  const last = document.getElementById('sync-last');
+  if (!dot || !label) return;
+  const cfg = readSyncConfig();
+  const ready = syncReady(cfg);
+  const meta = readSyncMeta();
+  const queue = readSyncQueue();
+  const autoOn = ready && cfg.auto !== false;
+  const offline = !syncOnline();
+  const queued = ready && queue.dirty;
+  const autoEl = document.getElementById('sync-auto');
+  if (autoEl){ autoEl.checked = autoOn; autoEl.disabled = !ready; }
+  let dotState = ready ? (meta.lastSyncedAt ? 'on' : 'ready') : 'off';
+  if (syncBusy) dotState = 'working';
+  else if (queued) dotState = 'pending';
+  dot.className = 'sync-dot ' + dotState;
+  label.textContent = !ready ? 'Not connected'
+    : syncBusy ? 'Syncing…'
+    : queued ? (offline ? 'Offline · queued' : (queue.attempts ? 'Retry scheduled' : 'Queued'))
+    : (meta.lastSyncedAt ? (autoOn ? 'Auto-sync on' : 'Cloud connected') : 'Ready to sync');
+  const queueEl = document.getElementById('sync-queue');
+  if (queueEl){
+    if (!queued){
+      queueEl.className = 'sync-queue';
+      queueEl.textContent = '';
+    } else {
+      const wait = queue.nextAt ? Math.max(0, Math.round((new Date(queue.nextAt).getTime() - Date.now()) / 1000)) : 0;
+      let msg;
+      if (offline) msg = 'Offline — changes are stored on this device and upload the moment you reconnect.';
+      else if (queue.attempts) msg = 'Upload failed' + (queue.lastError ? ' (' + queue.lastError + ')' : '') + (wait ? ' · retrying in ' + wait + 's' : ' · retrying…');
+      else msg = 'Changes saved here — uploading in a moment…';
+      queueEl.className = 'sync-queue pending';
+      queueEl.textContent = msg;
+    }
+  }
+  const retryBtn = document.getElementById('sync-retry');
+  if (retryBtn) retryBtn.hidden = !queued;
+  if (!last) return;
+  if (!ready){
+    last.textContent = 'Cloud sync is off — add your Supabase project under Cloud connection, or use Export Data for a local backup.';
+    return;
+  }
+  const where = syncHost(cfg.url) + ' · workspace ' + maskKey(cfg.workspace);
+  last.textContent = meta.lastSyncedAt
+    ? 'Last synced ' + syncWhen(meta.lastSyncedAt) + (meta.device ? ' from ' + meta.device : '') + ' · ' + where
+    : 'Connected to ' + where + ' · not synced yet';
+}
+function generateSyncKey(){
+  const el = document.getElementById('sync-workspace');
+  if (!el) return;
+  el.value = newSyncToken(16);
+  renderSyncSql();
+  toast('Sync key generated — copy it to every device you sync');
+}
+function saveSyncSetup(){
+  const urlEl = document.getElementById('sync-url');
+  const anonEl = document.getElementById('sync-anon');
+  const wsEl = document.getElementById('sync-workspace');
+  if (!urlEl || !anonEl || !wsEl) return;
+  const url = urlEl.value.trim().replace(/\/+$/, '');
+  const anonKey = anonEl.value.trim();
+  const workspace = wsEl.value.trim();
+  let parsed = null;
+  try { parsed = new URL(url); } catch (e){ parsed = null; }
+  if (!parsed || !/^https?:$/.test(parsed.protocol)){
+    toast('✗ Project URL must look like https://yourproject.supabase.co', 'error');
+    urlEl.focus();
+    return;
+  }
+  if (anonKey.length < 20){
+    toast('✗ Anon key looks too short — paste the full key', 'error');
+    anonEl.focus();
+    return;
+  }
+  if (!/^[A-Za-z0-9_-]{8,64}$/.test(workspace)){
+    toast('✗ Sync key needs 8+ letters, numbers, - or _', 'error');
+    wsEl.focus();
+    return;
+  }
+  const prev = readSyncConfig();
+  writeSyncConfig({
+    url, anonKey, workspace,
+    deviceId: (prev && prev.deviceId) || newSyncToken(6),
+    auto: !prev || prev.auto !== false,
+    savedAt: new Date().toISOString()
+  });
+  fillSyncForm(true);
+  markSyncDirty('connection saved');
+  scheduleAutoSync(800);
+  ensureSyncPoll();
+  renderSyncStatus();
+  toast('✓ Cloud connection saved — syncing in the background');
+}
+function disconnectSync(){
+  if (!readSyncConfig()){ toast('Cloud sync is already off'); return; }
+  if (!window.confirm('Disconnect cloud sync on this device?\n\nYour local data and the cloud row are left untouched.')) return;
+  stopAutoSync();
+  try {
+    localStorage.removeItem(SYNC_CONFIG_KEY);
+    localStorage.removeItem(SYNC_META_KEY);
+    localStorage.removeItem(SYNC_QUEUE_KEY);
+  } catch (e){}
+  fillSyncForm(true);
+  renderSyncStatus();
+  toast('Cloud sync disconnected');
+}
+function copySyncSql(){
+  const el = document.getElementById('sync-sql');
+  const text = el ? el.textContent : '';
+  if (!text || /^--/.test(text.trim())){ toast('Generate a sync key first', 'error'); return; }
+  const done = () => toast('✓ SQL copied — paste it into Supabase → SQL Editor');
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(() => {
+      if (copyTextFallback(text)) done(); else toast('Copy blocked — select the SQL and copy manually', 'error');
+    });
+    return;
+  }
+  if (copyTextFallback(text)) done(); else toast('Copy blocked — select the SQL and copy manually', 'error');
+}
+function copyTextFallback(text){
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    const ok = document.execCommand('copy');
+    ta.remove();
+    return ok;
+  } catch (e){ return false; }
+}
+
+/* ---------- Cloud sync merge (local wins, remote-only items are added) ---------- */
+function isPlainObject(v){ return !!v && typeof v === 'object' && !Array.isArray(v); }
+function syncMergeList(local, remote){
+  if (!local.length) return remote.slice();
+  if (!remote.length) return local.slice();
+  const allPrimitive = local.concat(remote).every(v => v === null || typeof v !== 'object');
+  if (allPrimitive){
+    const out = local.slice();
+    remote.forEach(v => { if (!out.includes(v)) out.push(v); });
+    return out;
+  }
+  if (local.every(isPlainObject) && remote.every(isPlainObject)){
+    const keyOf = v => (typeof v.id === 'string' && v.id) || (typeof v.key === 'string' && v.key) || '';
+    const remoteById = new Map();
+    remote.forEach(v => { const k = keyOf(v); if (k) remoteById.set(k, v); });
+    const seen = new Set();
+    const out = local.map(item => {
+      const k = keyOf(item);
+      if (k){
+        seen.add(k);
+        const match = remoteById.get(k);
+        return match ? syncMergeValue(item, match) : item;
+      }
+      const twin = remote.find(x => !keyOf(x) && JSON.stringify(x) === JSON.stringify(item));
+      return twin ? syncMergeValue(item, twin) : item;
+    });
+    remote.forEach(item => {
+      const k = keyOf(item);
+      if (k){ if (!seen.has(k)) out.push(item); return; }
+      if (!out.some(x => !keyOf(x) && JSON.stringify(x) === JSON.stringify(item))) out.push(item);
+    });
+    return out;
+  }
+  /* Mixed shapes (e.g. legacy bare sessions): keep this device's copy. */
+  return local.slice();
+}
+function syncMergeValue(local, remote){
+  if (Array.isArray(local) || Array.isArray(remote)){
+    return Array.isArray(local) && Array.isArray(remote) ? syncMergeList(local, remote) : (Array.isArray(local) ? local : remote);
+  }
+  if (isPlainObject(local) && isPlainObject(remote)){
+    const out = {};
+    Object.keys(remote).forEach(k => { out[k] = remote[k]; });
+    Object.keys(local).forEach(k => { out[k] = (k in remote) ? syncMergeValue(local[k], remote[k]) : local[k]; });
+    return out;
+  }
+  return local === undefined ? remote : local;
+}
+function mergeSyncState(local, remote){
+  if (!isPlainObject(remote)) return local;
+  if (JSON.stringify(remote) === JSON.stringify(local)) return local;
+  /* Deliberately NOT mergeState(): its normalizer drops fields it does not know
+     (e.g. playbook board layout), which would quietly rewrite the local save
+     during a no-op sync. Both sides are already normalized saves. */
+  const merged = syncMergeValue(local, remote);
+  merged.live = local.live;                    // in-progress sessions stay on their own device
+  merged.presets = mergePresetCollections(local.presets, remote.presets);
+  return merged;
+}
+
+/* ---------- Cloud sync (pull → merge → push) ---------- */
+function syncClient(cfg){
+  if (!window.supabase || typeof window.supabase.createClient !== 'function'){
+    throw new Error('Supabase library did not load — check your connection and reload.');
+  }
+  return window.supabase.createClient(cfg.url, cfg.anonKey, { auth: { persistSession: false, autoRefreshToken: false } });
+}
+function syncTimeout(promise, ms, label){
+  let timer = null;
+  const timeout = new Promise((_, reject) => {
+    timer = setTimeout(() => reject(new Error(label + ' timed out — check your connection')), ms);
+  });
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+}
+async function syncPull(client, cfg){
+  const query = client.from(SYNC_TABLE).select('payload,device,updated_at').eq('sync_key', cfg.workspace).maybeSingle();
+  const { data, error } = await syncTimeout(query, 20000, 'Pull');
+  if (error) throw error;
+  if (!data) return null;
+  const payload = data.payload;
+  const remote = isPlainObject(payload) && isPlainObject(payload.state) ? payload.state : payload;
+  return isPlainObject(remote) ? { state: remote, updatedAt: data.updated_at || '', device: data.device || '' } : null;
+}
+async function syncPush(client, cfg, nextState){
+  const device = syncDeviceName();
+  const payload = { app: 'PHOENIX OS', version: '2.0', savedAt: new Date().toISOString(), device, state: nextState };
+  const query = client.from(SYNC_TABLE)
+    .upsert({ sync_key: cfg.workspace, payload, device, updated_at: new Date().toISOString() }, { onConflict: 'sync_key' })
+    .select('updated_at')
+    .single();
+  const { data, error } = await syncTimeout(query, 20000, 'Push');
+  if (error) throw error;
+  return data || {};
+}
+function syncErrorText(err){
+  const raw = String((err && (err.message || err.details || err.hint || err.error_description)) || err || 'Unknown error');
+  if (/does not exist|not find the table|42P01|schema cache/i.test(raw)) return 'Table phoenix_sync is missing — run the setup SQL in Supabase.';
+  if (/invalid api key|jwt|401|unauthorized|invalid claim/i.test(raw)) return 'Supabase rejected the anon key — recheck the Cloud connection.';
+  if (/row-level security|permission denied|42501/i.test(raw)) return 'Blocked by the database policy — rerun the setup SQL with your sync key.';
+  if (/failed to fetch|networkerror|load failed|err_name_not_resolved/i.test(raw)) return 'Cannot reach Supabase — check your connection.';
+  return raw.length > 110 ? raw.slice(0, 110) + '…' : raw;
+}
+function setSyncBusy(on){
+  const btn = document.getElementById('btn-sync');
+  const label = document.getElementById('sync-btn-label');
+  if (btn){ btn.classList.toggle('syncing', on); btn.disabled = on; btn.setAttribute('aria-busy', on ? 'true' : 'false'); }
+  if (label) label.textContent = on ? 'Syncing…' : '☁ Sync Data';
+}
+async function syncData(opts){
+  const background = !!(opts && opts.background);
+  if (syncBusy){
+    if (background) scheduleAutoSync(1500);
+    return { ok: false, busy: true };
+  }
+  const cfg = readSyncConfig();
+  if (!syncReady(cfg)){
+    if (!background){
+      const setup = document.getElementById('sync-setup');
+      if (setup) setup.open = true;
+      const url = document.getElementById('sync-url');
+      if (url) url.focus();
+      toast('Add your Supabase project to turn on cloud sync', 'error');
+    }
+    return { ok: false, setup: true };
+  }
+  syncBusy = true;
+  setSyncBusy(true);
+  renderSyncStatus();
+  let requeue = false;
+  try {
+    flushSave();
+    const wasDirty = readSyncQueue().dirty || syncContentDirty();
+    const before = JSON.stringify(state);
+    const client = syncClient(cfg);
+    const remote = await syncPull(client, cfg);
+    let merged = false;
+    if (remote && remote.state){
+      const next = mergeSyncState(state, remote.state);
+      if (JSON.stringify(next) !== before){
+        state = next;
+        flushSave();
+        renderAll();
+        merged = true;
+      }
+    }
+    /* A quiet poll with nothing to send only pulls; everything else pushes.
+       An empty cloud row is always seeded. */
+    let pushed = false;
+    let pushedSig = '';
+    let receipt = {};
+    if (wasDirty || merged || !remote){
+      pushedSig = syncSignature(state);
+      receipt = await syncPush(client, cfg, state);
+      pushed = true;
+    }
+    const stamp = new Date().toISOString();
+    writeSyncMeta({
+      lastSyncedAt: stamp,
+      remoteUpdatedAt: (receipt && receipt.updated_at) || stamp,
+      device: syncDeviceName(),
+      ...(pushed ? { pushedSig } : {})
+    });
+    writeSyncQueue({ dirty: false, attempts: 0, lastError: '', since: '', lastAttemptAt: stamp, nextAt: '' });
+    /* An edit made while the request was in flight is not in what we pushed. */
+    requeue = syncContentDirty();
+    const note = merged ? 'Remote changes merged'
+      : pushed ? (remote ? 'Pushed to cloud' : 'Uploaded to cloud')
+      : 'Cloud already up to date';
+    renderSyncStatus();
+    if (!background) toast('✓ ' + note);
+    return { ok: true, merged, remote: !!remote, pushed, note };
+  } catch (err){
+    console.error('Phoenix sync failed', err);
+    const text = syncErrorText(err);
+    if (background) queueSyncFailure(text);
+    else toast('✗ ' + text, 'error');
+    renderSyncStatus();
+    return { ok: false, error: text };
+  } finally {
+    syncBusy = false;
+    setSyncBusy(false);
+    renderSyncStatus();
+    if (requeue) setTimeout(() => markSyncDirty('edit during sync'), 0);
+  }
+}
+
+/* ============================================================
+   BACKGROUND AUTO-SYNC · OFFLINE QUEUE · RETRY (V2.1)
+   Every save marks the queue dirty, a debounced pass pushes it, and a
+   failure keeps the change queued with exponential backoff. The queue is
+   persisted so a reload (or a phone that slept) cannot lose an edit.
+   ============================================================ */
+const SYNC_AUTO_DELAY = 2200;            // settle time after the last keystroke
+const SYNC_RETRY_BASE = 5000;            // 5s, 10s, 20s, 40s …
+const SYNC_RETRY_MAX = 5 * 60 * 1000;    // cap
+const SYNC_POLL_MS = 180000;             // quiet pull every 3 min for other devices
+/* View state churns on every tab switch and must not count as an edit. */
+const SYNC_UI_SETTINGS = [
+  'activeTab', 'landingTab', 'logDate', 'schoolCatFilter', 'schoolSem', 'schoolClassId',
+  'logView', 'workoutEnv', 'goalView', 'filmView', 'studyView', 'schoolView', 'schoolFilter',
+  'recruitFilter', 'recruitDivFilter', 'recruitWishOnly', 'mentalView', 'lifeView', 'routineView',
+  'routineDay', 'settingsView', 'goalTf', 'goalCat', 'shotRange', 'shotSummaryRange',
+  'shotRangeFrom', 'shotRangeTo', 'savedRange', 'savedRangeFrom', 'savedRangeTo', 'workoutDates'
+];
+let autoSyncTimer = null;
+let autoSyncPoll = null;
+
+function syncOnline(){ try { return navigator.onLine !== false; } catch (e){ return true; } }
+function syncAutoOn(cfg){
+  cfg = cfg || readSyncConfig();
+  return syncReady(cfg) && cfg.auto !== false;
+}
+function emptySyncQueue(){
+  return { dirty: false, since: '', attempts: 0, lastError: '', lastAttemptAt: '', nextAt: '', reason: '' };
+}
+function readSyncQueue(){
+  try {
+    const q = JSON.parse(localStorage.getItem(SYNC_QUEUE_KEY) || 'null');
+    if (!q || typeof q !== 'object' || Array.isArray(q)) return emptySyncQueue();
+    return {
+      dirty: q.dirty === true,
+      since: typeof q.since === 'string' ? q.since : '',
+      attempts: Math.max(0, parseInt(q.attempts, 10) || 0),
+      lastError: typeof q.lastError === 'string' ? q.lastError : '',
+      lastAttemptAt: typeof q.lastAttemptAt === 'string' ? q.lastAttemptAt : '',
+      nextAt: typeof q.nextAt === 'string' ? q.nextAt : '',
+      reason: typeof q.reason === 'string' ? q.reason : ''
+    };
+  } catch (e){ return emptySyncQueue(); }
+}
+function writeSyncQueue(q){
+  try {
+    if (!q || (!q.dirty && !q.attempts && !q.lastError)) localStorage.removeItem(SYNC_QUEUE_KEY);
+    else localStorage.setItem(SYNC_QUEUE_KEY, JSON.stringify({ ...q, updatedAt: new Date().toISOString() }));
+  } catch (e){}
+}
+function syncHash(text){
+  let h = 2166136261;
+  for (let i = 0; i < text.length; i++){
+    h ^= text.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return (h >>> 0).toString(16);
+}
+/* Fingerprint of the saved data with per-device view state removed, so a tab
+   switch never looks like a change worth uploading. */
+function syncSignature(source){
+  try {
+    const clone = JSON.parse(JSON.stringify(source || {}));
+    delete clone.live;                       // in-progress workouts stay device-local
+    if (isPlainObject(clone.settings)){
+      SYNC_UI_SETTINGS.forEach(k => { delete clone.settings[k]; });
+    }
+    return syncHash(JSON.stringify(clone));
+  } catch (e){ return ''; }
+}
+function syncContentDirty(){
+  const sig = syncSignature(state);
+  if (!sig) return true;
+  return sig !== (readSyncMeta().pushedSig || '');
+}
+function syncRetryDelay(attempts){
+  const n = Math.max(1, attempts || 1);
+  return Math.min(SYNC_RETRY_MAX, SYNC_RETRY_BASE * Math.pow(2, n - 1));
+}
+function scheduleAutoSync(delay){
+  clearTimeout(autoSyncTimer);
+  autoSyncTimer = null;
+  if (!syncAutoOn()) return;
+  const wait = Math.max(0, Number(delay) || 0);
+  autoSyncTimer = setTimeout(() => { autoSyncTimer = null; runAutoSync('timer'); }, wait);
+  ensureSyncPoll();
+}
+function markSyncDirty(reason){
+  if (syncBusy) return;                     // mid-sync edits are requeued by syncData
+  if (!syncAutoOn()) return;
+  const q = readSyncQueue();
+  const wasDirty = q.dirty;
+  q.dirty = true;
+  if (!q.since) q.since = new Date().toISOString();
+  q.reason = reason || 'edit';
+  writeSyncQueue(q);
+  const next = q.nextAt ? new Date(q.nextAt).getTime() - Date.now() : 0;
+  scheduleAutoSync(Math.max(SYNC_AUTO_DELAY, next));
+  if (!wasDirty) renderSyncStatus();
+}
+function queueSyncFailure(text){
+  const q = readSyncQueue();
+  q.dirty = true;
+  if (!q.since) q.since = new Date().toISOString();
+  q.attempts = (q.attempts || 0) + 1;
+  q.lastError = text || '';
+  q.lastAttemptAt = new Date().toISOString();
+  const wait = syncRetryDelay(q.attempts);
+  q.nextAt = new Date(Date.now() + wait).toISOString();
+  writeSyncQueue(q);
+  scheduleAutoSync(wait);
+}
+function ensureSyncPoll(){
+  if (autoSyncPoll || !syncAutoOn()) return;
+  autoSyncPoll = setInterval(() => {
+    if (!syncAutoOn()){ stopAutoSync(); return; }
+    if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
+    if (syncBusy) return;
+    if (!readSyncQueue().dirty && !readSyncMeta().lastSyncedAt) return;
+    runAutoSync('poll');
+  }, SYNC_POLL_MS);
+}
+async function runAutoSync(reason){
+  if (!syncAutoOn()){ stopAutoSync(); return; }
+  if (syncBusy){ scheduleAutoSync(1500); return; }
+  /* Tab switches and view filters queue a save but change no data — drop them
+     here, where the comparison is paid once, instead of on every keystroke. */
+  const queue = readSyncQueue();
+  if (queue.dirty && !queue.attempts && readSyncMeta().lastSyncedAt && !syncContentDirty()){
+    writeSyncQueue(emptySyncQueue());
+    renderSyncStatus();
+    return;
+  }
+  if (!syncOnline()){
+    const q = readSyncQueue();
+    if (q.dirty){
+      q.lastError = '';
+      writeSyncQueue(q);
+      renderSyncStatus();
+      scheduleAutoSync(SYNC_RETRY_MAX);    // the 'online' event also wakes this
+    }
+    return;
+  }
+  await syncData({ background: true, reason: reason || 'auto' });
+}
+function stopAutoSync(){
+  clearTimeout(autoSyncTimer);
+  autoSyncTimer = null;
+  if (autoSyncPoll){ clearInterval(autoSyncPoll); autoSyncPoll = null; }
+}
+function setSyncAuto(on){
+  const cfg = readSyncConfig();
+  if (!syncReady(cfg)){
+    toast('Connect Supabase under Cloud connection first', 'error');
+    renderSyncStatus();
+    return;
+  }
+  writeSyncConfig({ ...cfg, auto: !!on });
+  if (on){
+    markSyncDirty('auto enabled');
+    scheduleAutoSync(600);
+    toast('✓ Auto-sync on — edits upload in the background');
+  } else {
+    stopAutoSync();
+    toast('Auto-sync off — use Sync Data when you want to upload');
+  }
+  renderSyncStatus();
+}
+function retrySyncNow(){
+  const q = readSyncQueue();
+  q.attempts = 0;
+  q.nextAt = '';
+  q.lastError = '';
+  writeSyncQueue(q);
+  clearTimeout(autoSyncTimer);
+  autoSyncTimer = null;
+  syncData();
+}
+function syncResume(){
+  const q = readSyncQueue();
+  const next = q.nextAt ? new Date(q.nextAt).getTime() - Date.now() : 0;
+  if (q.dirty) scheduleAutoSync(Math.max(500, next));
+  else if (readSyncMeta().lastSyncedAt && syncContentDirty()) scheduleAutoSync(1200);
+}
+/* Boot: pick up a queue left by a closed tab, an offline phone, or a failed
+   upload, and start the quiet poll for other devices. */
+function startAutoSync(){
+  const cfg = readSyncConfig();
+  if (!syncAutoOn(cfg)) return;
+  ensureSyncPoll();
+  const q = readSyncQueue();
+  const next = q.nextAt ? new Date(q.nextAt).getTime() - Date.now() : 0;
+  if (q.dirty) scheduleAutoSync(Math.max(1500, next));
+  else if (!readSyncMeta().lastSyncedAt || syncContentDirty()) scheduleAutoSync(2500);
 }
 
 /* ---------- Tab navigation ---------- */
@@ -1147,7 +1834,6 @@ function renderAll(){
   renderExtracurricular();
   applyLifeView();
   renderLife();
-  renderBrainstorm();
   renderSettings();
   if (liveState().active) renderLive();
 }
@@ -1238,6 +1924,7 @@ function normalizeWorkoutDay(v){
     if (!TYPE_META[s.type]) s.type = env;
     if (!s.id) s.id = uid();
     if (s.type === 'basketball' && !s.sets && Array.isArray(s.drills)) s.sets = toSets(s.drills);
+    if (s.type === 'lift' && Array.isArray(s.exercises)) s.exercises.forEach(normalizeLiftRow);
     (day[env] = day[env] || []).push(s);
   };
   if (v.type){ push(v.type, v); }
@@ -1372,8 +2059,9 @@ function migrateSessionPreset(x){
    modules, so rows no longer carry a rest target. Legacy stored values are
    retained on the row objects (never deleted); they are simply not collected
    or displayed any more. */
+const LIFT_DEFAULT_SETS = 3;
 function blankRow(type){
-  if (type === 'lift')       return { name:'', sets:'', reps:'', weight:'', rpe:'', pr:false, setRows:[] };
+  if (type === 'lift')       return { name:'', rpe:'', pr:false, sets: Array.from({ length: LIFT_DEFAULT_SETS }, (_, i) => blankLiftSet(i + 1)) };
   return { name:'', sets:'', reps:'', rpe:'', sec:false, secs:'' };
 }
 function blankSession(type){
@@ -1383,7 +2071,7 @@ function blankSession(type){
 }
 function sessionFromPreset(p){
   if (p.type === 'basketball') return { id: uid(), type:'basketball', presetId:p.id, presetName:p.name, location:p.location, sets: JSON.parse(JSON.stringify(p.sets || toSets(p.drills))), time:(p.time ? String(p.time) : ''), notes:p.notes || '', logDate:'' };
-  if (p.type === 'lift')       return { id: uid(), type:'lift', presetId:p.id, presetName:p.name, day:p.day, exercises:p.exercises.map(r => ({ ...r })), time:'', notes:p.notes || '' };
+  if (p.type === 'lift')       return { id: uid(), type:'lift', presetId:p.id, presetName:p.name, day:p.day, exercises: JSON.parse(JSON.stringify(p.exercises || [])), time:'', notes:p.notes || '' };
   return { id: uid(), type:'strength', presetId:p.id, presetName:p.name, category:p.category, items:p.items.map(r => ({ ...r })), time:'', notes:p.notes || '' };
 }
 /* Shooting totals — only shooting-style SET TYPES (Shooting, Finishing,
@@ -1398,10 +2086,48 @@ function drillTotals(rows){
   });
   return { shots, makes, pct: shots ? Math.round(clamp(makes / shots * 100, 0, 100)) : 0 };
 }
-/* V2.0 — individual lift sets. A lift exercise can hold one row per set
-   (weight + reps each); legacy rows without setRows keep their aggregate
-   sets/reps/weight and are converted the moment a set row is added. */
-function liftSetList(r){ return (r && Array.isArray(r.setRows)) ? r.setRows : []; }
+/* V2.1 — individual lift sets are the only storage shape:
+     { name, rpe, pr, sets: [ { setNum, weight, reps }, … ] }
+   V2.0's setRows and V1.x aggregate rows (sets × reps @ weight) are migrated
+   on load, so an older save never loses volume. */
+function liftSetList(r){
+  if (!r) return [];
+  if (Array.isArray(r.sets) && r.sets.every(st => st && typeof st === 'object')) return r.sets;
+  if (Array.isArray(r.setRows)) return r.setRows;
+  return [];
+}
+function blankLiftSet(n, weight, reps){
+  return { setNum: n || 1, weight: weight === undefined ? '' : weight, reps: reps === undefined ? '' : reps };
+}
+function renumberLiftSets(r){
+  const rows = liftSetList(r);
+  rows.forEach((st, i) => { st.setNum = i + 1; });
+  if (r) r.sets = rows;
+  return rows;
+}
+/* Legacy aggregate → one row per set. Empty aggregates stay an empty list. */
+function normalizeLiftRow(r){
+  if (!r || typeof r !== 'object') return r;
+  let rows = liftSetList(r);
+  if (!rows.length){
+    const count = Math.max(0, Math.min(30, Math.round(num(r.sets))));
+    rows = [];
+    for (let i = 0; i < count; i++) rows.push(blankLiftSet(i + 1, r.weight === undefined ? '' : r.weight, r.reps === undefined ? '' : r.reps));
+  }
+  r.sets = rows.map((st, i) => ({
+    setNum: i + 1,
+    weight: st.weight === undefined ? '' : st.weight,
+    reps: st.reps === undefined ? '' : st.reps
+  }));
+  delete r.setRows;
+  delete r.weight;
+  delete r.reps;
+  return r;
+}
+function normalizeLiftPreset(p){
+  if (p && p.type === 'lift' && Array.isArray(p.exercises)) p.exercises.forEach(normalizeLiftRow);
+  return p;
+}
 function liftSetTotals(r){
   let sets = 0, reps = 0, weight = 0;
   liftSetList(r).forEach(st => {
@@ -1817,23 +2543,18 @@ function deleteSavedSession(env, id){
 
 function wsRowHtml(type, r, i){
   if (type === 'lift'){
-    /* V2.0 — individual sets: one weight/reps row per set instead of one
-       aggregate Sets × Reps × Weight line. Legacy rows keep their compact
-       inputs until the first set is added. */
+    /* V2.1 — every exercise is a list of individually logged sets; there is no
+       exercise-wide weight box any more. New exercises start with three. */
     const srows = liftSetList(r);
-    const perSet = srows.length ?
-      '<span class="lift-set-badge" title="Individual sets logged">' + srows.length + ' set' + (srows.length === 1 ? '' : 's') + '</span>' :
-      '<input class="n" type="number" min="0" data-wrow="' + i + '" data-wf="sets" placeholder="Sets" value="' + esc(r.sets) + '">' +
-      '<input class="n" type="number" min="0" data-wrow="' + i + '" data-wf="reps" placeholder="Reps" value="' + esc(r.reps) + '">' +
-      '<input class="n wide" type="number" min="0" step="any" data-wrow="' + i + '" data-wf="weight" placeholder="lbs" value="' + esc(r.weight) + '">';
     return '<div class="ws-lift-exercise">' +
       '<div class="ws-row">' +
         '<input class="grow" data-wrow="' + i + '" data-wf="name" placeholder="Exercise" value="' + esc(r.name) + '">' +
-        perSet +
+        '<span class="lift-set-badge" title="Individual sets logged">' + srows.length + ' set' + (srows.length === 1 ? '' : 's') + '</span>' +
         '<input class="n sm" type="number" min="1" max="10" step="1" data-wrow="' + i + '" data-wf="rpe" placeholder="RPE" title="Rate of perceived exertion (1–10)" value="' + esc(r.rpe) + '">' +
         '<label class="pr-box' + (r.pr ? ' on' : '') + '"><input type="checkbox" data-wrow="' + i + '" data-wf="pr" ' + (r.pr ? 'checked' : '') + '><span>PR</span></label>' +
-        '<button class="btn sm ghost" onclick="addLiftSet(' + i + ')" title="Log an individual set">＋ Set</button>' +
-        '<button class="icon-btn danger" onclick="removeWsRow(' + i + ')" title="Remove row">✕</button>' +
+        '<button class="btn sm ghost" onclick="addLiftSet(' + i + ')" title="Add another set to this exercise">＋ Add Set</button>' +
+        '<button class="btn sm ghost" onclick="removeLiftSet(' + i + ', -1)" title="Remove the last set"' + (srows.length ? '' : ' disabled') + '>− Remove Set</button>' +
+        '<button class="icon-btn danger" onclick="removeWsRow(' + i + ')" title="Remove exercise">✕</button>' +
       '</div>' +
       liftSetRowsHtml(r, i) +
     '</div>';
@@ -1850,16 +2571,120 @@ function wsRowHtml(type, r, i){
 }
 function liftSetRowsHtml(r, i){
   const rows = liftSetList(r);
-  if (!rows.length) return '';
+  if (!rows.length) return '<div class="lift-sets empty">No sets yet — press <b>＋ Add Set</b> to log this exercise.</div>';
+  const t = liftSetTotals(r);
   return '<div class="lift-sets">' + rows.map((st, si) =>
     '<div class="lift-set-row">' +
       '<span class="lift-set-num">Set ' + (si + 1) + '</span>' +
-      '<label class="lift-set-field"><span>Weight</span><input class="n" type="number" min="0" step="any" data-lrow="' + i + '" data-lset="' + si + '" data-lf="weight" placeholder="lbs" value="' + esc(st.weight) + '"></label>' +
-      '<label class="lift-set-field"><span>Reps</span><input class="n" type="number" min="0" step="any" data-lrow="' + i + '" data-lset="' + si + '" data-lf="reps" placeholder="reps" value="' + esc(st.reps) + '"></label>' +
-      '<button class="icon-btn danger" onclick="removeLiftSet(' + i + ',' + si + ')" title="Remove set">✕</button>' +
+      '<label class="lift-set-field"><span>Weight (lbs)</span><input class="n" type="number" min="0" step="any" inputmode="decimal" data-lrow="' + i + '" data-lset="' + si + '" data-lf="weight" placeholder="lbs" value="' + esc(st.weight) + '"></label>' +
+      '<label class="lift-set-field"><span>Reps</span><input class="n" type="number" min="0" step="any" inputmode="numeric" data-lrow="' + i + '" data-lset="' + si + '" data-lf="reps" placeholder="reps" value="' + esc(st.reps) + '"></label>' +
+      (si > 0
+        ? '<button class="icon-btn set-copy" onclick="copyLiftSet(' + i + ',' + si + ')" title="Copy weight &amp; reps from Set ' + si + '" aria-label="Copy weight and reps from set ' + si + '">⧉</button>'
+        : '<span class="set-copy-spacer" aria-hidden="true"></span>') +
+      '<button class="icon-btn danger" onclick="removeLiftSet(' + i + ',' + si + ')" title="Remove set ' + (si + 1) + '">✕</button>' +
     '</div>').join('') +
-    '<div class="lift-set-total">Individual sets · ' + liftSetTotals(r).sets + ' logged · ' + fmtNum(liftSetTotals(r).reps) + ' reps · ' + fmtNum(liftSetTotals(r).weight) + ' lbs</div>' +
+    '<div class="lift-set-total">' + t.sets + ' set' + (t.sets === 1 ? '' : 's') + ' logged · ' + fmtNum(t.reps) + ' reps · ' + fmtNum(t.weight) + ' lbs moved</div>' +
   '</div>';
+}
+/* V2.2 — one tap copies the previous set's working weight and reps into this
+   one. Values are written in place so the row never re-renders and loses focus. */
+function flashLiftSet(el){
+  const row = el && el.closest ? el.closest('.lift-set-row') : null;
+  if (!row || !row.classList) return;
+  row.classList.remove('copied');
+  void row.offsetWidth;                 // restart the animation on repeat taps
+  row.classList.add('copied');
+  setTimeout(() => row.classList.remove('copied'), 700);
+}
+function copyLiftSet(i, si){
+  const s = activeDraft();
+  if (!s || s.type !== 'lift' || si < 1) return;
+  const row = sessionRows(s)[i]; if (!row) return;
+  const rows = liftSetList(row);
+  const src = rows[si - 1], dst = rows[si];
+  if (!src || !dst) return;
+  /* Same snapshot cadence as typing into a set, so the undo history matches. */
+  snapshotDebounced();
+  dst.weight = src.weight;
+  dst.reps = src.reps;
+  dst.setNum = si + 1;
+  save();
+  const w = document.querySelector('[data-lrow="' + i + '"][data-lset="' + si + '"][data-lf="weight"]');
+  const rp = document.querySelector('[data-lrow="' + i + '"][data-lset="' + si + '"][data-lf="reps"]');
+  if (w) w.value = src.weight === undefined ? '' : src.weight;
+  if (rp) rp.value = src.reps === undefined ? '' : src.reps;
+  renderSessionMetrics(s);
+  renderSetTotal(i);
+  flashLiftSet(w);
+}
+function copyPmLiftSet(i, si){
+  if (!pmDraft || pmType === 'basketball' || si < 1) return;
+  const row = pmRows(pmDraft)[i]; if (!row) return;
+  const rows = liftSetList(row);
+  const src = rows[si - 1], dst = rows[si];
+  if (!src || !dst) return;
+  dst.weight = src.weight;
+  dst.reps = src.reps;
+  dst.setNum = si + 1;
+  const w = document.querySelector('[data-prow="' + i + '"][data-pset="' + si + '"][data-psf="weight"]');
+  const rp = document.querySelector('[data-prow="' + i + '"][data-pset="' + si + '"][data-psf="reps"]');
+  if (w) w.value = src.weight === undefined ? '' : src.weight;
+  if (rp) rp.value = src.reps === undefined ? '' : src.reps;
+  flashLiftSet(w);
+}
+/* V2.2 — a new exercise pre-fills from the most recent session that logged the
+   same exercise name. Only untouched rows are filled, so typing is never lost. */
+function liftSetsUntouched(row){
+  const rows = liftSetList(row);
+  if (!rows.length) return true;
+  return rows.every(st => String(st.weight ?? '').trim() === '' && String(st.reps ?? '').trim() === '' && !num(st.weight) && !num(st.reps));
+}
+function liftHistoryFor(name){
+  const needle = String(name || '').trim().toLowerCase();
+  if (!needle) return null;
+  let best = null;
+  Object.keys(state.workouts || {}).forEach(key => {
+    (envSessions(key, 'lift') || []).forEach(s => {
+      const when = s.logDate || s.date || key;
+      (s.exercises || []).forEach(ex => {
+        if (String(ex.name || '').trim().toLowerCase() !== needle) return;
+        const sets = liftSetList(ex).filter(st => String(st.weight ?? '').trim() !== '' || String(st.reps ?? '').trim() !== '');
+        if (!sets.length) return;
+        const stamp = when + '|' + (s.loggedAt || '');
+        if (!best || stamp > best.stamp){
+          best = { stamp, when, sets: sets.map((st, i) => ({ setNum: i + 1, weight: st.weight ?? '', reps: st.reps ?? '' })) };
+        }
+      });
+    });
+  });
+  return best;
+}
+function prefillLiftFromHistory(row){
+  if (!row || !liftSetsUntouched(row)) return false;
+  const hist = liftHistoryFor(row.name);
+  if (!hist) return false;
+  row.sets = hist.sets.map(st => ({ ...st }));
+  toast('✓ Loaded ' + row.sets.length + ' set' + (row.sets.length === 1 ? '' : 's') + ' from ' + fmtDate(hist.when));
+  return true;
+}
+/* Name fields commit on blur; focusout is used because some browsers only fire
+   change for certain commit paths, and a name is the trigger either way. */
+function onWsNameBlur(e){
+  const el = e && e.target;
+  if (!el || !el.dataset || el.dataset.wf !== 'name') return;
+  const s = activeDraft();
+  if (!s || s.type !== 'lift') return;
+  const row = sessionRows(s)[parseInt(el.dataset.wrow, 10)];
+  if (!row) return;
+  const clean = el.value.trim();
+  if (el.value !== clean) el.value = clean;
+  if (row.name === clean && !liftSetsUntouched(row)) return;
+  row.name = clean;
+  if (prefillLiftFromHistory(row)){
+    save();
+    renderSessionMetrics(s);
+    renderWorkoutSession();
+  }
 }
 function wsMetricsHtml(type, m, s){
   const rpeStat = stat('ws-m-rpe', m.rpe ? m.rpe.toFixed(1) : '—', type === 'basketball' ? 'Avg Set RPE' : 'Avg RPE');
@@ -1921,6 +2746,7 @@ function onWsInput(e){
       const setRow = row ? liftSetList(row)[parseInt(lsi, 10)] : null;
       if (!setRow) return;
       setRow[lf] = el.value;
+      setRow.setNum = parseInt(lsi, 10) + 1;
       save(); renderSessionMetrics(s);
       renderSetTotal(lri);
       return;
@@ -1930,6 +2756,17 @@ function onWsInput(e){
       if (!row) return;
       if (f === 'pr'){ row.pr = el.checked; const b = el.closest('.pr-box'); if (b) b.classList.toggle('on', el.checked); }
       else if (f === 'sec'){ row.sec = el.checked; full = true; }
+      else if (f === 'name' && e.type === 'change'){
+        /* A name committed on an exercise whose sets are still untouched pulls
+           last session's working sets in, so a repeat lift starts pre-filled. */
+        row.name = el.value.trim();
+        if (prefillLiftFromHistory(row)){
+          save();
+          renderSessionMetrics(s);
+          renderWorkoutSession();
+          return;
+        }
+      }
       else row[f] = el.value;
     } else if (f === 'time' || f === 'notes'){ s[f] = el.value; }
     else if (f === 'category'){ s.category = el.value; full = true; }
@@ -2039,23 +2876,25 @@ function addLiftSet(i){
   const s = activeDraft(); if (!s || s.type !== 'lift') return;
   const row = sessionRows(s)[i]; if (!row) return;
   snapshot();
-  if (!Array.isArray(row.setRows)){
-    /* Convert a legacy aggregate row into its individual sets so no volume is
-       lost, then append the new working set. */
-    const count = Math.max(1, Math.min(20, Math.round(num(row.sets)) || 1));
-    row.setRows = [];
-    for (let k = 0; k < count; k++) row.setRows.push({ weight: row.weight || '', reps: row.reps || '' });
-    row.sets = ''; row.reps = ''; row.weight = '';
-  }
-  row.setRows.push({ weight: '', reps: '' });
+  /* Adopt a legacy aggregate row first so its volume is preserved, then append
+     the new working set. */
+  normalizeLiftRow(row);
+  const rows = renumberLiftSets(row);
+  if (rows.length >= 30){ toast('30 sets is the limit for one exercise'); return; }
+  rows.push(blankLiftSet(rows.length + 1));
   save(); renderWorkoutSession();
 }
 function removeLiftSet(i, si){
   const s = activeDraft(); if (!s || s.type !== 'lift') return;
   const row = sessionRows(s)[i]; if (!row) return;
+  const rows = renumberLiftSets(row);
+  if (!rows.length) return;
+  /* -1 (the header button) removes the last set; a row's ✕ removes that set. */
+  const idx = (si === -1 || si === undefined) ? rows.length - 1 : si;
+  if (idx < 0 || idx >= rows.length) return;
   snapshot();
-  if (!Array.isArray(row.setRows)) return;
-  row.setRows.splice(si, 1);
+  rows.splice(idx, 1);
+  renumberLiftSets(row);
   save(); renderWorkoutSession();
 }
 function renderSetTotal(i){
@@ -2064,7 +2903,7 @@ function renderSetTotal(i){
   const el = document.querySelector('[data-lrow="' + i + '"]');
   const host = el ? el.closest('.ws-lift-exercise') : null;
   const total = host ? host.querySelector('.lift-set-total') : null;
-  if (total){ const t = liftSetTotals(row); total.textContent = 'Individual sets · ' + t.sets + ' logged · ' + fmtNum(t.reps) + ' reps · ' + fmtNum(t.weight) + ' lbs'; }
+  if (total){ const t = liftSetTotals(row); total.textContent = t.sets + ' set' + (t.sets === 1 ? '' : 's') + ' logged · ' + fmtNum(t.reps) + ' reps · ' + fmtNum(t.weight) + ' lbs moved'; }
 }
 function removeWsRow(i){
   const s = activeDraft(); if (!s || s.type === 'basketball') return;
@@ -2096,10 +2935,13 @@ function createPresetFromWorkout(){
     }));
   } else if (session.type === 'lift'){
     preset.day = session.day || 'Mon';
-    preset.exercises = JSON.parse(JSON.stringify(session.exercises || [])).map(r => ({
-      name: String(r.name || '').trim(), sets: optNum(r.sets), reps: optNum(r.reps), weight: optNum(r.weight), rpe: optNum(r.rpe), pr: !!r.pr,
-      setRows: liftSetList(r).map(st => ({ weight: optNum(st.weight), reps: optNum(st.reps) }))
-    }));
+    preset.exercises = JSON.parse(JSON.stringify(session.exercises || [])).map(r => {
+      normalizeLiftRow(r);
+      return {
+        name: String(r.name || '').trim(), rpe: optNum(r.rpe), pr: !!r.pr,
+        sets: liftSetList(r).map((st, i) => ({ setNum: i + 1, weight: optNum(st.weight), reps: optNum(st.reps) }))
+      };
+    });
   } else {
     preset.category = session.category || 'Sprints';
     preset.items = JSON.parse(JSON.stringify(session.items || [])).map(r => ({
@@ -2399,7 +3241,11 @@ function msyncLiftSession(body, date, day, header){
         const agg = chunk.match(/^(.*?)[\s:=]+(\d+)\s*(?:sets?)\s*(?:of|x|×)?\s*(\d+)\s*(?:reps?)?$/i);
         if (agg && agg[1].trim()){ name = agg[1].trim(); sets = agg[2]; reps = agg[3]; }
       }
-      exercises.push({ name, sets, reps, weight: a.wt || '', rpe: a.rpe || '', pr: !!a.pr, setRows });
+      const row = { name, rpe: a.rpe || '', pr: !!a.pr };
+      if (setRows.length) row.sets = setRows.map((st, i) => ({ setNum: i + 1, weight: st.weight, reps: st.reps }));
+      else { row.sets = sets; row.reps = reps; row.weight = a.wt || ''; }
+      normalizeLiftRow(row);
+      exercises.push(row);
     });
   });
   if (!exercises.length) return null;
@@ -2620,11 +3466,14 @@ function msyncFingerprint(s){
     if (Array.isArray(v)) return v.map(strip).filter(x => !blank(x));
     if (v && typeof v === 'object'){
       /* A row with explicit set rows renders from those, and the reader fills
-         sets/reps/weight from them — so those aggregates can't decide identity. */
+         sets/reps/weight from them — so those aggregates can't decide identity.
+         setNum is positional, not content, so it never breaks a twin match. */
       const rows = Array.isArray(v.setRows) && v.setRows.length > 0;
       const out = {};
       Object.keys(v).sort().forEach(k => {
-        if (k === 'id' || k === 'type' || k === 'at' || k === 'createdAt') return;
+        /* Identity, derived stamps and positional set numbers can't decide
+           whether two workouts are the same. */
+        if (k === 'id' || k === 'type' || k === 'at' || k === 'createdAt' || k === 'loggedAt' || k === 'date' || k === 'setNum') return;
         if (rows && (k === 'sets' || k === 'reps' || k === 'weight')) return;
         if (blank(v[k])) return;
         out[k] = strip(v[k]);
@@ -2654,7 +3503,7 @@ function msyncDropSession(id){
 }
 
 /* ============================================================
-   §11 — MOBILE SYNC: laptop ⇄ phone transfer
+   §10 — MOBILE SYNC: laptop ⇄ phone transfer
    Two payloads, both plain text so any messenger can carry them:
      · workout lines  — one per logged workout, parsed back by syncMobileText
      · a PHOENIX2- code — the whole app, DEFLATED then base64url encoded onto a
@@ -2844,8 +3693,11 @@ function msyncLineFor(env, key, s){
     (s.exercises || []).forEach(r => {
       const rows = liftSetList(r);
       const attrs = [];
+      /* Per-set rows travel as `setlist`; the old aggregate tokens are only
+         written for a legacy row that has none, so nothing is duplicated. */
       if (rows.length) attrs.push(['setlist', rows.map(msyncSetToken).join(',')]);
-      attrs.push(['sets', r.sets], ['reps', r.reps], ['wt', r.weight], ['rpe', r.rpe], ['pr', !!r.pr]);
+      else attrs.push(['sets', r.sets], ['reps', r.reps], ['wt', r.weight]);
+      attrs.push(['rpe', r.rpe], ['pr', !!r.pr]);
       const seg = msyncDrillSeg(r.name, attrs);
       if (seg) segs.push(seg);
     });
@@ -2885,7 +3737,7 @@ async function msyncPayload(){
   const days = new Set(lines.map(l => l.split('|')[1].trim())).size;
   if (!lines.length) return { text: '', info: 'no workouts in ' + msyncScopeLabel(), log: '' };
   const header = '# PHOENIX OS · Mobile Sync · ' + lines.length + ' workout' + (lines.length === 1 ? '' : 's') +
-    ' across ' + days + ' day' + (days === 1 ? '' : 's') + ' — paste into section 11 on the other device';
+    ' across ' + days + ' day' + (days === 1 ? '' : 's') + ' — paste into section 10 on the other device';
   return {
     text: header + '\n' + lines.join('\n'),
     info: lines.length + ' workout line' + (lines.length === 1 ? '' : 's') + ' · ' + days + ' day' + (days === 1 ? '' : 's') + ' · ' + msyncScopeLabel(),
@@ -3354,17 +4206,21 @@ function renderEditor(d){
     return '<div class="pm-field"><label>Program Name</label><input data-pf="name" id="pm-lift-name" list="lift-splits" placeholder="e.g. Upper #1" value="' + esc(d.name) + '"></div>' +
       '<div class="pm-splits"><span class="kicker">5-DAY SPLIT</span>' + LIFT_SPLITS.map(x => '<button class="chip-btn" onclick="setLiftSplit(\'' + x + '\')">' + x + '</button>').join('') + '</div>' +
       '<div class="pm-field"><label>Day Assignee</label><select data-pf="day">' + LIFT_DAYS.map(x => '<option' + (d.day === x ? ' selected' : '') + '>' + x + '</option>').join('') + '</select></div>' +
-      '<div class="pm-label-row"><span>EXERCISES — NAME · SETS · REPS · WEIGHT · PR FLAG</span><button class="btn sm ghost" onclick="addPmRow()">+ Add Exercise</button></div>' +
-      d.exercises.map((r, i) =>
-        '<div class="ws-row">' +
-          '<input class="grow" data-prow="' + i + '" data-pf="name" placeholder="Exercise" value="' + esc(r.name) + '">' +
-          (liftSetList(r).length ? '<span class="lift-set-badge" title="Individual sets saved with this exercise">' + liftSetList(r).length + ' sets</span>' : '') +
-          '<input class="n" type="number" min="0" data-prow="' + i + '" data-pf="sets" placeholder="Sets" value="' + esc(r.sets) + '">' +
-          '<input class="n" type="number" min="0" data-prow="' + i + '" data-pf="reps" placeholder="Reps" value="' + esc(r.reps) + '">' +
-          '<input class="n wide" type="number" min="0" step="any" data-prow="' + i + '" data-pf="weight" placeholder="lbs" value="' + esc(r.weight) + '">' +
-          '<label class="pr-box' + (r.pr ? ' on' : '') + '"><input type="checkbox" data-prow="' + i + '" data-pf="pr" ' + (r.pr ? 'checked' : '') + '><span>PR</span></label>' +
-          '<button class="icon-btn danger" onclick="removePmRow(' + i + ')">✕</button>' +
-        '</div>').join('') +
+      '<div class="pm-label-row"><span>EXERCISES — SET-BY-SET WEIGHT &amp; REPS · PR FLAG</span><button class="btn sm ghost" onclick="addPmRow()">+ Add Exercise</button></div>' +
+      d.exercises.map((r, i) => {
+        const n = liftSetList(r).length;
+        return '<div class="ws-lift-exercise">' +
+          '<div class="ws-row">' +
+            '<input class="grow" data-prow="' + i + '" data-pf="name" placeholder="Exercise" value="' + esc(r.name) + '">' +
+            '<span class="lift-set-badge" title="Individual sets saved with this exercise">' + n + ' set' + (n === 1 ? '' : 's') + '</span>' +
+            '<label class="pr-box' + (r.pr ? ' on' : '') + '"><input type="checkbox" data-prow="' + i + '" data-pf="pr" ' + (r.pr ? 'checked' : '') + '><span>PR</span></label>' +
+            '<button class="btn sm ghost" onclick="addPmLiftSet(' + i + ')" title="Add a set to this preset exercise">＋ Add Set</button>' +
+            '<button class="btn sm ghost" onclick="removePmLiftSet(' + i + ', -1)" title="Remove the last set"' + (n ? '' : ' disabled') + '>− Remove Set</button>' +
+            '<button class="icon-btn danger" onclick="removePmRow(' + i + ')" title="Remove exercise">✕</button>' +
+          '</div>' +
+          liftPmSetRowsHtml(r, i) +
+        '</div>';
+      }).join('') +
       '<button class="btn" style="width:100%;margin-top:8px" onclick="savePreset()">' + (d.id ? 'Save Changes' : 'Save Preset') + '</button>' +
       notesField(d);
   }
@@ -3408,7 +4264,16 @@ function cleanBbDrill(setType, dr){
 }
 function onPmInput(e){
   if (!pmDraft) return;
-  const el = e.target, f = el.dataset.pf, ri = el.dataset.prow, si = el.dataset.psi, di = el.dataset.pdi;
+  const el = e.target, f = el.dataset.pf, ri = el.dataset.prow, si = el.dataset.psi, di = el.dataset.pdi, pset = el.dataset.pset;
+  if (ri !== undefined && pset !== undefined){
+    const row = pmRows(pmDraft)[parseInt(ri, 10)];
+    const set = row ? liftSetList(row)[parseInt(pset, 10)] : null;
+    if (set){
+      set[el.dataset.psf] = el.value;
+      set.setNum = parseInt(pset, 10) + 1;
+    }
+    return;
+  }
   if (pmType === 'basketball'){
     if (si !== undefined && di !== undefined && el.dataset.psp !== undefined){
       /* Per-spot makes/attempts typed straight into a preset drill. */
@@ -3525,6 +4390,43 @@ function removePmRow(i){
   pmRows(pmDraft).splice(i, 1);
   renderPresetManager();
 }
+/* Preset editor — the same per-set rows as the live logger. */
+function liftPmSetRowsHtml(r, i){
+  const rows = liftSetList(r);
+  if (!rows.length) return '<div class="lift-sets empty">No sets yet — press <b>＋ Add Set</b>.</div>';
+  return '<div class="lift-sets">' + rows.map((st, si) =>
+    '<div class="lift-set-row">' +
+      '<span class="lift-set-num">Set ' + (si + 1) + '</span>' +
+      '<label class="lift-set-field"><span>Weight (lbs)</span><input class="n" type="number" min="0" step="any" inputmode="decimal" data-prow="' + i + '" data-pset="' + si + '" data-psf="weight" placeholder="lbs" value="' + esc(st.weight) + '"></label>' +
+      '<label class="lift-set-field"><span>Reps</span><input class="n" type="number" min="0" step="any" inputmode="numeric" data-prow="' + i + '" data-pset="' + si + '" data-psf="reps" placeholder="reps" value="' + esc(st.reps) + '"></label>' +
+      (si > 0
+        ? '<button class="icon-btn set-copy" onclick="copyPmLiftSet(' + i + ',' + si + ')" title="Copy weight &amp; reps from Set ' + si + '" aria-label="Copy weight and reps from set ' + si + '">⧉</button>'
+        : '<span class="set-copy-spacer" aria-hidden="true"></span>') +
+      '<button class="icon-btn danger" onclick="removePmLiftSet(' + i + ',' + si + ')" title="Remove set ' + (si + 1) + '">✕</button>' +
+    '</div>').join('') + '</div>';
+}
+function addPmLiftSet(i){
+  if (!pmDraft || pmType === 'basketball') return;
+  const row = pmRows(pmDraft)[i];
+  if (!row) return;
+  normalizeLiftRow(row);
+  const rows = renumberLiftSets(row);
+  if (rows.length >= 30) return;
+  rows.push(blankLiftSet(rows.length + 1));
+  renderPresetManager();
+}
+function removePmLiftSet(i, si){
+  if (!pmDraft || pmType === 'basketball') return;
+  const row = pmRows(pmDraft)[i];
+  if (!row) return;
+  const rows = renumberLiftSets(row);
+  if (!rows.length) return;
+  const idx = (si === -1 || si === undefined) ? rows.length - 1 : si;
+  if (idx < 0 || idx >= rows.length) return;
+  rows.splice(idx, 1);
+  renumberLiftSets(row);
+  renderPresetManager();
+}
 function newPreset(){ pmDraft = blankDraft(pmType); pmSpotMenu = null; renderPresetManager(); }
 function editPreset(id){
   const p = (state.presets[pmType] || []).find(x => x.id === id);
@@ -3562,8 +4464,13 @@ function savePreset(){
     const rows = pmRows(pmDraft).filter(r => (r.name || '').trim());
     if (!rows.length){ toast('Add at least one exercise with a name', 'error'); return; }
     p.day = pmDraft.day || 'Mon';
-    p.exercises = rows.map(r => ({ name: r.name.trim(), sets: optNum(r.sets), reps: optNum(r.reps), weight: optNum(r.weight), pr: !!r.pr,
-      setRows: liftSetList(r).map(st => ({ weight: optNum(st.weight), reps: optNum(st.reps) })) }));
+    p.exercises = rows.map(r => {
+      normalizeLiftRow(r);
+      return {
+        name: r.name.trim(), rpe: optNum(r.rpe), pr: !!r.pr,
+        sets: liftSetList(r).map((st, i) => ({ setNum: i + 1, weight: optNum(st.weight), reps: optNum(st.reps) }))
+      };
+    });
   } else {
     const rows = pmRows(pmDraft).filter(r => (r.name || '').trim());
     if (!rows.length){ toast('Add at least one exercise with a name', 'error'); return; }
@@ -8669,13 +9576,16 @@ function bindEvents(){
   });
   WORKOUT_ENVS.forEach(env => {
     const slot = document.getElementById('workout-session-' + env);
-    if (slot){ slot.addEventListener('input', onWsInput); slot.addEventListener('change', onWsInput); }
+    if (slot){
+      slot.addEventListener('input', onWsInput);
+      slot.addEventListener('change', onWsInput);
+      slot.addEventListener('focusout', onWsNameBlur);
+    }
   });
   document.getElementById('modal-body').addEventListener('input', onPmInput);
   document.getElementById('modal-body').addEventListener('change', onPmChange);
   document.getElementById('importFile').addEventListener('change', e => {
-    const f = e.target.files[0];
-    if (f) importJSON(f);
+    if (e.target.files && e.target.files[0]) importData(e);
     e.target.value = '';
   });
   const playsHost = document.getElementById('film-plays');
@@ -8692,6 +9602,26 @@ function bindEvents(){
     if (mod && e.key === 'y'){ e.preventDefault(); redo(); }
   });
   window.addEventListener('beforeunload', flushSave);
+  /* Connection came back: drop the backoff and push the queue immediately. */
+  window.addEventListener('online', () => {
+    renderSyncStatus();
+    if (!syncAutoOn()) return;
+    const q = readSyncQueue();
+    if (q.dirty && q.attempts){
+      q.attempts = 0;
+      q.nextAt = '';
+      q.lastError = '';
+      writeSyncQueue(q);
+    }
+    scheduleAutoSync(600);
+  });
+  window.addEventListener('offline', () => { renderSyncStatus(); });
+  /* Returning to the tab is the best moment to resume a paused queue. */
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState !== 'visible') return;
+    renderSyncStatus();
+    syncResume();
+  });
 }
 
 function tickClock(){
@@ -10961,605 +11891,8 @@ function renderCombineHistory(){
     '<div class="paste-hint" style="margin-top:8px">Append-only: saving a new testing day never rewrites an older one.</div>';
 }
 
-/* ============================================================
-   PHOENIX OS V1.0 — PRODUCTION MODULE LAYER (part 2)
-   Brainstorm mind-mapping engine · System Settings · event delegation
-   ============================================================ */
-
-/* ---------------- Phoenix OS deep-link registry ---------------- */
-const OS_LINKS = [
-  { id: 'dashboard',        label: 'Dashboard',                              tab: 'dashboard' },
-  { id: 'routine-schedule', label: 'Daily Routine · Fixed Schedule',         tab: 'routine',    set: () => setRoutineView('schedule') },
-  { id: 'routine-log',      label: 'Daily Routine · Daily Log',              tab: 'routine',    set: () => setRoutineView('log') },
-  { id: 'routine-mental',   label: 'Daily Routine · Mental Game / Wind-Down', tab: 'routine',   set: () => setRoutineView('mental') },
-  { id: 'workouts-lift',       label: 'Workouts · Lifting',                    tab: 'log',        set: () => setLogView('lift') },
-  { id: 'workouts-basketball', label: 'Workouts · Basketball',                 tab: 'log',        set: () => setLogView('basketball') },
-  { id: 'workouts-strength',   label: 'Workouts · Strength Training',          tab: 'log',        set: () => setLogView('strength') },
-  { id: 'workouts-records',    label: 'Workouts · Records',                    tab: 'log',        set: () => setLogView('records') },
-  { id: 'school-assign',    label: 'School · Assignment Tracker',            tab: 'school',     set: () => setSchoolView('assign') },
-  { id: 'school-classes',   label: 'School · Course Hub',                    tab: 'school',     set: () => setSchoolView('classes') },
-  { id: 'school-xc',        label: 'School · Extracurricular',               tab: 'school',     set: () => setSchoolView('xc') },
-  { id: 'school-ncaa',      label: 'School · BC to NCAA Map',                tab: 'school',     set: () => setSchoolView('ncaa') },
-  { id: 'film-plays',       label: 'Film Study · Plays',                     tab: 'film',       set: () => setFilmView('plays') },
-  { id: 'film-vault',       label: 'Film Study · Video Vault',               tab: 'film',       set: () => setFilmView('study') },
-  { id: 'film-scouting',    label: 'Film Study · Scouting Reports',          tab: 'film',       set: () => setFilmView('scouting') },
-  { id: 'film-playbook',    label: 'Film Study · Playbook',                  tab: 'film',       set: () => setFilmView('playbook') },
-  { id: 'finance',          label: 'Finance Tracker',                        tab: 'finance' },
-  { id: 'life-habits',      label: 'Life Maxx · Habit Categories',           tab: 'life',       set: () => setLifeView('habits') },
-  { id: 'life-monthly',     label: 'Life Maxx · Monthly Tracker',            tab: 'life',       set: () => setLifeView('monthly') },
-  { id: 'life-goals',       label: 'Life Maxx · Goals Engine',               tab: 'life',       set: () => setLifeView('goals') },
-  { id: 'life-combine',     label: 'Life Maxx · Physical Combine',           tab: 'life',       set: () => setLifeView('combine') },
-  { id: 'brainstorm',       label: 'Brainstorm',                             tab: 'brainstorm' },
-  { id: 'recruiting',       label: 'Recruiting CRM',                         tab: 'recruiting' },
-  { id: 'settings',         label: 'System Settings',                        tab: 'settings' }
-];
-function osJump(id){
-  const l = OS_LINKS.find(x => x.id === id);
-  if (!l) return;
-  if (typeof l.set === 'function') l.set();
-  switchTab(l.tab);
-  toast('Jumped to ' + l.label);
-}
-
-/* ---------------- Mind-map state ---------------- */
-const BM_LAYOUTS = ['mind', 'org', 'tree'];
-const BM_NODE_COLORS = ['', '#45a29e', '#66fcf1', '#f0a500', '#e63946', '#9d4edd', '#2ecc71'];
-function bmBlankMap(name){
-  return {
-    id: 'bm-' + uid(), name: name || 'Mind Map', layout: 'mind', zoom: 1, pan: { x: 0, y: 0 },
-    nodes: [{ id: 'bn-' + uid(), parent: '', text: 'Central Idea', x: 0, y: 0, collapsed: false, color: '', link: '', note: '', metrics: [], logs: [] }]
-  };
-}
-function brainstormState(){
-  if (!state.brainstorm || typeof state.brainstorm !== 'object') state.brainstorm = { maps: [], activeId: '', selected: '' };
-  const b = state.brainstorm;
-  if (!Array.isArray(b.maps)) b.maps = [];
-  if (!b.maps.length) b.maps.push(bmBlankMap('Brainstorm'));
-  if (!b.maps.some(m => m.id === b.activeId)) b.activeId = b.maps[0].id;
-  return b;
-}
-function bmActiveMap(){ const b = brainstormState(); return b.maps.find(m => m.id === b.activeId) || b.maps[0]; }
-function bmNode(map, id){ return ((map && map.nodes) || []).find(n => n.id === id) || null; }
-function bmRoot(map){ return ((map && map.nodes) || []).find(n => !n.parent) || ((map && map.nodes) || [])[0] || null; }
-function bmChildren(map, id){ return ((map && map.nodes) || []).filter(n => n.parent === id); }
-function bmSelectedNode(){ return bmNode(bmActiveMap(), brainstormState().selected); }
-function bmBlankNode(parent){
-  return { id: 'bn-' + uid(), parent: parent || '', text: 'New idea', x: 0, y: 0, collapsed: false, color: '', link: '', note: '', metrics: [], logs: [] };
-}
-function bmVisibleNodes(map){
-  const byId = {};
-  ((map && map.nodes) || []).forEach(n => { byId[n.id] = n; });
-  return ((map && map.nodes) || []).filter(n => {
-    let p = n.parent, guard = 0;
-    while (p && guard++ < 500){
-      const pn = byId[p];
-      if (!pn) return true;
-      if (pn.collapsed) return false;
-      p = pn.parent;
-    }
-    return true;
-  });
-}
-function bmDescendantCount(map, id){
-  let n = 0;
-  const walk = pid => bmChildren(map, pid).forEach(c => { n++; walk(c.id); });
-  walk(id);
-  return n;
-}
-function bmAsk(question, fallback){
-  try {
-    if (typeof prompt !== 'function') return fallback || '';
-    const v = prompt(question, fallback || '');
-    return (v === null || v === undefined) ? null : String(v);
-  } catch (e){ return fallback || ''; }
-}
-
-/* ---------------- Layout engine ---------------- */
-function bmAutoLayout(map){
-  const root = bmRoot(map);
-  if (!root) return;
-  const gapMindX = 232, gapMindY = 74, gapOrgX = 210, gapOrgY = 132, gapTreeX = 268, gapTreeY = 74;
-  const counters = { 1: 0, '-1': 0 };
-  const alternate = map.layout === 'mind';
-  const walk = (n, depth, side) => {
-    n.bmDepth = depth;
-    n.bmSide = depth === 0 ? 1 : side;
-    const kids = n.collapsed ? [] : bmChildren(map, n.id);
-    if (!kids.length){
-      n.bmOrd = counters[side] || 0;
-      counters[side] = (counters[side] || 0) + 1;
-      return;
-    }
-    kids.forEach((k, i) => walk(k, depth + 1, depth === 0 ? (alternate ? (i % 2 ? -1 : 1) : 1) : side));
-    n.bmOrd = (kids[0].bmOrd + kids[kids.length - 1].bmOrd) / 2;
-  };
-  walk(root, 0, 1);
-  const total = Math.max(1, counters[1] || 1);
-  ((map && map.nodes) || []).forEach(n => {
-    if (n.bmDepth === undefined) return;
-    /* V2.0 — a node the user dragged owns its coordinates. Fold / unfold and
-       sibling insertions reflow the auto-laid nodes around it but never snap a
-       custom position back to the engine default. */
-    if (n.manual) return;
-    if (map.layout === 'org'){
-      n.x = Math.round((n.bmOrd - (total - 1) / 2) * gapOrgX);
-      n.y = n.bmDepth * gapOrgY;
-    } else if (map.layout === 'tree'){
-      n.x = n.bmDepth * gapTreeX;
-      n.y = Math.round((n.bmOrd - (total - 1) / 2) * gapTreeY);
-    } else {
-      const s = n.bmSide === -1 ? -1 : 1;
-      const c = Math.max(1, counters[s] || 1);
-      n.x = n.bmDepth === 0 ? 0 : n.bmDepth * gapMindX * s;
-      n.y = n.bmDepth === 0 ? 0 : Math.round((n.bmOrd - (c - 1) / 2) * gapMindY);
-    }
-  });
-}
-function bmEdgePath(p, n){
-  const dx = n.x - p.x, dy = n.y - p.y;
-  if (Math.abs(dx) >= Math.abs(dy)){
-    const s = dx >= 0 ? 1 : -1;
-    const ax = p.x + s * 84, bx = n.x - s * 84;
-    const mx = Math.round((ax + bx) / 2);
-    return 'M' + ax + ' ' + p.y + ' C' + mx + ' ' + p.y + ', ' + mx + ' ' + n.y + ', ' + bx + ' ' + n.y;
-  }
-  const s = dy >= 0 ? 1 : -1;
-  const ay = p.y + s * 26, by = n.y - s * 26;
-  const my = Math.round((ay + by) / 2);
-  return 'M' + p.x + ' ' + ay + ' C' + p.x + ' ' + my + ', ' + n.x + ' ' + my + ', ' + n.x + ' ' + by;
-}
-
-/* ---------------- Rendering ---------------- */
-function bmApplyTransform(){
-  const map = bmActiveMap();
-  const cv = document.getElementById('bm-canvas');
-  if (!cv) return;
-  cv.style.transform = 'translate(' + Math.round(map.pan.x || 0) + 'px,' + Math.round(map.pan.y || 0) + 'px) scale(' + (map.zoom || 1) + ')';
-}
-function bmRenderEdges(){
-  const map = bmActiveMap();
-  const el = document.getElementById('bm-edges');
-  if (!el) return;
-  el.innerHTML = '<g transform="translate(2400,2400)">' + bmVisibleNodes(map).filter(n => n.parent).map(n => {
-    const p = bmNode(map, n.parent);
-    if (!p) return '';
-    return '<path d="' + bmEdgePath(p, n) + '" fill="none" stroke="' + (n.color || 'rgba(102,252,241,.45)') + '" stroke-width="1.7"/>';
-  }).join('') + '</g>';
-}
-function bmNodeHtml(map, n, selected){
-  const kids = bmChildren(map, n.id);
-  const link = OS_LINKS.find(l => l.id === n.link);
-  const metrics = n.metrics || [];
-  const flags =
-    (link ? '<span class="bm-flag link" data-act="bm-jump" data-link="' + link.id + '" title="Jump to ' + esc(link.label) + '">🔗</span>' : '') +
-    (n.note ? '<span class="bm-flag note" title="Sticky note attached">📌</span>' : '') +
-    (metrics.length ? '<span class="bm-flag metric" title="Metric counters">#' + metrics.length + '</span>' : '');
-  return '<div class="bm-node' + (selected ? ' sel' : '') + (n.parent ? '' : ' root') + '" data-node="' + n.id + '"' +
-    ' style="left:' + Math.round(n.x) + 'px;top:' + Math.round(n.y) + 'px;' + (n.color ? '--nc:' + n.color + ';' : '') + '">' +
-    '<span class="bm-text">' + (esc(n.text) || '&nbsp;') + '</span>' +
-    (flags ? '<span class="bm-flags">' + flags + '</span>' : '') +
-    (kids.length
-      ? '<span class="bm-fold' + (n.collapsed ? ' folded' : '') + '" data-act="bm-fold" data-id="' + n.id + '" title="Fold / unfold branch (Space)">' +
-        (n.collapsed ? '+' + bmDescendantCount(map, n.id) : '–') + '</span>'
-      : '') +
-  '</div>';
-}
-function bmRenderNodes(){
-  const map = bmActiveMap();
-  const el = document.getElementById('bm-nodes');
-  if (!el) return;
-  const b = brainstormState();
-  el.innerHTML = bmVisibleNodes(map).map(n => bmNodeHtml(map, n, b.selected === n.id)).join('');
-}
-function renderBmInspector(){
-  const el = document.getElementById('bm-inspector');
-  if (!el) return;
-  const n = bmSelectedNode();
-  if (!n){
-    el.innerHTML = '<div class="empty sm">Select a node to edit its text, colour, deep-link and rich attachments. Double-click a node to jump straight into the text field.</div>';
-    return;
-  }
-  const link = OS_LINKS.find(l => l.id === n.link);
-  const metrics = n.metrics || [];
-  el.innerHTML =
-    '<div class="bm-ins-grid">' +
-      '<div class="bm-ins-col">' +
-        '<div class="field"><label>Node text</label>' +
-          '<input id="bm-text" data-act="bm-text-live" value="' + esc(n.text) + '" placeholder="Node text..."></div>' +
-        '<div class="field"><label>Custom colour</label><div class="bm-colors">' +
-          BM_NODE_COLORS.map(c =>
-            '<button class="bm-sw' + (c === (n.color || '') ? ' active' : '') + '" style="--nc:' + (c || '#7c8b9a') + '" data-act="bm-color" data-color="' + c + '" title="' + (c || 'default') + '"></button>').join('') +
-        '</div></div>' +
-        '<div class="field"><label>System jump link <span class="hint">routes into an OS module</span></label>' +
-          '<div class="bm-link-row">' +
-            '<select data-act="bm-link-select">' +
-              '<option value="">— none —</option>' +
-              OS_LINKS.map(l => '<option value="' + l.id + '"' + (n.link === l.id ? ' selected' : '') + '>' + esc(l.label) + '</option>').join('') +
-            '</select>' +
-            (link ? '<button class="btn sm" data-act="bm-jump" data-link="' + link.id + '">Jump</button>' : '') +
-          '</div>' +
-        '</div>' +
-        '<div class="field"><label>Sticky note</label>' +
-          '<textarea rows="3" data-act="bm-note" placeholder="Pin a thought to this node...">' + esc(n.note || '') + '</textarea></div>' +
-      '</div>' +
-      '<div class="bm-ins-col">' +
-        '<div class="bm-ins-head"><span class="kicker">METRIC COUNTERS</span>' +
-          '<button class="chip-btn" data-act="bm-add-metric">+ Metric</button></div>' +
-        (metrics.length
-          ? metrics.map(mt =>
-              '<div class="bm-metric-row">' +
-                '<input value="' + esc(mt.label) + '" placeholder="label (cost, priority...)" data-act="bm-metric-label" data-mid="' + mt.id + '">' +
-                '<input type="number" value="' + esc(String(mt.value)) + '" data-act="bm-metric-value" data-mid="' + mt.id + '">' +
-                '<button class="icon-btn" data-act="bm-step-metric" data-mid="' + mt.id + '" data-delta="1">+</button>' +
-                '<button class="icon-btn" data-act="bm-step-metric" data-mid="' + mt.id + '" data-delta="-1">−</button>' +
-                '<button class="icon-btn danger" data-act="bm-del-metric" data-mid="' + mt.id + '">✕</button>' +
-              '</div>').join('')
-          : '<div class="hint">No counters yet — track cost, priority or a numeric target.</div>') +
-        '<div class="bm-ins-head" style="margin-top:14px"><span class="kicker">TEXT LOG</span></div>' +
-        '<div class="bm-logs">' + ((n.logs || []).length
-          ? (n.logs || []).map(l => '<div class="bm-log"><span class="bm-log-at">' + esc(l.at ? fmtDate(l.at) : '') + '</span>' + esc(l.text) + '</div>').join('')
-          : '<div class="hint">No log entries yet.</div>') +
-        '</div>' +
-        '<div class="bm-log-add">' +
-          '<input id="bm-log-input" placeholder="Append a text log entry..." data-act="bm-log-input">' +
-          '<button class="btn sm" data-act="bm-add-log">Log</button>' +
-        '</div>' +
-      '</div>' +
-    '</div>';
-}
-function renderBrainstorm(){
-  const stage = document.getElementById('bm-stage');
-  if (!stage) return;
-  const b = brainstormState();
-  const map = bmActiveMap();
-  const sel = document.getElementById('bm-map-select');
-  if (sel) sel.innerHTML = b.maps.map(mp => '<option value="' + mp.id + '"' + (mp.id === map.id ? ' selected' : '') + '>' + esc(mp.name) + '</option>').join('');
-  BM_LAYOUTS.forEach(l => {
-    const el = document.getElementById('bm-layout-' + l);
-    if (el) el.classList.toggle('active', map.layout === l);
-  });
-  const zl = document.getElementById('bm-zoom-label');
-  if (zl) zl.textContent = Math.round((map.zoom || 1) * 100) + '%';
-  bmAutoLayout(map);
-  bmRenderEdges();
-  bmRenderNodes();
-  bmApplyTransform();
-  renderBmInspector();
-}
-
-/* ---------------- Node operations ---------------- */
-function bmSelect(id){ brainstormState().selected = id || ''; }
-function bmFocusText(){
-  const el = document.getElementById('bm-text');
-  if (el && el.focus) el.focus();
-}
-function bmSetTextLive(v){
-  const n = bmSelectedNode();
-  if (!n) return;
-  n.text = v;
-  const el = document.querySelector('[data-node="' + n.id + '"] .bm-text');
-  if (el) el.textContent = v;
-  bmTextDirty();
-}
-let bmTextTimer = null;
-function bmTextDirty(){
-  clearTimeout(bmTextTimer);
-  bmTextTimer = setTimeout(() => { save(); bmRenderEdges(); }, 220);
-}
-function bmSetColor(c){
-  const n = bmSelectedNode();
-  if (!n) return;
-  snapshot();
-  n.color = c || '';
-  save();
-  renderBrainstorm();
-}
-function bmSetNote(v){
-  const n = bmSelectedNode();
-  if (!n) return;
-  snapshot();
-  n.note = String(v || '').trim();
-  save();
-  bmRenderNodes();
-}
-function bmSetLink(id){
-  const n = bmSelectedNode();
-  if (!n) return;
-  snapshot();
-  n.link = id || '';
-  save();
-  bmRenderNodes();
-  renderBmInspector();
-  toast(id ? 'Deep-link attached' : 'Deep-link removed');
-}
-function bmAddMetric(){
-  const n = bmSelectedNode();
-  if (!n) return;
-  snapshot();
-  n.metrics = Array.isArray(n.metrics) ? n.metrics : [];
-  n.metrics.push({ id: uid(), label: 'Priority', value: 1 });
-  save();
-  renderBmInspector();
-  bmRenderNodes();
-}
-function bmSetMetric(mid, field, value){
-  const n = bmSelectedNode();
-  if (!n) return;
-  const mt = (n.metrics || []).find(x => x.id === mid);
-  if (!mt) return;
-  mt[field] = field === 'value' ? (parseFloat(value) || 0) : String(value || '');
-  save();
-  bmRenderNodes();
-}
-function bmStepMetric(mid, delta){
-  const n = bmSelectedNode();
-  if (!n) return;
-  const mt = (n.metrics || []).find(x => x.id === mid);
-  if (!mt) return;
-  mt.value = (parseFloat(mt.value) || 0) + delta;
-  save();
-  renderBmInspector();
-  bmRenderNodes();
-}
-function bmDelMetric(mid){
-  const n = bmSelectedNode();
-  if (!n) return;
-  snapshot();
-  n.metrics = (n.metrics || []).filter(x => x.id !== mid);
-  save();
-  renderBmInspector();
-  bmRenderNodes();
-}
-function bmAddLog(){
-  const n = bmSelectedNode();
-  if (!n) return;
-  const inp = document.getElementById('bm-log-input');
-  const text = ((inp && inp.value) || '').trim();
-  if (!text) return;
-  snapshot();
-  n.logs = Array.isArray(n.logs) ? n.logs : [];
-  n.logs.push({ id: uid(), at: todayKey(), text });
-  save();
-  if (inp) inp.value = '';
-  renderBmInspector();
-}
-function bmAddChild(){
-  const map = bmActiveMap();
-  let parentId = brainstormState().selected;
-  if (!parentId || !bmNode(map, parentId)){
-    const r = bmRoot(map);
-    if (!r) return;
-    parentId = r.id;
-  }
-  snapshot();
-  const p = bmNode(map, parentId);
-  if (p) p.collapsed = false;
-  const n = bmBlankNode(parentId);
-  map.nodes.push(n);
-  brainstormState().selected = n.id;
-  save();
-  renderBrainstorm();
-}
-function bmAddSibling(){
-  const map = bmActiveMap();
-  const cur = bmSelectedNode();
-  if (!cur){ bmAddChild(); return; }
-  snapshot();
-  const n = bmBlankNode(cur.parent || '');
-  map.nodes.push(n);
-  brainstormState().selected = n.id;
-  save();
-  renderBrainstorm();
-}
-function bmDeleteSelected(){
-  const map = bmActiveMap();
-  const n = bmSelectedNode();
-  if (!n) return;
-  if (!n.parent){ toast('The root node cannot be deleted', 'error'); return; }
-  snapshot();
-  const doomed = {};
-  const mark = id => { doomed[id] = true; bmChildren(map, id).forEach(c => mark(c.id)); };
-  mark(n.id);
-  map.nodes = map.nodes.filter(x => !doomed[x.id]);
-  brainstormState().selected = n.parent;
-  save();
-  renderBrainstorm();
-  const extra = Object.keys(doomed).length - 1;
-  toast(extra > 0 ? 'Node removed with ' + extra + ' sub-node(s)' : 'Node removed');
-}
-function bmFold(id){
-  const map = bmActiveMap();
-  const n = bmNode(map, id);
-  if (!n) return;
-  if (!bmChildren(map, id).length) return;
-  snapshot();
-  n.collapsed = !n.collapsed;
-  save();
-  renderBrainstorm();
-}
-function bmToggleFold(){
-  const n = bmSelectedNode();
-  if (!n){ toast('Select a branch first', 'error'); return; }
-  bmFold(n.id);
-}
-function bmSetLayout(id){
-  if (!BM_LAYOUTS.includes(id)) return;
-  snapshot();
-  const map = bmActiveMap();
-  map.layout = id;
-  /* Choosing a layout is an explicit request to reflow every node, so custom
-     drag offsets are released here (only here). */
-  (map.nodes || []).forEach(n => { delete n.manual; });
-  save();
-  renderBrainstorm();
-  toast('Layout: ' + id);
-}
-function bmZoom(dir){
-  const map = bmActiveMap();
-  const z = (map.zoom || 1) * (dir > 0 ? 1.15 : 1 / 1.15);
-  map.zoom = Math.round(clamp(z, 0.35, 2.2) * 100) / 100;
-  save();
-  bmApplyTransform();
-  const zl = document.getElementById('bm-zoom-label');
-  if (zl) zl.textContent = Math.round(map.zoom * 100) + '%';
-}
-function bmFit(){
-  const stage = document.getElementById('bm-stage');
-  const map = bmActiveMap();
-  const vis = bmVisibleNodes(map);
-  if (!stage || !vis.length) return;
-  const xs = vis.map(n => n.x), ys = vis.map(n => n.y);
-  const minX = Math.min.apply(null, xs) - 180, maxX = Math.max.apply(null, xs) + 180;
-  const minY = Math.min.apply(null, ys) - 90,  maxY = Math.max.apply(null, ys) + 90;
-  const rect = stage.getBoundingClientRect ? stage.getBoundingClientRect() : { width: 960, height: 520 };
-  const w = Math.max(1, maxX - minX), h = Math.max(1, maxY - minY);
-  map.zoom = Math.round(clamp(Math.min((rect.width || 960) / w, (rect.height || 520) / h), 0.35, 1.35) * 100) / 100;
-  map.pan.x = Math.round(-((minX + maxX) / 2) * map.zoom);
-  map.pan.y = Math.round(-((minY + maxY) / 2) * map.zoom);
-  save();
-  renderBrainstorm();
-}
-function bmSelectMap(id){
-  const b = brainstormState();
-  if (!b.maps.some(m => m.id === id)) return;
-  b.activeId = id;
-  b.selected = '';
-  save();
-  renderBrainstorm();
-}
-function bmNewMap(){
-  const name = bmAsk('Name the new mind map', 'New Mind Map');
-  if (!name) return;
-  snapshot();
-  const b = brainstormState();
-  const m = bmBlankMap(name.trim());
-  b.maps.push(m);
-  b.activeId = m.id;
-  b.selected = '';
-  save();
-  renderBrainstorm();
-  toast('Map created');
-}
-function bmRenameMap(){
-  const b = brainstormState();
-  const m = bmActiveMap();
-  const name = bmAsk('Rename this map', m.name);
-  if (!name) return;
-  snapshot();
-  m.name = name.trim() || m.name;
-  save();
-  renderBrainstorm();
-}
-function bmDeleteMap(){
-  const b = brainstormState();
-  if (b.maps.length <= 1){ toast('Keep at least one map', 'error'); return; }
-  const m = bmActiveMap();
-  const ok = bmAsk('Delete the map "' + m.name + '"? Type the name to confirm.', '');
-  if (ok === null) return;
-  if (String(ok).trim().toLowerCase() !== String(m.name).trim().toLowerCase()){
-    toast('Name did not match — map kept', 'error');
-    return;
-  }
-  snapshot();
-  b.maps = b.maps.filter(x => x.id !== m.id);
-  b.activeId = b.maps[0].id;
-  b.selected = '';
-  save();
-  renderBrainstorm();
-  toast('Map deleted');
-}
-function bmOpenLinkPicker(){
-  const n = bmSelectedNode();
-  openModal('Attach a Phoenix OS deep-link');
-  let html = '<p class="paste-hint" style="margin-bottom:10px">Pick the module this node should jump to. Clicking the node afterwards routes straight there.</p>';
-  NAV_SECTIONS.forEach(t => {
-    const items = OS_LINKS.filter(l => l.tab === t);
-    if (!items.length) return;
-    html += '<div class="log-label" style="margin-top:12px">' + esc(TITLES[t] || t) + '</div><div class="bm-link-picker">' +
-      items.map(l => '<button class="chip-btn' + (n && n.link === l.id ? ' active' : '') + '" data-act="bm-apply-link" data-link="' + l.id + '">' + esc(l.label) + '</button>').join('') +
-      '</div>';
-  });
-  html += '<div style="display:flex;justify-content:flex-end;margin-top:14px"><button class="btn sm" data-act="bm-apply-link" data-link="">Clear link</button></div>';
-  modalBody.innerHTML = html;
-}
-
-/* ---------------- Pointer interaction (desktop + touch) ---------------- */
-let bmDrag = null;
-function bmNodeDown(e, id){
-  const t = e.target;
-  if (t && t.closest && t.closest('[data-act]')) return;
-  const map = bmActiveMap();
-  brainstormState().selected = id;
-  const n = bmNode(map, id);
-  bmDrag = { kind: 'node', id, x: e.clientX, y: e.clientY, ox: n ? n.x : 0, oy: n ? n.y : 0, pid: e.pointerId, moved: false };
-  if (e.preventDefault) e.preventDefault();
-  bmRenderNodes();
-  renderBmInspector();
-}
-function bmCanvasDown(e){
-  const map = bmActiveMap();
-  brainstormState().selected = '';
-  bmDrag = { kind: 'pan', x: e.clientX, y: e.clientY, ox: map.pan.x || 0, oy: map.pan.y || 0, pid: e.pointerId, moved: false };
-  if (e.preventDefault) e.preventDefault();
-  bmRenderNodes();
-  renderBmInspector();
-}
-function bmPointerMove(e){
-  if (!bmDrag || bmDrag.pid !== e.pointerId) return;
-  const map = bmActiveMap();
-  const dx = (e.clientX || 0) - bmDrag.x, dy = (e.clientY || 0) - bmDrag.y;
-  if (Math.abs(dx) + Math.abs(dy) > 3) bmDrag.moved = true;
-  if (bmDrag.kind === 'node'){
-    const n = bmNode(map, bmDrag.id);
-    if (!n) return;
-    const z = map.zoom || 1;
-    if (bmDrag.moved) n.manual = true;
-    n.x = Math.round(bmDrag.ox + dx / z);
-    n.y = Math.round(bmDrag.oy + dy / z);
-    const el = document.querySelector('[data-node="' + n.id + '"]');
-    if (el){ el.style.left = n.x + 'px'; el.style.top = n.y + 'px'; }
-    bmRenderEdges();
-  } else {
-    map.pan.x = Math.round(bmDrag.ox + dx);
-    map.pan.y = Math.round(bmDrag.oy + dy);
-    bmApplyTransform();
-  }
-}
-function bmPointerUp(){
-  if (!bmDrag) return;
-  const moved = bmDrag.moved;
-  bmDrag = null;
-  if (moved) save();
-}
-function bmKeydown(e){
-  if (!state || !state.settings || state.settings.activeTab !== 'brainstorm') return;
-  const t = e.target || document.activeElement;
-  const tag = t && t.tagName ? String(t.tagName).toLowerCase() : '';
-  if (tag === 'input' || tag === 'textarea' || tag === 'select' || tag === 'button') return;
-  if (t && t.isContentEditable) return;
-  if (e.ctrlKey || e.metaKey || e.altKey) return;
-  const key = e.key;
-  if (key === 'Tab'){ e.preventDefault(); bmAddChild(); }
-  else if (key === 'Enter'){ e.preventDefault(); bmAddSibling(); }
-  else if (key === 'Delete' || key === 'Backspace'){ e.preventDefault(); bmDeleteSelected(); }
-  else if (key === ' ' || key === 'Spacebar' || key === 'Space'){ e.preventDefault(); bmToggleFold(); }
-  else if (key === 'Escape'){ brainstormState().selected = ''; renderBrainstorm(); }
-}
-
 /* ---------------- Delegated events ---------------- */
 const V2_ACTIONS = {
-  'bm-fold': el => bmFold(el.dataset.id),
-  'bm-jump': (el, e) => { if (e && e.stopPropagation) e.stopPropagation(); osJump(el.dataset.link); },
-  'bm-color': el => bmSetColor(el.dataset.color),
-  'bm-add-metric': () => bmAddMetric(),
-  'bm-del-metric': el => bmDelMetric(el.dataset.mid),
-  'bm-step-metric': el => bmStepMetric(el.dataset.mid, parseFloat(el.dataset.delta) || 1),
-  'bm-add-log': () => bmAddLog(),
-  'bm-apply-link': (el, e) => { bmSetLink(el.dataset.link || ''); if (e && e.stopPropagation) e.stopPropagation(); closeModal(); },
-  'bm-new-map': () => bmNewMap(),
-  'bm-rename-map': () => bmRenameMap(),
-  'bm-del-map': () => bmDeleteMap(),
-  'bm-fit': () => bmFit(),
   'arch-restore-assign': el => restoreAssignment(el.dataset.id),
   'arch-restore-play': el => restorePlay(el.dataset.id),
   'arch-export': () => exportArchiveJSON()
@@ -11577,35 +11910,11 @@ function v2Change(e){
   if (!t || !t.dataset) return;
   if (t.dataset.pref) setPref(t.dataset.pref, t.value);
   else if (t.dataset.prefNum) setPrefNum(t.dataset.prefNum, t.value);
-  else if (t.dataset.act === 'bm-note') bmSetNote(t.value);
-  else if (t.dataset.act === 'bm-link-select') bmSetLink(t.value);
-  else if (t.dataset.act === 'bm-metric-label') bmSetMetric(t.dataset.mid, 'label', t.value);
-  else if (t.dataset.act === 'bm-metric-value') bmSetMetric(t.dataset.mid, 'value', t.value);
 }
-function v2Input(e){
-  const t = e.target;
-  if (!t || !t.dataset) return;
-  if (t.dataset.act === 'bm-text-live') bmSetTextLive(t.value);
-}
-function v2PointerDown(e){
-  const t = e.target;
-  if (!t || !t.closest) return;
-  if (t.closest('[data-act]')) return;
-  const nodeEl = t.closest('[data-node]');
-  if (nodeEl){ bmNodeDown(e, nodeEl.dataset.node); return; }
-  const stage = document.getElementById('bm-stage');
-  if (stage && stage.contains && stage.contains(t)) bmCanvasDown(e);
-}
-function bindBrainstormEvents(){
+function bindGlobalActions(){
   if (typeof document === 'undefined' || !document.addEventListener) return;
   document.addEventListener('click', v2Click);
   document.addEventListener('change', v2Change);
-  document.addEventListener('input', v2Input);
-  document.addEventListener('keydown', bmKeydown);
-  document.addEventListener('pointerdown', v2PointerDown);
-  document.addEventListener('pointermove', bmPointerMove);
-  document.addEventListener('pointerup', bmPointerUp);
-  document.addEventListener('pointercancel', bmPointerUp);
 }
 
 /* ============================================================
@@ -11936,31 +12245,28 @@ function renderSettingsPrefs(){
     '</div>';
 }
 function renderSettingsBackup(){
-  const el = document.getElementById('settings-backup');
-  if (!el) return;
-  let bytes = 0;
-  try { bytes = JSON.stringify(state).length; } catch (e){ bytes = 0; }
-  const counts = [
-    ['Daily logs', Object.keys(state.logs || {}).length],
-    ['Workout sessions', allSessions().length],
-    ['Assignments', (state.school || []).length],
-    ['Goals', (state.goals || []).length],
-    ['Habits', (state.habits || []).length],
-    ['Mind maps', ((state.brainstorm || {}).maps || []).length],
-    ['Recruiting targets', (state.recruiting || []).length],
-    ['Saved plays', (((state.film || {}).plays) || []).length]
-  ];
-  el.innerHTML =
-    '<div class="card"><div class="card-head"><h3>Data Backup</h3><span class="kicker">' + fmtBytes(bytes) + ' in localStorage</span></div>' +
-      '<p class="page-sub">Everything lives under <b>' + LS_KEY + '</b> on this device. Export regularly — the JSON backup restores every module exactly as it stands.</p>' +
-      '<div class="backup-actions">' +
-        '<button class="btn" onclick="exportJSON()">Export full backup (JSON)</button>' +
-        '<button class="btn ghost" onclick="document.getElementById(&quot;importFile&quot;).click()">Import backup</button>' +
-        '<button class="btn ghost" data-act="arch-export">Export archive only</button>' +
-      '</div>' +
-      '<div class="paste-hint">Importing merges your file forward into the current schema — new fields get defaults and nothing already stored is discarded.</div>' +
-      '<div class="bk-stats">' + counts.map(c => '<div class="bk-stat"><b>' + c[1] + '</b><span>' + esc(c[0]) + '</span></div>').join('') + '</div>' +
-    '</div>';
+  const el = document.getElementById('settings-stats');
+  if (el){
+    let bytes = 0;
+    try { bytes = JSON.stringify(state).length; } catch (e){ bytes = 0; }
+    const counts = [
+      ['Daily logs', Object.keys(state.logs || {}).length],
+      ['Workout sessions', allSessions().length],
+      ['Assignments', (state.school || []).length],
+      ['Goals', (state.goals || []).length],
+      ['Habits', (state.habits || []).length],
+      ['Recruiting targets', (state.recruiting || []).length],
+      ['Saved plays', (((state.film || {}).plays) || []).length]
+    ];
+    el.innerHTML =
+      '<div class="card"><div class="card-head"><h3>On This Device</h3><span class="kicker">' + fmtBytes(bytes) + ' in localStorage</span></div>' +
+        '<p class="page-sub">Everything lives under <b>' + LS_KEY + '</b> in this browser. Export Data writes every Phoenix OS key into one JSON file; Import Data replaces this device with a validated backup and keeps Undo available.</p>' +
+        '<div class="backup-actions"><button class="btn ghost" data-act="arch-export">Export archive only (JSON)</button></div>' +
+        '<div class="bk-stats">' + counts.map(c => '<div class="bk-stat"><b>' + c[1] + '</b><span>' + esc(c[0]) + '</span></div>').join('') + '</div>' +
+      '</div>';
+  }
+  fillSyncForm(false);
+  renderSyncStatus();
 }
 function archiveSlices(){
   return {
@@ -12080,9 +12386,10 @@ seedHabitBuckets();
 pmType = state.settings.pmType || 'basketball';
 if (state.settings.landingTab && state.settings.landingTab !== 'last') state.settings.activeTab = normalizeTab(state.settings.landingTab);
 bindEvents();
-bindBrainstormEvents();
+bindGlobalActions();
 populateLiftSplits();
 applyTab();
 renderAll();
 startClock();
+startAutoSync();
 if (liveState().active){ openLiveOverlay(); startLiveTicker(); }
