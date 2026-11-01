@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0b0c10">
-<title>PHOENIX OS V2.0</title>
+<title>PHOENIX OS V3.0</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%3E%3Cdefs%3E%3ClinearGradient%20id%3D%27g%27%20x1%3D%2712%27%20y1%3D%272%27%20x2%3D%2712%27%20y2%3D%2722%27%20gradientUnits%3D%27userSpaceOnUse%27%3E%3Cstop%20stop-color%3D%27%2366fcf1%27%2F%3E%3Cstop%20offset%3D%271%27%20stop-color%3D%27%231ea89e%27%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Cpath%20fill%3D%27url%28%23g%29%27%20d%3D%27M12%207c-2.2%201.5-3.4%203.4-3.4%205.8a3.4%203.4%200%200%200%206.8%200c0-2.4-1.2-4.3-3.4-5.8z%27%2F%3E%3Cpath%20fill%3D%27url%28%23g%29%27%20d%3D%27M9.2%206.6%206.7%204.9c-.9%201.1-.7%202.1.7%203.1-.7%201-.4%202%20.6%203-1.6%200-2.5.8-2.8%202.3l1.9.4c.2-1.2%201-1.8%202.4-1.9-.5-1.7-.2-3.1%201.5-4.4z%27%2F%3E%3Cpath%20fill%3D%27url%28%23g%29%27%20d%3D%27M14.8%206.6l2.5-1.7c.9%201.1.7%202.1-.7%203.1.7%201%20.4%202-.6%203%201.6%200%202.5.8%202.8%202.3l-1.9.4c-.2-1.2-1-1.8-2.4-1.9.5-1.7.2-3.1-1.5-4.4z%27%2F%3E%3Ccircle%20cx%3D%2712%27%20cy%3D%274.9%27%20r%3D%271.3%27%20fill%3D%27url%28%23g%29%27%2F%3E%3C%2Fsvg%3E">
   <link rel="stylesheet" href="styles.css">
   <!-- Supabase JS v2 (UMD build exposes window.supabase). Deferred so it never blocks first paint. -->
@@ -41,7 +41,7 @@
       </svg>
       <div>
         <h1>PHOENIX<br>OPERATING SYSTEM</h1>
-        <div class="brand-sub">PHOENIX OS V2.0 · DAILY COMMAND CENTER</div>
+        <div class="brand-sub">PHOENIX OS V3.0 · DAILY COMMAND CENTER</div>
       </div>
     </div>
 
@@ -51,11 +51,9 @@
       <button class="nav-btn" data-tab="log" onclick="switchTab('log')"><span class="nav-num">03</span><span>🏋️ Workouts</span></button>
       <button class="nav-btn" data-tab="school" onclick="switchTab('school')"><span class="nav-num">04</span><span>📚 School</span></button>
       <button class="nav-btn" data-tab="film" onclick="switchTab('film')"><span class="nav-num">05</span><span>🎥 Film Study</span></button>
-      <button class="nav-btn" data-tab="finance" onclick="switchTab('finance')"><span class="nav-num">06</span><span>💰 Finance Tracker</span></button>
-      <button class="nav-btn" data-tab="life" onclick="switchTab('life')"><span class="nav-num">07</span><span>⚡ Life Maxx</span></button>
-      <button class="nav-btn" data-tab="recruiting" onclick="switchTab('recruiting')"><span class="nav-num">08</span><span>🎯 Recruiting CRM</span></button>
-      <button class="nav-btn" data-tab="settings" onclick="switchTab('settings')"><span class="nav-num">09</span><span>⚙️ System Settings</span></button>
-      <button class="nav-btn" data-tab="mobile" onclick="switchTab('mobile')"><span class="nav-num">10</span><span>📲 Mobile Sync</span></button>
+      <button class="nav-btn" data-tab="finance" onclick="switchTab('finance')"><span class="nav-num">06</span><span>💰 Finance Tracker- BETA</span></button>
+      <button class="nav-btn" data-tab="life" onclick="switchTab('life')"><span class="nav-num">07</span><span>⚡ Habits &amp; Goals</span></button>
+      <button class="nav-btn" data-tab="settings" onclick="switchTab('settings')"><span class="nav-num">08</span><span>⚙️ System Settings</span></button>
     </nav>
 
     <div class="side-util">
@@ -78,7 +76,7 @@
         <p id="topbar-date"></p>
       </div>
       <div class="clock-shell">
-        <span class="beta-label">V2.0</span>
+        <span class="beta-label">V3.0</span>
         <div class="clock" id="clock" aria-label="Live digital clock">--:--:--</div>
       </div>
     </header>
@@ -90,9 +88,8 @@
         <div class="card-head-row">
           <div>
             <h2 class="page-title">Weekly Overview</h2>
-            <p class="page-sub">Academics, athletics, habits and recruiting for the current week.</p>
+            <p class="page-sub">Academics, athletics and habits for the current week.</p>
           </div>
-          <button class="btn" onclick="openNotionExport()">⇪ Export to Notion</button>
         </div>
         <div class="dash-grid">
 
@@ -153,7 +150,7 @@
           <div class="card-head-row">
             <div>
               <h2 class="page-title">Daily Routine</h2>
-              <p class="page-sub">Fixed sleep window and class timetable — the operational backbone of every day. Habit tracking now lives in Life Maxx.</p>
+              <p class="page-sub">Fixed sleep window and class timetable — the operational backbone of every day. Habit tracking now lives in Habits &amp; Goals.</p>
             </div>
           </div>
           <div id="routine-sleep"></div>
@@ -287,16 +284,6 @@
           <button class="sub-tab" data-lv="records" onclick="setLogView('records')">🏆 Records</button>
         </div>
 
-        <!-- Mobile Text Sync moved to its own section (10) — laptop ⇄ phone transfer -->
-        <div class="card">
-          <div class="card-head">
-            <h3>📲 Mobile Sync</h3>
-            <span class="kicker">section 10 · laptop ⇄ phone</span>
-          </div>
-          <p class="paste-hint" style="margin-bottom:10px">Phone notes and both-way data transfer now have their own section, so nothing is buried in the workout tracker.</p>
-          <button class="btn sm" onclick="switchTab('mobile')">Open Mobile Sync →</button>
-        </div>
-
         <!-- VIEW: LIFTING (independent tracker) -->
         <div class="log-sub active" id="log-view-lift">
           <div class="card">
@@ -384,12 +371,18 @@
           <button class="chip-btn" id="sview-btn-tt" onclick="setSchoolView('tt')">🗓 Timetable</button>
           <button class="chip-btn" id="sview-btn-classes" onclick="setSchoolView('classes')">▦ Classes</button>
           <button class="chip-btn" id="sview-btn-xc" onclick="setSchoolView('xc')">🎖 Extracurricular</button>
-          <button class="chip-btn" id="sview-btn-ncaa" onclick="setSchoolView('ncaa')">🧭 BC→NCAA Map</button>
         </div>
         <div class="school-toolbar" style="margin-bottom:14px">
           <span class="kicker">SEMESTER VIEW</span>
           <button class="chip-btn" id="sem-s1" onclick="setSchoolSem('s1')">Semester 1 (S1)</button>
           <button class="chip-btn" id="sem-s2" onclick="setSchoolSem('s2')">Semester 2 (S2)</button>
+        </div>
+        <div class="school-toolbar" style="margin-bottom:14px">
+          <span class="kicker">ACADEMIC YEAR</span>
+          <button class="chip-btn" id="syear-all" onclick="setSchoolYear('all')">All Years</button>
+          <button class="chip-btn" id="syear-g10" onclick="setSchoolYear('g10')">Grade 10</button>
+          <button class="chip-btn" id="syear-g11" onclick="setSchoolYear('g11')">Grade 11</button>
+          <button class="chip-btn" id="syear-g12" onclick="setSchoolYear('g12')">Grade 12</button>
         </div>
         <div id="sview-assign">
         <div class="school-layout">
@@ -401,6 +394,14 @@
               <div class="field"><label>Assignment</label><input id="s-assign" placeholder="e.g. Ch. 7 Quiz"></div>
             </div>
             <div class="school-form-row">
+              <div class="field"><label>Academic Year <span class="hint">required</span></label>
+                <select id="s-year">
+                  <option value="">Select year…</option>
+                  <option value="g10">Grade 10</option>
+                  <option value="g11">Grade 11</option>
+                  <option value="g12">Grade 12</option>
+                </select>
+              </div>
               <div class="field"><label>Due Date</label><input type="date" id="s-due"></div>
               <div class="field"><label>Category</label>
                 <select id="s-cat"><option>Homework</option><option>Quiz</option><option>Test</option><option>Project</option><option>Presentation</option><option>Other</option></select>
@@ -551,31 +552,6 @@
           </div>
         </div>
 
-        <!-- BC → NCAA 1-DIRECTION FLOW MIND MAP -->
-        <div id="sview-ncaa" style="display:none">
-          <div class="card-head-row">
-            <div>
-              <h2 class="page-title">BC → NCAA 1-Direction Flow Map</h2>
-              <p class="page-sub">Directed path from Grade 10–12 BC Ministry courses into the NCAA D1/D2 16-core requirements. Build your own sequential path below.</p>
-            </div>
-          </div>
-          <div class="ncaa-layout">
-            <div class="card" style="overflow:auto">
-              <div class="card-head"><h3>Course → Core Flow</h3><span class="kicker" id="ncaa-kicker"></span></div>
-              <div id="ncaa-flow"></div>
-            </div>
-            <div>
-              <div class="card" style="margin-bottom:16px">
-                <div class="card-head"><h3>Node Details</h3><span class="kicker">Click a course node</span></div>
-                <div id="ncaa-detail"></div>
-              </div>
-              <div class="card">
-                <div class="card-head"><h3>Custom Path Builder</h3><button class="btn sm" onclick="openNcaaPathModal()">+ New Path</button></div>
-                <div id="ncaa-paths"></div>
-              </div>
-            </div>
-          </div>
-        </div>
       </section>
 
       <!-- ============ TAB 5: FILM STUDY ============ -->
@@ -659,7 +635,7 @@
       <section id="tab-finance" class="tab">
         <div class="card-head-row">
           <div>
-            <h2 class="page-title">Finance Tracker</h2>
+            <h2 class="page-title">Finance Tracker- BETA</h2>
             <p class="page-sub">Multi-year banking engine for student-athletes — Grade 10 through Grade 12.</p>
           </div>
           <button class="btn" onclick="openTxModal()">+ Log Transaction</button>
@@ -744,20 +720,7 @@
         </div>
       </section>
 
-      <!-- ============ TAB 7: RECRUITING CRM ============ -->
-      <section id="tab-recruiting" class="tab">
-        <div class="card-head-row">
-          <div>
-            <h2 class="page-title">Recruiting CRM</h2>
-            <p class="page-sub">Coach &amp; school pipeline — track outreach, dialogue, offers and commitments.</p>
-          </div>
-          <button class="btn" onclick="openCoachModal()">+ New Coach / School</button>
-        </div>
-        <div class="rec-filter" id="rec-filter"></div>
-        <div class="rec-board" id="recruiting-board"></div>
-      </section>
-
-      <!-- ============ TAB 7: LIFE MAXX ============ -->
+      <!-- ============ TAB 7: HABITS & GOALS ============ -->
       <section id="tab-life" class="tab">
         <div class="sub-tabs" id="life-subtabs">
           <button class="sub-tab" data-lview="habits" onclick="setLifeView('habits')">⚡ Categories View</button>
@@ -771,7 +734,7 @@
           <div class="card-head-row">
             <div>
               <h2 class="page-title">Habit Categories</h2>
-              <p class="page-sub">Physical &amp; Recovery · Sleep Hygiene · Nutrition &amp; Fuel · Mindset. Check-ins reset automatically at midnight and every bucket keeps its own streak and history.</p>
+              <p class="page-sub">Habits &amp; Goals — Physical &amp; Recovery · Sleep Hygiene · Nutrition &amp; Fuel · Mindset. Check-ins reset automatically at midnight and every bucket keeps its own streak and history.</p>
             </div>
             <button class="btn sm" onclick="openHabitModal()">+ New Habit</button>
           </div>
@@ -829,6 +792,7 @@
         <div class="sub-tabs" id="settings-subtabs">
           <button class="sub-tab" data-sv="prefs" onclick="setSettingsView('prefs')">⚙️ Preferences</button>
           <button class="sub-tab" data-sv="backup" onclick="setSettingsView('backup')">☁️ Data &amp; Sync</button>
+          <button class="sub-tab" data-sv="mobile" onclick="setSettingsView('mobile')">📲 Mobile Sync</button>
           <button class="sub-tab" data-sv="archive" onclick="setSettingsView('archive')">🗄 System Archive</button>
           <button class="sub-tab" data-sv="trash" onclick="setSettingsView('trash')">🗑 Recently Deleted</button>
         </div>
@@ -882,10 +846,9 @@
         </div>
         <div class="log-sub" id="sview-archive"><div id="settings-archive"></div></div>
         <div class="log-sub" id="sview-trash"><div id="settings-trash"></div></div>
-      </section>
 
-      <!-- ============ TAB 10: MOBILE SYNC (laptop ⇄ phone) ============ -->
-      <section id="tab-mobile" class="tab">
+        <!-- V3.0 — Mobile Sync is a subsection of System Settings -->
+        <div class="log-sub" id="sview-mobile">
         <div class="card msync-hero">
           <div class="card-head">
             <h3>📲 Mobile Sync</h3>
@@ -971,6 +934,7 @@
             <span class="kicker">this session only · not saved</span>
           </div>
           <div class="msync-log" id="msync-log"></div>
+        </div>
         </div>
       </section>
 

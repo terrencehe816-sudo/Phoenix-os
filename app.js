@@ -12,13 +12,12 @@ const CATEGORIES = {
   skiing:     { label: 'Skiing / Coaching',  color: '#9d4edd' },
   life:       { label: 'Life / Recovery',    color: '#e63946' }
 };
-const TITLES = { dashboard: '🏠 Dashboard', routine: '📅 Daily Routine', log: '🏋️ Workouts', school: '📚 School', film: '🎥 Film Study', finance: '💰 Finance Tracker', life: '⚡ Life Maxx', recruiting: '🎯 Recruiting CRM', settings: '⚙️ System Settings', mobile: '📲 Mobile Sync' };
-/* Production nav — ten sections, in order. Retired tabs are mapped forward so
-   a legacy save can never land on a missing view. Section 10 (Mobile Sync) owns
-   every laptop ⇄ phone transfer: workout-line import, text export and the whole-app
-   backup code. */
-const NAV_SECTIONS = ['dashboard', 'routine', 'log', 'school', 'film', 'finance', 'life', 'recruiting', 'settings', 'mobile'];
-const LEGACY_TAB_MAP = { goals: 'life', mental: 'routine' };
+const TITLES = { dashboard: '🏠 Dashboard', routine: '📅 Daily Routine', log: '🏋️ Workouts', school: '📚 School', film: '🎥 Film Study', finance: '💰 Finance Tracker- BETA', life: '⚡ Habits & Goals', settings: '⚙️ System Settings' };
+/* V3.0 nav — eight sections. Recruiting CRM is retired and Mobile Sync is now a
+   subsection of System Settings; retired tab names are mapped forward so a
+   legacy save can never land on a missing view. */
+const NAV_SECTIONS = ['dashboard', 'routine', 'log', 'school', 'film', 'finance', 'life', 'settings'];
+const LEGACY_TAB_MAP = { goals: 'life', mental: 'routine', recruiting: 'dashboard', mobile: 'settings' };
 function normalizeTab(name){ return NAV_SECTIONS.includes(name) ? name : (LEGACY_TAB_MAP[name] || 'dashboard'); }
 const WEEKLY_PROMPTS = [
   'What did I do this week that moved my goals forward?',
@@ -45,7 +44,17 @@ const CONTACT_STALE_DAYS = 14;   // days without contact before the badge goes r
 function contactStaleDays(){ return Math.max(1, parseInt(state && state.settings && state.settings.staleDays, 10) || CONTACT_STALE_DAYS); }
 
 /* ---------- V1.0 additions ---------- */
-const TODO_CATEGORIES = { Basketball: '#45a29e', School: '#f0a500', 'Life Maxx': '#2ec4b6', Finance: '#9d4edd', Personal: '#e63946', Recruiting: '#66a3ff', Other: '#7c8b9a' };
+/* 'Life Maxx' stays as a legacy alias so older to-do records keep their colour. */
+const TODO_CATEGORIES = { Basketball: '#45a29e', School: '#f0a500', 'Habits & Goals': '#2ec4b6', 'Life Maxx': '#2ec4b6', Finance: '#9d4edd', Personal: '#e63946', Recruiting: '#66a3ff', Other: '#7c8b9a' };
+/* V3.0 — every school record carries a mandatory academic year so assignments
+   can be logged and filtered grade-by-grade. */
+const SCHOOL_YEARS = [
+  { key: 'g10', label: 'Grade 10' },
+  { key: 'g11', label: 'Grade 11' },
+  { key: 'g12', label: 'Grade 12' }
+];
+function schoolYearLabel(key){ const y = SCHOOL_YEARS.find(x => x.key === key); return y ? y.label : ''; }
+function defaultSchoolYear(){ return (state && state.finance && SCHOOL_YEARS.some(y => y.key === state.finance.grade)) ? state.finance.grade : 'g10'; }
 /* Fixed Time Window — configurable sleep/wake anchor. Default: 9:15 PM lights out → 5:40 AM wake. */
 const DEFAULT_TIME_WINDOW = { bed: '21:15', wake: '05:40', label: 'Target protocol' };
 const TIME_WINDOW_PRESETS = [
@@ -160,7 +169,7 @@ function drillSpotAggregate(range){
   return agg;
 }
 const SPRINT_DURATIONS = [21, 30, 45, 60, 90, 120];
-/* Physical Combine — biometric baseline for the Life Maxx > Stats sub-section. */
+/* Physical Combine — biometric baseline for the Habits & Goals > Stats sub-section. */
 const COMBINE_METRICS = [
   { id: 'height',  label: 'Height',          unit: 'cm', baseline: 172, note: "5'8\" baseline" },
   { id: 'weight',  label: 'Weight (lbs)',    unit: 'lbs', baseline: '', note: 'Morning, fasted' },
@@ -283,23 +292,6 @@ const TREE_LEVELS = [
   { name: 'Skilled',   min: 8 },
   { name: 'Mastered',  min: 15 }
 ];
-const NCAA_CORE = { english: 'English', math: 'Math', science: 'Natural / Physical Science', social: 'Social Science', extra: 'Additional Core' };
-const NCAA_COURSES = [
-  { id: 'eng10',      label: 'English 10',               grade: '10', credits: 4, cat: 'english', desc: 'BC English Language Arts 10 — foundational reading, writing and oral communication.' },
-  { id: 'foundmath10',label: 'Foundations of Math 10',   grade: '10', credits: 4, cat: 'math',    desc: 'Core algebra, geometry and data — prerequisite track toward Pre-Calculus 11.' },
-  { id: 'sci10',      label: 'Science 10',               grade: '10', credits: 4, cat: 'science', desc: 'Integrated biology, chemistry, physics and earth science foundations.' },
-  { id: 'soc10',      label: 'Social Studies 10',        grade: '10', credits: 4, cat: 'social',  desc: 'Canadian and world history, geography and civic literacy.' },
-  { id: 'precalc11',  label: 'Pre-Calculus 11',          grade: '11', credits: 4, cat: 'math',    desc: 'Advanced algebra, trigonometry and functions — NCAA Math core.' },
-  { id: 'eng11',      label: 'English 11',               grade: '11', credits: 4, cat: 'english', desc: 'Literary analysis and composition — NCAA English core.' },
-  { id: 'chem11',     label: 'Chemistry 11',             grade: '11', credits: 4, cat: 'science', desc: 'Atomic theory, stoichiometry and lab work — NCAA Science core.' },
-  { id: 'bio11',      label: 'Life Sciences 11',         grade: '11', credits: 4, cat: 'science', desc: 'Biology of living systems — NCAA Science core option.' },
-  { id: 'cs11',       label: 'Computer Science 11',      grade: '11', credits: 4, cat: 'extra',   desc: 'Programming and computational thinking — Additional core or elective.' },
-  { id: 'metal11',    label: 'Metalwork 11',             grade: '11', credits: 4, cat: 'extra',   desc: 'Applied design, skills and technology — elective, not an NCAA core.' },
-  { id: 'precalc12',  label: 'Pre-Calculus 12',          grade: '12', credits: 4, cat: 'math',    desc: 'Functions, transformations and calculus readiness — NCAA Math core.' },
-  { id: 'eng12',      label: 'English Studies 12',       grade: '12', credits: 4, cat: 'english', desc: 'Senior English — NCAA English core.' },
-  { id: 'phys12',     label: 'Physics 12',               grade: '12', credits: 4, cat: 'science', desc: 'Mechanics, fields and energy — NCAA Science core.' },
-  { id: 'soc12',      label: '20th Century World History 12', grade: '12', credits: 4, cat: 'social', desc: 'Modern world history — NCAA Social Science core.' }
-];
 const TYPE_META = {
   basketball: { label: 'Basketball', color: '#45a29e' },
   lift:       { label: 'Lift',       color: '#f0a500' },
@@ -368,7 +360,7 @@ const SYNC_TABLE = 'phoenix_sync';
 const DAY_ABBR = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-/* ---------- Life Maxx habit buckets (V1.0 production) ----------
+/* ---------- Habits & Goals habit buckets (V1.0 production) ----------
    Every daily habit belongs to one of four buckets. Check-ins are stored per
    calendar day in state.logs[key].habits, so they reset on their own at
    midnight while the historical record — and therefore every streak — stays
@@ -699,12 +691,12 @@ function defaultState(){
       investments: [],   // { id, date, asset, category, amount, buyPrice, currentPrice }
       investPlan: { start: '', monthly: '', rate: 7 }   // compound calculator inputs
     },
-    recruiting: [],     // { id, school, lead, coach, role, email, phone, lastContact, notes, filmLink, status }
+    recruiting: [],     // retired in V3.0 — records retained in the save and archive
     routine: { blocks: [] },   // editable daily routine time-blocks
     shotMap: {},               // zoneId -> { m, a } lifetime multi-zone shot chart
     trash: [],                 // Recently Deleted pile — soft-deleted records, restorable from Settings
     ncaa: { paths: [], selectedNode: 'precalc11' },   // BC -> NCAA mind map
-    life: {                    // LIFE MAXX skill sprints, physical combine, leveling, debriefs & network
+    life: {                    // HABITS & GOALS physical combine, leveling, debriefs & network
       sprints: [], debriefs: [], contacts: [],
       lunches: [],            // fast-lunch templates { id, name, kcal, protein, items }
       combineHistory: [],     // dated snapshots of the physical combine
@@ -724,14 +716,15 @@ function defaultState(){
       studyView: 'player',    // Player Study | Team Study
       schoolView: 'assign',   // School sub-view: Assignments | Timetable | Classes
       schoolFilter: 'all',    // Assignments filter: all | active | archived
+      schoolYear: 'all',      // Assignments academic-year filter: all | g10 | g11 | g12
       recruitFilter: 'all',   // Recruiting CRM filter: all | one of RECRUIT_STATUSES
       recruitDivFilter: 'all', // Recruiting CRM division filter: all | one of RECRUIT_DIVISIONS
       recruitWishOnly: false,  // Recruiting CRM: show only starred wishlist targets
       mentalView: 'journal',  // retired — journaling now lives inside Daily Routine
-      lifeView: 'habits',     // Life Maxx sub-view: habits (Categories) | monthly | goals | combine (V1.2)
+      lifeView: 'habits',     // Habits & Goals sub-view: habits (Categories) | monthly | goals | combine (V1.2)
       routineView: 'schedule',// Daily Routine sub-view: schedule | log | mental
       routineDay: '',         // timetable day override ('' = follow today)
-      settingsView: 'prefs',  // System Settings sub-view: prefs | backup | archive
+      settingsView: 'prefs',  // System Settings sub-view: prefs | backup | mobile | archive | trash
       goalTf: 'all',          // Goals Engine timeframe filter
       goalCat: 'all',         // Goals Engine category filter
       landingTab: 'last',     // boot behaviour: 'last' or one of NAV_SECTIONS
@@ -752,12 +745,15 @@ function defaultState(){
 
 function mergeState(p){
   const d = defaultState();
+  /* V3.0 — records saved before academic-year tracking inherit the student's
+     current grade so they stay visible in the year filter instead of vanishing. */
+  const legacyYear = SCHOOL_YEARS.some(y => y.key === (p.finance && p.finance.grade)) ? p.finance.grade : 'g10';
   const merged = {
     version: 2,
     seedVersion: Number(p.seedVersion) || 0,
     habits:   Array.isArray(p.habits)   && p.habits.length   ? p.habits.map(h => ({ ...h, type: h.type || 'good', desc: h.desc || '', target: h.target ?? '', bucket: (h && typeof h.bucket === 'string' && h.bucket) ? h.bucket : habitBucketOf(h), createdAt: (h && typeof h.createdAt === 'string') ? h.createdAt : '' })) : d.habits,
     habitBuckets: Array.isArray(p.habitBuckets) && p.habitBuckets.length ? normalizeHabitBuckets(p.habitBuckets) : d.habitBuckets,
-    school:   Array.isArray(p.school)   ? p.school.map(a => ({ ...a, semester: a.semester || 's1', status: a.status || 'Not Started', desc: a.desc || '', category: ASSIGNMENT_CATEGORIES.includes(a.category) ? a.category : (a.category === 'Exam' ? 'Test' : (a.category || 'Homework')) })) : d.school,
+    school:   Array.isArray(p.school)   ? p.school.map(a => ({ ...a, year: SCHOOL_YEARS.some(y => y.key === a.year) ? a.year : legacyYear, semester: a.semester || 's1', status: a.status || 'Not Started', desc: a.desc || '', category: ASSIGNMENT_CATEGORIES.includes(a.category) ? a.category : (a.category === 'Exam' ? 'Test' : (a.category || 'Homework')) })) : d.school,
     classCats: Array.isArray(p.classCats) && p.classCats.length ? p.classCats.map(c => ({ ...c, category: c.category || classCategory(c.label), room: c.room || '', teacher: c.teacher || '', credits: (c.credits === undefined || c.credits === null || c.credits === '') ? 4 : c.credits, period: c.period || 'p1', semester: c.semester || 's1', targetGrade: c.targetGrade ?? '', currentGrade: c.currentGrade ?? '' })) : d.classCats,
     extracurricular: p.extracurricular && typeof p.extracurricular === 'object'
       ? {
@@ -929,7 +925,7 @@ function mergeState(p){
           combine: p.life.combine && typeof p.life.combine === 'object' ? { ...p.life.combine } : {}
         }
       : d.life,
-    settings: { ...d.settings, ...(p.settings || {}), schoolClassId: (p.settings && p.settings.schoolClassId) || '', schoolFilter: ['all', 'active', 'archived'].includes(p.settings && p.settings.schoolFilter) ? p.settings.schoolFilter : 'all', recruitFilter: ['all', ...RECRUIT_STATUSES].includes(p.settings && p.settings.recruitFilter) ? p.settings.recruitFilter : 'all', recruitDivFilter: ['all', ...RECRUIT_DIVISIONS].includes(p.settings && p.settings.recruitDivFilter) ? p.settings.recruitDivFilter : 'all', mentalView: ['journal'].includes(p.settings && p.settings.mentalView) ? p.settings.mentalView : 'journal', filmView: ['games', 'plays', 'study', 'scouting', 'playbook'].includes(p.settings && p.settings.filmView) ? p.settings.filmView : 'games', lifeView: (function(){ const v = p.settings && p.settings.lifeView; if (LIFE_VIEWS.includes(v)) return v; if (v === 'sprints' || v === 'stats') return 'combine'; if (v === 'goals') return 'goals'; return 'habits'; })(), workoutEnv: WORKOUT_ENVS.includes(p.settings && p.settings.workoutEnv) ? p.settings.workoutEnv : (WORKOUT_ENVS.includes(p.settings && p.settings.logView) ? p.settings.logView : 'lift'), logView: WORKOUT_ENVS.includes(p.settings && p.settings.logView) ? p.settings.logView : 'lift', routineView: ['schedule', 'log', 'mental'].includes(p.settings && p.settings.routineView) ? p.settings.routineView : 'schedule', routineDay: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', ''].includes(p.settings && p.settings.routineDay) ? p.settings.routineDay : '', settingsView: ['prefs', 'backup', 'archive'].includes(p.settings && p.settings.settingsView) ? p.settings.settingsView : 'prefs', goalTf: ['all', 'short', 'mid', 'long'].includes(p.settings && p.settings.goalTf) ? p.settings.goalTf : 'all', goalCat: ['all', 'athletic', 'academic', 'personal'].includes(p.settings && p.settings.goalCat) ? p.settings.goalCat : 'all', staleDays: Math.max(1, parseInt(p.settings && p.settings.staleDays, 10) || CONTACT_STALE_DAYS), matrixHideDone: !!(p.settings && p.settings.matrixHideDone), shotRange: ['7', '30', 'custom', 'lifetime'].includes(p.settings && p.settings.shotRange) ? p.settings.shotRange : 'lifetime', shotSummaryRange: (p.settings && p.settings.shotSummaryRange) === '30' ? '30' : '7', shotRangeFrom: /^\d{4}-\d{2}-\d{2}$/.test((p.settings && p.settings.shotRangeFrom) || '') ? p.settings.shotRangeFrom : '', shotRangeTo: /^\d{4}-\d{2}-\d{2}$/.test((p.settings && p.settings.shotRangeTo) || '') ? p.settings.shotRangeTo : '', savedRange: ['day', '7', '30', 'custom'].includes(p.settings && p.settings.savedRange) ? p.settings.savedRange : 'day', savedRangeFrom: /^\d{4}-\d{2}-\d{2}$/.test((p.settings && p.settings.savedRangeFrom) || '') ? p.settings.savedRangeFrom : '', savedRangeTo: /^\d{4}-\d{2}-\d{2}$/.test((p.settings && p.settings.savedRangeTo) || '') ? p.settings.savedRangeTo : '', workoutDates: normalizeWorkoutDates(p.settings && p.settings.workoutDates) }
+    settings: { ...d.settings, ...(p.settings || {}), schoolClassId: (p.settings && p.settings.schoolClassId) || '', schoolFilter: ['all', 'active', 'archived'].includes(p.settings && p.settings.schoolFilter) ? p.settings.schoolFilter : 'all', schoolYear: ['all', ...SCHOOL_YEARS.map(y => y.key)].includes(p.settings && p.settings.schoolYear) ? p.settings.schoolYear : 'all', recruitFilter: ['all', ...RECRUIT_STATUSES].includes(p.settings && p.settings.recruitFilter) ? p.settings.recruitFilter : 'all', recruitDivFilter: ['all', ...RECRUIT_DIVISIONS].includes(p.settings && p.settings.recruitDivFilter) ? p.settings.recruitDivFilter : 'all', mentalView: ['journal'].includes(p.settings && p.settings.mentalView) ? p.settings.mentalView : 'journal', filmView: ['games', 'plays', 'study', 'scouting', 'playbook'].includes(p.settings && p.settings.filmView) ? p.settings.filmView : 'games', lifeView: (function(){ const v = p.settings && p.settings.lifeView; if (LIFE_VIEWS.includes(v)) return v; if (v === 'sprints' || v === 'stats') return 'combine'; if (v === 'goals') return 'goals'; return 'habits'; })(), workoutEnv: WORKOUT_ENVS.includes(p.settings && p.settings.workoutEnv) ? p.settings.workoutEnv : (WORKOUT_ENVS.includes(p.settings && p.settings.logView) ? p.settings.logView : 'lift'), logView: WORKOUT_ENVS.includes(p.settings && p.settings.logView) ? p.settings.logView : 'lift', routineView: ['schedule', 'log', 'mental'].includes(p.settings && p.settings.routineView) ? p.settings.routineView : 'schedule', routineDay: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', ''].includes(p.settings && p.settings.routineDay) ? p.settings.routineDay : '', settingsView: ['prefs', 'backup', 'archive', 'trash', 'mobile'].includes(p.settings && p.settings.settingsView) ? p.settings.settingsView : 'prefs', goalTf: ['all', 'short', 'mid', 'long'].includes(p.settings && p.settings.goalTf) ? p.settings.goalTf : 'all', goalCat: ['all', 'athletic', 'academic', 'personal'].includes(p.settings && p.settings.goalCat) ? p.settings.goalCat : 'all', staleDays: Math.max(1, parseInt(p.settings && p.settings.staleDays, 10) || CONTACT_STALE_DAYS), matrixHideDone: !!(p.settings && p.settings.matrixHideDone), shotRange: ['7', '30', 'custom', 'lifetime'].includes(p.settings && p.settings.shotRange) ? p.settings.shotRange : 'lifetime', shotSummaryRange: (p.settings && p.settings.shotSummaryRange) === '30' ? '30' : '7', shotRangeFrom: /^\d{4}-\d{2}-\d{2}$/.test((p.settings && p.settings.shotRangeFrom) || '') ? p.settings.shotRangeFrom : '', shotRangeTo: /^\d{4}-\d{2}-\d{2}$/.test((p.settings && p.settings.shotRangeTo) || '') ? p.settings.shotRangeTo : '', savedRange: ['day', '7', '30', 'custom'].includes(p.settings && p.settings.savedRange) ? p.settings.savedRange : 'day', savedRangeFrom: /^\d{4}-\d{2}-\d{2}$/.test((p.settings && p.settings.savedRangeFrom) || '') ? p.settings.savedRangeFrom : '', savedRangeTo: /^\d{4}-\d{2}-\d{2}$/.test((p.settings && p.settings.savedRangeTo) || '') ? p.settings.savedRangeTo : '', workoutDates: normalizeWorkoutDates(p.settings && p.settings.workoutDates) }
   };
   merged.settings.timeWindow = timeWindowFrom(p.settings && p.settings.timeWindow);
   // Baseline data is merged in exactly once, then respected as user-owned.
@@ -1774,6 +1770,8 @@ function startAutoSync(){
 
 /* ---------- Tab navigation ---------- */
 function switchTab(name){
+  /* V3.0 — Mobile Sync is no longer a tab; legacy links open its settings view. */
+  if (name === 'mobile'){ state.settings.settingsView = 'mobile'; name = 'settings'; }
   name = normalizeTab(name);
   state.settings.activeTab = name;
   if (name !== 'film') stopPlayback();
@@ -1828,7 +1826,6 @@ function renderAll(){
   renderCombine();
   renderCombineHistory();
   renderFinance();
-  renderRecruiting();
   applyMentalView();
   renderMental();
   renderExtracurricular();
@@ -4531,7 +4528,7 @@ function renderDashboard(){
           '</div>' +
         '</div>';
       }).join('')
-    : empty('No goals yet — create one in Life Maxx → Goals Engine.');
+    : empty('No goals yet — create one in Habits & Goals → Goals Engine.');
 }
 function renderDashboardWorkout(){
   const list = sessionsFor(todayKey());
@@ -5093,7 +5090,7 @@ function setLogView(v){
   /* V1.0 — the Daily Log entry form lives in Daily Routine; keep old links working. */
   if (v === 'entry'){ switchTab('routine'); setRoutineView('log'); return; }
   /* V1.2 — legacy aliases: the Shot Chart now lives inside Basketball, and the
-     Physical Combine moved to Life Maxx. */
+     Physical Combine moved to Habits & Goals. */
   if (v === 'session') v = activeEnv();
   if (v === 'shots') v = 'basketball';
   if (v === 'combine'){ switchTab('life'); setLifeView('combine'); return; }
@@ -5114,10 +5111,10 @@ function applyLogView(){
     if (el) el.classList.toggle('active', k === v);
   });
 }
-/* ---------- Goal sub-views: retired in V1.0 — goals + habits live in Life Maxx.
+/* ---------- Goal sub-views: retired in V1.0 — goals + habits live in Habits & Goals.
    The old entry points are kept as forwarders so legacy markup/links still work. */
 function setGoalView(v){ state.settings.lifeView = (v === 'matrix') ? 'matrix' : (v === 'habits' ? 'habits' : 'goals'); setLifeView(state.settings.lifeView); }
-function applyGoalView(){ /* no-op — Life Maxx owns these views now. */ }
+function applyGoalView(){ /* no-op — Habits & Goals owns these views now. */ }
 
 /* ---------- Daily Routine sub-views: Fixed Schedule / Daily Log / Mental Game ---------- */
 function setRoutineView(v){
@@ -5164,34 +5161,15 @@ function syncSessionToLog(key){
 }
 
 /* ---------- Records: Gym PRs + Shooting Record Highs ---------- */
-function bestShots(){
-  let sPct = null, sLabel = '';
-  let dPct = null, dLabel = '';
-  allSessions().forEach(({ session: s }) => {
-    if (!s || s.type !== 'basketball') return;
-    const m = drillTotals(basketAllDrills(s));
-    if (m.shots >= 5 && (sPct === null || m.pct > sPct)){ sPct = m.pct; sLabel = (s.presetName || 'Session'); }
-    basketAllDrills(s).forEach(dr => {
-      const st = dr.setType || 'Shooting';
-      if (st !== 'Shooting' && st !== 'Finishing' && st !== 'Free Throws') return;
-      const a = num(dr.attempts);
-      if (a >= 5){ const pc = Math.round(clamp(num(dr.makes) / a * 100, 0, 100)); if (dPct === null || pc > dPct){ dPct = pc; dLabel = (dr.name || 'Drill'); } }
-    });
-  });
-  return stat('', (sPct === null ? '—' : sPct + '%'), sLabel || 'Best Session %') +
-         stat('', (dPct === null ? '—' : dPct + '%'), dLabel || 'Best Set / Drill %');
-}
 function renderRecords(){
   const el = document.getElementById('records-view');
   if (!el) return;
   const lifts = (state.records && state.records.lifts) || [];
-  const shots = (state.records && state.records.shooting) || [];
   const sortedLifts = lifts.slice().sort((a, b) => num(b.weight) - num(a.weight));
-  const sortedShots = shots.slice().sort((a, b) => num(b.pct) - num(a.pct));
   el.innerHTML =
     '<div class="rec-grid">' +
       '<div class="card">' +
-        '<div class="card-head"><h3>Gym PRs</h3><span class="kicker">Lifetime Records</span><button class="chip-btn" onclick="openRankTiers()">⚙ Rank Tiers</button></div>' +
+        '<div class="card-head"><h3>Gym PRs</h3><span class="kicker">Lifetime Records</span></div>' +
         '<div class="rec-form">' +
           '<input id="pr-ex" placeholder="Exercise — e.g. Back Squat">' +
           '<input id="pr-date" type="date" value="' + todayKey() + '">' +
@@ -5204,46 +5182,15 @@ function renderRecords(){
           ? sortedLifts.map(r => liftRecordHtml(r)).join('')
           : '<div class="empty sm">No gym PRs yet — flag PRs on lifts, or log one above.</div>') + '</div>' +
       '</div>' +
-      '<div class="card">' +
-        '<div class="card-head"><h3>Shooting Record Highs</h3><span class="kicker">Best Percentages</span></div>' +
-        '<div class="rec-best">' + bestShots() + '</div>' +
-        '<div class="rec-form">' +
-          '<input id="sh-ex" placeholder="Drill / session name">' +
-          '<input id="sh-date" type="date" value="' + todayKey() + '">' +
-          '<input id="sh-att" type="number" min="0" placeholder="Attempts">' +
-          '<input id="sh-makes" type="number" min="0" placeholder="Makes">' +
-          '<button class="btn full" type="button" onclick="addShotRecord()">+ Log Shooting Record</button>' +
-        '</div>' +
-        '<div class="rec-list">' + (sortedShots.length
-          ? sortedShots.map(r => shotRecordHtml(r)).join('')
-          : '<div class="empty sm">No shooting records yet — log your best sessions here.</div>') + '</div>' +
-      '</div>' +
-    '</div>' +
-    '<div class="card" style="margin-top:16px;grid-column:1 / -1">' +
-      '<div class="card-head"><h3>🏅 Lifetime Badge Vault</h3><span class="kicker" id="badge-count"></span></div>' +
-      '<p class="paste-hint" style="margin-bottom:6px">Backlog builds from every saved basketball session — make 3-pointers, finishes, and free throws to climb each ladder.</p>' +
-      '<div id="badge-vault"></div>' +
-    '</div>' +
     '</div>';
-  renderBadgeVault();
 }
 function liftRecordHtml(r){
   return '<div class="rec-item">' +
     '<b>' + esc(r.exercise) + '</b>' +
-    rankBadgeHtml(r.exercise) +
     '<span class="rec-val">' + fmtNum(r.weight) + ' lbs</span>' +
     '<span class="rec-val">' + fmtNum(r.sets) + '×' + fmtNum(r.reps) + '</span>' +
     '<span class="rec-date">' + fmtDate(r.date) + '</span>' +
     '<button class="icon-btn danger" onclick="deleteLiftRecord(\'' + r.id + '\')" title="Delete">✕</button>' +
-  '</div>';
-}
-function shotRecordHtml(r){
-  return '<div class="rec-item green">' +
-    '<b>' + esc(r.name) + '</b>' +
-    '<span class="rec-val">' + fmtNum(r.pct) + '%</span>' +
-    '<span class="rec-val">' + fmtNum(r.makes) + ' / ' + fmtNum(r.attempts) + '</span>' +
-    '<span class="rec-date">' + fmtDate(r.date) + '</span>' +
-    '<button class="icon-btn danger" onclick="deleteShotRecord(\'' + r.id + '\')" title="Delete">✕</button>' +
   '</div>';
 }
 function addLiftRecord(){
@@ -5272,260 +5219,6 @@ function deleteLiftRecord(id){
   state.records.lifts = state.records.lifts.filter(r => r.id !== id);
   save();
   renderRecords();
-}
-function addShotRecord(){
-  snapshot();
-  const name = document.getElementById('sh-ex').value.trim();
-  if (!name){ toast('Enter the drill / session name', 'error'); return; }
-  const attempts = num(document.getElementById('sh-att').value);
-  const makes = num(document.getElementById('sh-makes').value);
-  if (attempts <= 0 || makes > attempts){ toast('Enter valid attempts & makes', 'error'); return; }
-  state.records.shooting.push({
-    id: uid(), name, attempts, makes,
-    pct: Math.round(makes / attempts * 100),
-    date: document.getElementById('sh-date').value || todayKey()
-  });
-  document.getElementById('sh-ex').value = '';
-  document.getElementById('sh-att').value = '';
-  document.getElementById('sh-makes').value = '';
-  save();
-  renderRecords();
-  toast('✓ Shooting record logged — ' + name);
-}
-function deleteShotRecord(id){
-  snapshot();
-  const r = (state.records.shooting || []).find(x => x.id === id);
-  if (r) trashItem('shotRec', (r.name || 'Shooting record'), (r.makes || 0) + '/' + (r.attempts || 0) + ' · ' + (r.pct || 0) + '%', { record: JSON.parse(JSON.stringify(r)), index: idxOf(state.records.shooting, id) });
-  state.records.shooting = state.records.shooting.filter(r => r.id !== id);
-  save();
-  renderRecords();
-}
-
-/* ============================================================
-   EXERCISE RANK TIERS — custom target weights / sets / reps
-   Bronze → Silver → Gold → Platinum → Diamond → Mythic → Legendary → Elite
-   ============================================================ */
-const RANKS = ['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond', 'Mythic', 'Legendary', 'Elite'];
-const RANK_KEYS = ['bronze', 'silver', 'gold', 'platinum', 'diamond', 'mythic', 'legendary', 'elite'];
-const RANK_WEIGHTS_DEFAULT = { bronze: '', silver: '', gold: '', platinum: '', diamond: '', mythic: '', legendary: '', elite: '' };
-const RANK_ICONS = ['🥉', '🥈', '🥇', '💠', '💎', '🔮', '⚜️', '👑'];
-let rankTierEditId = null;
-function rankTierFor(exercise){
-  const en = String(exercise || '').trim().toLowerCase();
-  if (!en) return null;
-  const t = (state.records.rankTiers || []).find(x => String(x.exercise || '').trim().toLowerCase() === en);
-  if (!t) return null;
-  const best = (state.records.lifts || [])
-    .filter(r => String(r.exercise || '').trim().toLowerCase() === en)
-    .reduce((m, r) => Math.max(m, num(r.weight)), 0);
-  let idx = -1;
-  RANK_KEYS.forEach((k, i) => { if (best >= num(t.weights[k])) idx = i; });
-  return { ...t, best, idx };
-}
-function rankBadgeHtml(exercise){
-  const t = rankTierFor(exercise);
-  if (!t) return '';
-  const cls = t.idx >= 0 ? 'r' + t.idx : 'rn';
-  const lbl = t.idx >= 0 ? RANKS[t.idx] : 'Unranked';
-  return '<span class="rank-tier ' + cls + '" title="Best PR: ' + (t.best ? fmtNum(t.best) + ' lbs' : 'none yet') + ' · Rank ladder: ' +
-    RANK_KEYS.map((k, i) => RANKS[i] + ' ' + (t.weights[k] ? fmtNum(t.weights[k]) + ' lbs' : '—')).join(' → ') + '">' +
-    (t.idx >= 0 ? RANK_ICONS[t.idx] : '◇') + ' ' + lbl + '</span>';
-}
-function openRankTiers(exercise, editId){
-  rankTierEditId = editId || null;
-  openModal('Exercise Rank Tiers — Custom Weight Ladder');
-  const tiers = state.records.rankTiers || [];
-  const exOptions = state.records.rankTiers.map(t => '<option value="' + esc(t.exercise) + '"></option>').join('') +
-    state.records.lifts.map(r => '<option value="' + esc(r.exercise) + '"></option>').join('');
-  const weightsInput = k => '<input class="n" style="width:86px" type="number" min="0" step="any" id="rt-' + k + '" placeholder="' + RANKS[RANK_KEYS.indexOf(k)] + '" data-tier="' + k + '">';
-  modalBody.innerHTML =
-    '<p class="paste-hint" style="margin-bottom:10px">Configure a custom weight ladder per exercise. Your best logged PR auto-assigns the rank badge shown on every record for that exercise.</p>' +
-    '<div class="rec-form" style="grid-template-columns:1fr 1fr auto auto">' +
-      '<input id="rt-ex" placeholder="Exercise — e.g. Back Squat" list="rank-ex-list">' +
-      '<input id="rt-sets" type="number" min="0" placeholder="Target Sets">' +
-      '<input id="rt-reps" type="number" min="0" placeholder="Target Reps">' +
-      '<button class="btn sm" onclick="saveRankTier()">' + (rankTierEditId ? 'Update' : '+ Add') + '</button>' +
-    '</div>' +
-    '<div class="log-grid-2" style="margin-top:10px">' +
-      '<div class="field"><label>Bronze (lbs)</label>' + weightsInput('bronze') + '</div>' +
-      '<div class="field"><label>Silver (lbs)</label>' + weightsInput('silver') + '</div>' +
-      '<div class="field"><label>Gold (lbs)</label>' + weightsInput('gold') + '</div>' +
-      '<div class="field"><label>Platinum (lbs)</label>' + weightsInput('platinum') + '</div>' +
-      '<div class="field"><label>Diamond (lbs)</label>' + weightsInput('diamond') + '</div>' +
-      '<div class="field"><label>Mythic (lbs)</label>' + weightsInput('mythic') + '</div>' +
-      '<div class="field"><label>Legendary (lbs)</label>' + weightsInput('legendary') + '</div>' +
-      '<div class="field"><label>Elite (lbs)</label>' + weightsInput('elite') + '</div>' +
-    '</div>' +
-    '<datalist id="rank-ex-list">' + exOptions + '</datalist>' +
-    '<div class="rec-list" style="margin-top:14px;max-height:260px">' + (tiers.length
-      ? tiers.map(t => {
-          const tt = rankTierFor(t.exercise);
-          return '<div class="rec-item">' +
-            '<b>' + esc(t.exercise) + '</b>' +
-            '<span class="rec-val">' + fmtNum(t.sets) + '×' + fmtNum(t.reps) + '</span>' +
-            '<span class="rec-val" style="color:var(--muted)">Ladder: ' + RANK_KEYS.map((k, i) => (t.weights[k] ? fmtNum(t.weights[k]) : '—')).join(' / ') + ' lbs</span>' +
-            (tt && tt.idx >= 0 ? '<span class="rank-tier r' + tt.idx + '">' + RANK_ICONS[tt.idx] + ' ' + RANKS[tt.idx] + '</span>' : '') +
-            '<button class="icon-btn" onclick="editRankTier(\'' + t.id + '\')" title="Edit tier">✎</button>' +
-            '<button class="icon-btn danger" onclick="deleteRankTier(\'' + t.id + '\')" title="Delete tier">✕</button>' +
-          '</div>';
-        }).join('')
-      : '<div class="empty sm">No tier ladders configured yet — add one above.</div>') + '</div>';
-  if (exercise && document.getElementById('rt-ex')) document.getElementById('rt-ex').value = exercise;
-}
-function saveRankTier(){
-  snapshot();
-  const exercise = document.getElementById('rt-ex').value.trim();
-  if (!exercise){ toast('Enter the exercise name', 'error'); return; }
-  const weights = {};
-  RANK_KEYS.forEach(k => { weights[k] = document.getElementById('rt-' + k) ? optNum(document.getElementById('rt-' + k).value) : ''; });
-  const data = { exercise, sets: optNum(document.getElementById('rt-sets').value), reps: optNum(document.getElementById('rt-reps').value), weights };
-  if (rankTierEditId){
-    const t = state.records.rankTiers.find(x => x.id === rankTierEditId);
-    if (t) Object.assign(t, data);
-  } else {
-    state.records.rankTiers.push({ id: uid(), ...data });
-  }
-  save();
-  openRankTiers();
-  renderRecords();
-  toast('✓ Rank tier saved — ' + exercise);
-}
-function editRankTier(id){
-  const t = state.records.rankTiers.find(x => x.id === id);
-  if (!t) return;
-  openRankTiers(t.exercise, id);
-  document.getElementById('rt-sets').value = t.sets || '';
-  document.getElementById('rt-reps').value = t.reps || '';
-  RANK_KEYS.forEach(k => { const el = document.getElementById('rt-' + k); if (el) el.value = t.weights[k] || ''; });
-}
-function deleteRankTier(id){
-  snapshot();
-  const r = (state.records.rankTiers || []).find(t => t.id === id);
-  if (r) trashItem('rankTier', (r.exercise || 'Rank tier'), (r.sets ? r.sets + '×' + (r.reps || '') : ''), { tier: JSON.parse(JSON.stringify(r)), index: idxOf(state.records.rankTiers, id) });
-  state.records.rankTiers = state.records.rankTiers.filter(t => t.id !== id);
-  save();
-  openRankTiers();
-  renderRecords();
-}
-
-/* ============================================================
-   LIFETIME BADGE VAULT — accumulation from saved workouts
-   ============================================================ */
-const LIFETIME_BADGES = [
-  { key: 'threes', icon: '🎯', cat: '3PT Makes', list: [
-    ['Shooter', 500, 1000, 1500], ['Sniper', 2000, 2900, 3800], ['Flamethrower', 5000, 6200, 7400],
-    ['Sharpshooter', 9000, 11000, 13000], ['Ice Vein', 16000, 20000, 25000]
-  ]},
-  { key: 'finishes', icon: '🏀', cat: 'Finishes Made', list: [
-    ['Marksman', 1000, 3500, 5000], ['Smooth Touch', 7000, 9000, 11000], ['Slasher', 13500, 16000, 20000],
-    ['Jelly Fam', 28000, 40000, 54000], ['Paint Beast', 70000, 85000, 100000]
-  ]},
-  { key: 'fts', icon: '⛹️', cat: 'FT Made', list: [
-    ['Automatic', 150, 250, 350], ['Clutch Gene I', 460, 570, 700], ['Clutch Gene II', 1000, 1500, 2000],
-    ['Clutch Gene III', 2400, 2900, 3500], ['Clutch Gene IV', 4000, 5000, 6500]
-  ]}
-];
-const BADGE_TIERS = ['Bronze', 'Silver', 'Gold'];
-function badgeTierFor(count, thresholds){
-  if (count >= thresholds[2]) return 2;
-  if (count >= thresholds[1]) return 1;
-  if (count >= thresholds[0]) return 0;
-  return -1;
-}
-/* Lifetime make totals, routed from every saved workout drill into its badge
-   category. Category resolution prefers an explicit drill category, then the
-   set type, then legacy shooting-spot text (Corner / 3-Pointer). */
-function lifetimeShotCounts(){
-  const out = { threes: 0, finishes: 0, fts: 0 };
-  if (typeof state === 'undefined' || !state || !state.workouts || typeof state.workouts !== 'object') return out;
-  allSessions().forEach(({ session: s }) => {
-    if (!s || s.type !== 'basketball' || typeof basketAllDrills !== 'function') return;
-    basketAllDrills(s).forEach(dr => {
-      if (!dr) return;
-      const a = num(dr.attempts);
-      const m = a > 0 ? Math.min(num(dr.makes), a) : num(dr.makes);
-      if (!m) return;
-      const cat = drillCategory(dr, dr.setType || 'Shooting');
-      if (cat === '3-PT') out.threes += m;
-      else if (cat === 'FT') out.fts += m;
-      else if (cat === 'Lay') out.finishes += m;
-    });
-  });
-  return out;
-}
-function emptyLifetimeCounts(){
-  return { threes: 0, finishes: 0, fts: 0 };
-}
-function badgeVaultStats(){
-  const lifetimeShotCountsSafe = emptyLifetimeCounts();
-  let c = (typeof lifetimeShotCounts === 'function') ? lifetimeShotCounts() : null;
-  if (!c || typeof c !== 'object') c = lifetimeShotCountsSafe;
-  c = {
-    threes: num(c.threes) || 0,
-    finishes: num(c.finishes) || 0,
-    fts: num(c.fts) || 0
-  };
-  let unlocked = 0, total = 0;
-  (LIFETIME_BADGES || []).forEach(b => (b.list || []).forEach(item => {
-    const thresholds = item.slice(1);
-    total += thresholds.length;
-    unlocked += thresholds.filter(th => c[b.key] >= th).length;
-  }));
-  if (!c || typeof c !== 'object') c = emptyLifetimeCounts();
-  return { c: (c && typeof c === 'object') ? c : emptyLifetimeCounts(), unlocked, total };
-}
-function badgeTileHtml(key, item, count){
-  const name = item[0], thresholds = item.slice(1), active = badgeTierFor(count, thresholds);
-  const icon = (LIFETIME_BADGES.find(b => b.key === key) || {}).icon || '🏅';
-  return '<div class="badge-tier-group" title="' + esc(name) + '">' +
-    '<div class="badge-tier-name"><span class="b-icon">' + icon + '</span><b>' + esc(name) + '</b></div>' +
-    '<div class="badge-tier-row">' + thresholds.map((th, i) =>
-      '<div class="badge-tile ' + (i <= active ? 'unlocked' : 'locked') + '">' +
-        '<span class="b-name">' + BADGE_TIERS[i] + '</span>' +
-        '<span class="b-thresh">' + th.toLocaleString() + ' makes' + (i <= active ? ' · ✓' : '') + '</span>' +
-        '<div class="b-prog"><i style="width:' + Math.min(100, Math.round(count / th * 100)) + '%"></i></div>' +
-      '</div>'
-    ).join('') + '</div>' +
-  '</div>';
-}
-function badgeVaultHtml(){
-  const { c } = badgeVaultStats();
-  return LIFETIME_BADGES.map(b =>
-    '<div class="rec-cat-label" style="margin-top:12px">' + b.icon + ' ' + b.cat + ' — lifetime <b style="color:var(--bright)">' + fmtNum(c[b.key]) + '</b></div>' +
-    '<div class="badge-vault">' + b.list.map(item => badgeTileHtml(b.key, item, c[b.key])).join('') + '</div>'
-  ).join('');
-}
-function renderBadgeVault(){
-  const el = document.getElementById('badge-vault');
-  if (!el) return;
-  const { unlocked, total } = badgeVaultStats();
-  el.innerHTML = badgeVaultHtml();
-  const cnt = document.getElementById('badge-count');
-  if (cnt) cnt.textContent = unlocked + ' / ' + total + ' tiers unlocked';
-}
-function renderDashBadges(){
-  const el = document.getElementById('dash-badges');
-  if (!el) return;
-  const stats = badgeVaultStats() || {};
-  const c = (stats.c && typeof stats.c === 'object') ? stats.c : emptyLifetimeCounts();
-  const unlocked = num(stats.unlocked) || 0;
-  const total = num(stats.total) || 0;
-  const rows = (LIFETIME_BADGES || []).map(b => {
-    const list = (b && b.list) || [];
-    const cnt = num(c[b.key]) || 0;
-    const completed = list.reduce((n, item) => n + item.slice(1).filter(th => cnt >= th).length, 0);
-    const next = list.flatMap(item => item.slice(1).map((th, i) => ({ th, name: item[0], tier: BADGE_TIERS[i] }))).find(x => cnt < x.th);
-    const last = list[list.length - 1];
-    const target = next || (last ? { th: last[3], name: last[0], tier: 'Gold' } : null);
-    const pct = target ? Math.min(100, Math.round(cnt / target.th * 100)) : 0;
-    return '<div class="dash-bd-row' + (list.length && completed === list.length * 3 ? ' unlocked' : '') + '" onclick="setLogView(\'records\')" style="cursor:pointer">' +
-      '<span class="bd-ic">' + (b.icon || '🏅') + '</span>' +
-      '<span class="bd-txt"><b>' + (target ? 'Next: ' + target.name + ' · ' + target.tier : 'Complete') + '</b><i>' + esc(b.cat || '') + '</i></span>' +
-      '<span class="bd-num">' + cnt.toLocaleString() + '</span><span class="bd-bar"><i style="width:' + pct + '%"></i></span>' +
-    '</div>';
-  }).join('');
-  el.innerHTML = '<div class="dash-badge-strip">' + rows + '</div>' +
-    '<div class="paste-hint" style="margin-top:10px">' + unlocked + ' / ' + total + ' Bronze, Silver, and Gold tiers unlocked — tracked from saved workouts.</div>';
 }
 
 /* ============================================================
@@ -6239,7 +5932,6 @@ function setSchoolView(v){
   if (v === 'tt') renderSchoolTT();
   if (v === 'classes') renderSchoolClasses();
   if (v === 'class-detail') renderClassDetail();
-  if (v === 'ncaa') renderNcaa();
 }
 function applySchoolView(){
   const v = state.settings.schoolView || 'assign';
@@ -6248,31 +5940,25 @@ function applySchoolView(){
   const showClasses = v === 'classes';
   const showDetail = v === 'class-detail';
   const showXc = v === 'xc';
-  const showNcaa = v === 'ncaa';
   const a = document.getElementById('sview-assign');
   const t = document.getElementById('sview-tt');
   const c = document.getElementById('sview-classes');
   const d = document.getElementById('sview-class-detail');
   const x = document.getElementById('sview-xc');
-  const n = document.getElementById('sview-ncaa');
   if (a) a.style.display = showAssign ? '' : 'none';
   if (t) t.style.display = showTT ? '' : 'none';
   if (c) c.style.display = showClasses ? '' : 'none';
   if (d) d.style.display = showDetail ? '' : 'none';
   if (x) x.style.display = showXc ? '' : 'none';
-  if (n) n.style.display = showNcaa ? '' : 'none';
   const ba = document.getElementById('sview-btn-assign');
   const bt = document.getElementById('sview-btn-tt');
   const bc = document.getElementById('sview-btn-classes');
   const bx = document.getElementById('sview-btn-xc');
-  const bn = document.getElementById('sview-btn-ncaa');
   if (ba) ba.classList.toggle('active', showAssign);
   if (bt) bt.classList.toggle('active', showTT);
   if (bc) bc.classList.toggle('active', showClasses || showDetail);
   if (bx) bx.classList.toggle('active', showXc);
-  if (bn) bn.classList.toggle('active', showNcaa);
   if (showXc) renderExtracurricular();
-  if (showNcaa) renderNcaa();
 }
 
 /* ---------- Automated GPA tracker (all semesters, credit-weighted) ----------
@@ -6736,7 +6422,10 @@ function renderSchool(){
   const todayS = todayKey();
   applySchoolFilterButtons();
   applySchoolCatButtons();
+  const fyear = state.settings.schoolYear || 'all';
+  applySchoolYearButtons();
   let list = state.school.filter(a => (a.semester || sem) === sem);
+  if (fyear !== 'all') list = list.filter(a => a.year === fyear);
   if (ftype !== 'all') list = list.filter(a => (a.category || 'Other') === ftype);
   if (fview === 'active')        list = list.filter(a => !assignmentArchived(a));
   else if (fview === 'archived') list = list.filter(a => assignmentArchived(a));
@@ -6748,7 +6437,7 @@ function renderSchool(){
   if (cnt) cnt.textContent = list.length + ' assignment' + (list.length === 1 ? '' : 's');
   tbl.innerHTML = list.length
     ? '<table class="school-table"><thead><tr>' +
-        '<th>Course</th><th>Assignment</th><th>Due</th><th>Category</th><th>Priority</th><th>Status</th><th>Score</th><th>Weight</th><th></th>' +
+        '<th>Course</th><th>Year</th><th>Assignment</th><th>Due</th><th>Category</th><th>Priority</th><th>Status</th><th>Score</th><th>Weight</th><th></th>' +
       '</tr></thead><tbody>' +
       list.map(a => {
         const done = ['Completed', 'Handed In'].includes(a.status);
@@ -6758,6 +6447,7 @@ function renderSchool(){
         const hasScore = a.score !== '' && a.score !== undefined && a.score !== null && a.score !== 0;
         return '<tr class="' + cls + '" onclick="openClassDetail(\'' + esc(a.course || '') + '\')" title="Open class details">' +
           '<td class="school-course" onclick="openClassDetail(\'' + esc(a.course || '') + '\')" title="Open class details">' + esc(a.course) + '</td>' +
+          '<td style="font-family:var(--mono);font-size:11px;white-space:nowrap">' + (a.year ? esc(schoolYearLabel(a.year)) : '<span style="color:var(--muted)">—</span>') + '</td>' +
           '<td>' + esc(a.assignment) +
             (a.desc ? '<details class="assign-desc" onclick="event.stopPropagation()"><summary>Notes</summary><div class="rich-text">' + richText(a.desc) + '</div></details>' : '') + '</td>' +
           '<td style="font-family:var(--mono);font-size:11px">' + (a.dueDate ? fmtDate(a.dueDate) : '—') + '</td>' +
@@ -6772,7 +6462,7 @@ function renderSchool(){
           '</td>' +
         '</tr>';
       }).join('') + '</tbody></table>'
-    : empty(q || fcat || fprio || ftype !== 'all' || fview !== 'all' ? 'No assignments match your filters.' : 'No assignments in ' + sem.toUpperCase() + ' yet — add your first one on the left.');
+    : empty(q || fcat || fprio || ftype !== 'all' || fview !== 'all' || fyear !== 'all' ? 'No assignments match your filters.' : 'No assignments in ' + sem.toUpperCase() + ' yet — add your first one on the left.');
 }
 /* ---------- Assignment type filters + rich-text helpers ---------- */
 function setSchoolCat(cat){
@@ -6825,13 +6515,34 @@ function applySchoolFilterButtons(){
     if (b) b.classList.toggle('active', cur === v);
   });
 }
+/* ---------- V3.0 academic-year tracking: every record is logged against one
+   of Grade 10 / 11 / 12, and the list can be filtered to a single year. ---------- */
+function setSchoolYear(v){
+  state.settings.schoolYear = ['all', ...SCHOOL_YEARS.map(y => y.key)].includes(v) ? v : 'all';
+  save();
+  renderSchool();
+}
+function applySchoolYearButtons(){
+  const cur = state.settings.schoolYear || 'all';
+  ['all', ...SCHOOL_YEARS.map(y => y.key)].forEach(k => {
+    const b = document.getElementById('syear-' + k);
+    if (b) b.classList.toggle('active', cur === k);
+  });
+}
+function resetSchoolYearField(){
+  const el = document.getElementById('s-year');
+  if (el) el.value = defaultSchoolYear();
+}
 function saveSchool(){
   snapshot();
   const course = document.getElementById('s-course').value.trim();
   const assignment = document.getElementById('s-assign').value.trim();
   if (!course || !assignment){ toast('Enter course and assignment', 'error'); return; }
+  const yearEl = document.getElementById('s-year');
+  const year = yearEl ? yearEl.value : '';
+  if (!SCHOOL_YEARS.some(y => y.key === year)){ toast('Select the academic year', 'error'); return; }
   const data = {
-    course, assignment,
+    course, assignment, year,
     dueDate: document.getElementById('s-due').value || '',
     category: document.getElementById('s-cat').value,
     priority: document.getElementById('s-prio').value,
@@ -6858,6 +6569,8 @@ function editSchool(id){
   const a = state.school.find(x => x.id === id);
   if (!a) return;
   state.settings.editSchool = id;
+  const yearEl = document.getElementById('s-year');
+  if (yearEl) yearEl.value = a.year || defaultSchoolYear();
   document.getElementById('s-course').value = a.course;
   document.getElementById('s-assign').value = a.assignment;
   document.getElementById('s-due').value = a.dueDate || '';
@@ -6875,6 +6588,7 @@ function editSchool(id){
 function cancelEditSchool(){
   state.settings.editSchool = null;
   ['s-course', 's-assign', 's-due', 's-weight', 's-score', 's-desc'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  resetSchoolYearField();
   const hd = document.getElementById('school-form-head'); if (hd) hd.textContent = 'Add Assignment';
   const eb = document.getElementById('school-editbar'); if (eb) eb.style.display = 'none';
   save();
@@ -9291,264 +9005,6 @@ function saveGoalCurriculum(gid){
 }
 
 /* ============================================================
-   TAB 7 — RECRUITING CRM (kanban pipeline)
-   ============================================================ */
-let coachModalId = null;
-function recruitFilter(){ return state.settings.recruitFilter || 'all'; }
-function setRecruitFilter(v){
-  state.settings.recruitFilter = (v === 'all' || RECRUIT_STATUSES.includes(v)) ? v : 'all';
-  save();
-  renderRecruiting();
-}
-function recruitDivFilter(){ return state.settings.recruitDivFilter || 'all'; }
-function setRecruitDivFilter(v){
-  state.settings.recruitDivFilter = (v === 'all' || RECRUIT_DIVISIONS.includes(v)) ? v : 'all';
-  save();
-  renderRecruiting();
-}
-/* Days since the most recent contact — an interaction or the stored lastContact date. */
-function daysSinceContact(c){
-  let latest = c.lastContact || '';
-  (c.interactions || []).forEach(i => { if (i.date && i.date > latest) latest = i.date; });
-  if (!latest) return null;
-  const today = new Date(); today.setHours(0, 0, 0, 0);
-  const d = keyToDate(latest); d.setHours(0, 0, 0, 0);
-  return Math.round((today - d) / 86400000);
-}
-function contactBadgeHtml(c){
-  const days = daysSinceContact(c);
-  if (days === null) return '<span class="rec-days stale">No contact logged</span>';
-  const stale = days > contactStaleDays();
-  const label = days === 0 ? 'Contacted today' : days + 'd since contact';
-  return '<span class="rec-days' + (stale ? ' stale' : ' fresh') + '" title="' + (stale ? 'Over ' + contactStaleDays() + ' days — follow up' : 'Recent contact') + '">' + label + '</span>';
-}
-function recruitFilterChips(){
-  const cur = recruitFilter();
-  const div = recruitDivFilter();
-  const parts = ['<span class="kicker">FILTER BY STATUS</span>'];
-  parts.push('<button class="chip-btn' + (cur === 'all' ? ' active' : '') + '" onclick="setRecruitFilter(\'all\')">All (' + state.recruiting.length + ')</button>');
-  RECRUIT_STATUSES.forEach(st => {
-    const n = state.recruiting.filter(c => c.status === st).length;
-    parts.push('<button class="chip-btn' + (cur === st ? ' active' : '') + '" onclick="setRecruitFilter(\'' + st + '\')">' + esc(st) + ' (' + n + ')</button>');
-  });
-  parts.push('<span class="kicker" style="margin-left:12px">WISHLIST</span>');
-  parts.push('<button class="chip-btn star' + (state.settings.recruitWishOnly ? ' active' : '') + '" onclick="toggleRecruitWishFilter()">★ Starred Targets (' + state.recruiting.filter(c => c.starred).length + ')</button>');
-  parts.push('<span class="kicker" style="margin-left:12px">TARGET DIVISION</span>');
-  parts.push('<button class="chip-btn' + (div === 'all' ? ' active' : '') + '" onclick="setRecruitDivFilter(\'all\')">All Divisions</button>');
-  RECRUIT_DIVISIONS.forEach(dv => {
-    const n = state.recruiting.filter(c => c.division === dv).length;
-    parts.push('<button class="chip-btn' + (div === dv ? ' active' : '') + '" onclick="setRecruitDivFilter(\'' + dv + '\')">' + esc(dv) + ' (' + n + ')</button>');
-  });
-  return parts.join('');
-}
-function renderRecruiting(){
-  const filterEl = document.getElementById('rec-filter');
-  const board = document.getElementById('recruiting-board');
-  if (!filterEl || !board) return;
-  if (!Array.isArray(state.recruiting)) state.recruiting = [];
-  const cur = recruitFilter();
-  const div = recruitDivFilter();
-  const wishOnly = !!state.settings.recruitWishOnly;
-  filterEl.innerHTML = recruitFilterChips();
-  const inView = c => (cur === 'all' || c.status === cur) && (div === 'all' || c.division === div) && (!wishOnly || c.starred);
-  if (div !== 'all'){
-    const hits = state.recruiting.filter(inView);
-    board.innerHTML = hits.length
-      ? '<div class="rec-col" style="grid-column:1/-1"><div class="rec-col-head"><h3>Target Division · ' + esc(div) + '</h3><span class="rec-count">' + hits.length + '</span></div><div class="rec-divlist">' + hits.map(recruitCardHtml).join('') + '</div></div>'
-      : '<div class="rec-col" style="grid-column:1/-1">' + '<div class="rec-empty">No schools in ' + esc(div) + ' yet.</div></div>';
-    return;
-  }
-  board.innerHTML = RECRUIT_STATUSES.map(st => {
-    const list = state.recruiting.filter(c => c.status === st && inView(c));
-    const cards = list.length ? list.map(recruitCardHtml).join('') : '<div class="rec-empty">No schools here yet.</div>';
-    return '<div class="rec-col">' +
-      '<div class="rec-col-head"><h3>' + esc(st) + '</h3><span class="rec-count">' + list.length + '</span></div>' +
-      cards +
-    '</div>';
-  }).join('');
-}
-function recruitCardHtml(c){
-  const statusOpts = RECRUIT_STATUSES.map(s => '<option value="' + s + '"' + (c.status === s ? ' selected' : '') + '>' + s + '</option>').join('');
-  const contact = [c.email, c.phone].filter(Boolean).join(' · ');
-  const ints = (c.interactions || []).slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
-  const intHtml = ints.length
-    ? '<div class="rc-int-head"><b>Interaction Tracker</b><span class="rec-count">' + ints.length + '</span></div>' +
-      ints.slice(0, 3).map(i =>
-        '<div class="rec-int-row"><span class="rec-int-type">' + esc(i.type) + '</span>' +
-          '<span>' + (i.date ? esc(fmtDate(i.date)) : '—') + '</span>' +
-          (i.notes ? '<i>' + esc(i.notes) + '</i>' : '') +
-          '<button class="icon-btn danger" onclick="deleteInteraction(\'' + c.id + '\',\'' + i.id + '\')" title="Delete interaction">✕</button></div>').join('') +
-      (ints.length > 3 ? '<div class="rc-row" style="color:var(--muted)">+ ' + (ints.length - 3) + ' earlier</div>' : '')
-    : '';
-  return '<div class="rec-card' + (c.starred ? ' starred' : '') + '">' +
-    '<h4><button class="star-btn' + (c.starred ? ' on' : '') + '" onclick="toggleCoachStar(\'' + c.id + '\')" title="Star as a target wishlist school">' + (c.starred ? '★' : '☆') + '</button>' + esc(c.school || 'Unnamed school') + '</h4>' +
-    '<div class="rec-tags">' + contactBadgeHtml(c) +
-      '<span class="rec-div">' + esc(c.division || 'Other') + '</span>' +
-      '<span class="rec-tier ' + (String(c.priorityRank || '').startsWith('Tier 1') ? 't1' : String(c.priorityRank || '').startsWith('Safety') ? 'safety' : 't2') + '">' + esc(c.priorityRank || 'Tier 2 Backup') + '</span></div>' +
-    ((c.coach || c.role) ? '<div class="rc-sub">' + esc(c.coach || '—') + (c.role ? ' · <span class="rec-role">' + esc(c.role) + '</span>' : '') + '</div>' : '') +
-    (c.lead ? '<div class="rc-row"><b>Assignee / Lead</b>' + esc(c.lead) + '</div>' : '') +
-    (contact ? '<div class="rc-row"><b>Contact Info</b>' + esc(contact) + '</div>' : '') +
-    (c.lastContact ? '<div class="rc-row"><b>Last Contact</b>' + fmtDate(c.lastContact) + '</div>' : '') +
-    '<button class="btn sm" style="width:100%;margin-top:8px" onclick="openInteractionModal(\'' + c.id + '\')">＋ Log Interaction</button>' +
-    intHtml +
-    (c.filmLink ? '<div class="rc-row"><b>Highlights / Film Sent</b><a class="rec-link" href="' + esc(c.filmLink) + '" target="_blank" rel="noopener">' + esc(c.filmLink) + '</a></div>' : '') +
-    (c.notes ? '<div class="rc-notes"><b>Feedback / Notes</b> ' + esc(c.notes) + '</div>' : '') +
-    '<div class="rc-actions">' +
-      '<select class="rec-move" onchange="moveCoach(\'' + c.id + '\',this.value)" title="Move to status">' + statusOpts + '</select>' +
-      '<button class="icon-btn" onclick="openCoachModal(\'' + c.id + '\')" title="Edit">✎</button>' +
-      '<button class="icon-btn danger" onclick="deleteCoach(\'' + c.id + '\')" title="Delete">✕</button>' +
-    '</div>' +
-  '</div>';
-}
-/* ---------- Interaction Tracker: log calls, visits, camps and offers ---------- */
-let interactionCoachId = null;
-function interactionCoach(){ return (state.recruiting || []).find(c => c.id === interactionCoachId) || null; }
-function openInteractionModal(coachId){
-  const c = (state.recruiting || []).find(x => x.id === coachId);
-  if (!c){ toast('School not found', 'error'); return; }
-  interactionCoachId = coachId;
-  openModal('Log Interaction — ' + (c.school || 'School'));
-  const typeOpts = INTERACTION_TYPES.map(t => '<option value="' + t + '">' + t + '</option>').join('');
-  modalBody.innerHTML =
-    '<div class="log-grid-2">' +
-      '<div class="field"><label>Interaction Type</label><select id="int-type">' + typeOpts + '</select></div>' +
-      '<div class="field"><label>Date</label><input type="date" id="int-date" value="' + todayKey() + '"></div>' +
-    '</div>' +
-    '<div class="field"><label>Notes / Outcome</label><textarea id="int-notes" rows="3" placeholder="What was said, next step, who to follow up with..."></textarea></div>' +
-    ((c.interactions || []).length
-      ? '<div class="log-label" style="margin-top:14px">LOGGED INTERACTIONS</div><div style="max-height:180px;overflow:auto">' +
-        c.interactions.slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || ''))).map(i =>
-          '<div class="rec-int-row"><span class="rec-int-type">' + esc(i.type) + '</span><span>' + (i.date ? esc(fmtDate(i.date)) : '—') + '</span>' +
-          (i.notes ? '<i>' + esc(i.notes) + '</i>' : '') +
-          '<button class="icon-btn danger" onclick="deleteInteraction(\'' + c.id + '\',\'' + i.id + '\')" title="Delete">✕</button></div>').join('') +
-        '</div>'
-      : '') +
-    '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">' +
-      '<button class="btn sm ghost" onclick="closeModal()">Cancel</button>' +
-      '<button class="btn" onclick="saveInteraction()">Save Interaction</button>' +
-    '</div>';
-}
-function saveInteraction(){
-  const c = interactionCoach();
-  if (!c) return;
-  const type = document.getElementById('int-type').value;
-  const date = document.getElementById('int-date').value;
-  const notes = document.getElementById('int-notes').value.trim();
-  if (!date){ toast('Pick an interaction date', 'error'); return; }
-  snapshot();
-  c.interactions = c.interactions || [];
-  c.interactions.push({ id: uid(), type: INTERACTION_TYPES.includes(type) ? type : 'Call', date, notes });
-  if (!c.lastContact || date > c.lastContact) c.lastContact = date;
-  /* Logging any outreach moves a cold lead off the top of the funnel. */
-  if (c.status === 'Not Contacted') c.status = 'Email Sent';
-  save(); closeModal(); renderRecruiting();
-  toast('✓ ' + type + ' logged for ' + (c.school || 'school'));
-}
-function deleteInteraction(coachId, intId){
-  const c = (state.recruiting || []).find(x => x.id === coachId);
-  if (!c) return;
-  snapshot();
-  const it = (c.interactions || []).find(i => i.id === intId);
-  if (it) trashItem('interaction', (it.type || 'Interaction'), (c.school || c.name || 'Coach'), { coachId, interaction: JSON.parse(JSON.stringify(it)), index: idxOf(c.interactions, intId) });
-  c.interactions = (c.interactions || []).filter(i => i.id !== intId);
-  save();
-  renderRecruiting();
-  if (document.getElementById('modal-overlay') && !document.getElementById('modal-overlay').classList.contains('hidden')) openInteractionModal(coachId);
-  toast('Interaction deleted');
-}
-/* Star a school as a top-priority target — the wishlist filter reads this flag. */
-function toggleRecruitWishFilter(){
-  state.settings.recruitWishOnly = !state.settings.recruitWishOnly;
-  save();
-  renderRecruiting();
-}
-function toggleCoachStar(id){
-  const c = (state.recruiting || []).find(x => x.id === id);
-  if (!c) return;
-  snapshot();
-  c.starred = !c.starred;
-  save();
-  renderRecruiting();
-  toast(c.starred ? '★ ' + (c.school || 'School') + ' added to your target wishlist' : '☆ Removed from the wishlist');
-}
-function moveCoach(id, status){
-  const c = state.recruiting.find(x => x.id === id);
-  if (!c || !RECRUIT_STATUSES.includes(status)) return;
-  snapshot();
-  c.status = status;
-  save();
-  renderRecruiting();
-  toast('Moved to ' + status);
-}
-function openCoachModal(id){
-  const c = id ? state.recruiting.find(x => x.id === id) : null;
-  coachModalId = c ? c.id : null;
-  openModal(c ? 'School / Coach — ' + (c.school || '') : 'New Coach / School');
-  const roleOpts = RECRUIT_ROLES.map(r => '<option value="' + r + '"' + (c && c.role === r ? ' selected' : '') + '>' + r + '</option>').join('');
-  const statusOpts = RECRUIT_STATUSES.map(s => '<option value="' + s + '"' + (c && c.status === s ? ' selected' : '') + '>' + s + '</option>').join('');
-  modalBody.innerHTML =
-    '<div class="school-form-row">' +
-      '<div class="field full"><label>School Name</label><input id="c-school" value="' + esc(c ? c.school : '') + '" placeholder="e.g. Simon Fraser University"></div>' +
-      '<div class="field"><label>Assignee / Lead</label><input id="c-lead" value="' + esc(c ? c.lead : '') + '" placeholder="Who owns this lead"></div>' +
-      '<div class="field"><label>Coach Name</label><input id="c-coach" value="' + esc(c ? c.coach : '') + '"></div>' +
-      '<div class="field"><label>Coach Role</label><select id="c-role">' + roleOpts + '</select></div>' +
-      '<div class="field"><label>Email</label><input id="c-email" type="email" value="' + esc(c ? c.email : '') + '"></div>' +
-      '<div class="field"><label>Phone</label><input id="c-phone" value="' + esc(c ? c.phone : '') + '"></div>' +
-      '<div class="field"><label>Last Contact Date</label><input id="c-last" type="date" value="' + esc(c ? c.lastContact : '') + '"></div>' +
-      '<div class="field"><label>Status / Career Phase</label><select id="c-status">' + statusOpts + '</select></div>' +
-      '<div class="field"><label>Target Division</label><select id="c-division">' + RECRUIT_DIVISIONS.map(dv => '<option value="' + dv + '"' + (c && c.division === dv ? ' selected' : '') + '>' + dv + '</option>').join('') + '</select></div>' +
-      '<div class="field"><label>Priority Rank</label><select id="c-tier">' + RECRUIT_TIERS.map(t => '<option value="' + t + '"' + (c && c.priorityRank === t ? ' selected' : '') + '>' + t + '</option>').join('') + '</select></div>' +
-      '<div class="field full"><label>Highlights / Film Link Sent</label><input id="c-film" value="' + esc(c ? c.filmLink : '') + '" placeholder="https://..."></div>' +
-      '<div class="field full"><label>Feedback Received / Notes</label><textarea id="c-notes" placeholder="Coach feedback, interest level, next steps...">' + esc(c ? c.notes : '') + '</textarea></div>' +
-      '<label class="curr-toggle full"><input type="checkbox" id="c-starred" ' + (c && c.starred ? 'checked' : '') + '> ★ Starred / Target Wishlist — top-priority school</label>' +
-    '</div>' +
-    '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">' +
-      (c ? '<button class="btn sm danger-ghost" onclick="deleteCoach(\'' + c.id + '\')">Delete</button>' : '') +
-      '<button class="btn" onclick="saveCoach()">Save</button>' +
-    '</div>';
-}
-function saveCoach(){
-  const v = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
-  const school = v('c-school');
-  if (!school){ toast('School name is required', 'error'); return; }
-  snapshot();
-  const data = {
-    school, lead: v('c-lead'), coach: v('c-coach'), role: v('c-role'),
-    email: v('c-email'), phone: v('c-phone'), lastContact: v('c-last'),
-    status: v('c-status'), filmLink: v('c-film'), notes: v('c-notes'),
-    division: v('c-division'), priorityRank: v('c-tier'),
-    starred: !!(document.getElementById('c-starred') && document.getElementById('c-starred').checked)
-  };
-  if (!RECRUIT_STATUSES.includes(data.status)) data.status = 'Not Contacted';
-  if (!RECRUIT_DIVISIONS.includes(data.division)) data.division = 'Other';
-  if (!RECRUIT_TIERS.includes(data.priorityRank)) data.priorityRank = 'Tier 2 Backup';
-  if (coachModalId){
-    const c = state.recruiting.find(x => x.id === coachModalId);
-    if (c) Object.assign(c, data);
-  } else {
-    state.recruiting.push({ id: uid(), interactions: [], ...data });
-  }
-  coachModalId = null;
-  save();
-  closeModal();
-  renderRecruiting();
-  toast('✓ Saved ' + school);
-}
-function deleteCoach(id){
-  const cid = id || coachModalId;
-  const c = state.recruiting.find(x => x.id === cid);
-  if (!c) return;
-  snapshot();
-  trashItem('coach', c.school || c.coach || 'Recruit', (c.coach || '') + (c.status ? ' · ' + c.status : ''), { coach: JSON.parse(JSON.stringify(c)) });
-  state.recruiting = state.recruiting.filter(x => x.id !== cid);
-  coachModalId = null;
-  save();
-  closeModal();
-  renderRecruiting();
-  toast('Removed ' + (c.school || 'entry'));
-}
-
-/* ============================================================
    EVENT BINDING & INIT
    ============================================================ */
 function bindEvents(){
@@ -9666,7 +9122,7 @@ function weekStartKey(offset){
 function setMentalView(){ state.settings.routineView = 'mental'; setRoutineView('mental'); }
 function applyMentalView(){ /* no-op — Daily Routine owns the journaling view now. */ }
 
-/* ---------- Life Maxx sub-views ---------- */
+/* ---------- Habits & Goals sub-views ---------- */
 const LIFE_VIEWS = ['habits', 'monthly', 'goals', 'combine'];
 function setLifeView(v){
   if (!LIFE_VIEWS.includes(v)) v = 'habits';
@@ -10152,7 +9608,7 @@ function renderLive(){
       '<div class="live-sec card" style="box-shadow:none">' +
         '<div class="compact-row">' +
           '<div class="field inline-block"><label>Drill / Skill</label><input id="live-drill-input" value="' + esc(l.drill || '') + '" placeholder="e.g. 5 Spot Midrange" onchange="setLiveField(\'drill\',this.value)"></div>' +
-          '<div class="field inline-block"><label>Category <span class="hint">badge routing</span></label><select onchange="setLiveField(\'category\',this.value)">' +
+          '<div class="field inline-block"><label>Category <span class="hint">shot type</span></label><select onchange="setLiveField(\'category\',this.value)">' +
             LIVE_CATEGORIES.map(c => '<option value="' + c + '"' + (l.category === c ? ' selected' : '') + '>' + c + ' — ' + LIVE_CAT_META[c].label + '</option>').join('') +
           '</select></div>' +
           '<div class="field inline-block"><label>Location</label><input id="live-loc" value="' + esc(l.location || '') + '" placeholder="DT" onchange="setLiveField(\'location\',this.value)"></div>' +
@@ -10173,159 +9629,6 @@ function renderLive(){
     '</div>';
 }
 
-/* ============================================================
-   NOTION WEEKLY SUMMARY — Markdown generator + clipboard copy
-   ============================================================ */
-function weeklyWindow(){
-  const start = keyToDate(weekStartKey(0));           // Monday of the current week
-  const end = new Date(start); end.setDate(end.getDate() + 6);
-  return { startKey: dateKey(start), endKey: dateKey(end) };
-}
-function inWeekWindow(k, r){ return !!k && k >= r.startKey && k <= r.endKey; }
-function weekDayKeys(r){
-  const out = [];
-  const d = keyToDate(r.startKey);
-  for (let i = 0; i < 7; i++){ out.push(dateKey(d)); d.setDate(d.getDate() + 1); }
-  return out;
-}
-function weeklyAthleticsData(r){
-  let attempts = 0, makes = 0, live = 0, sessions = 0;
-  allSessions().forEach(({ key: k, session: s }) => {
-    if (!inWeekWindow(k, r) || !s || s.type !== 'basketball') return;
-    const m = drillTotals(basketAllDrills(s));
-    attempts += num(m.shots);
-    makes += num(m.makes);
-    live += num(s.liveSessions);
-    sessions++;
-  });
-  const games = (state.film.games || []).filter(g => inWeekWindow(g.date, r))
-    .sort((a, b) => String(a.date).localeCompare(String(b.date)));
-  return { attempts, makes, live, sessions, games, pct: attempts ? Math.round(makes / attempts * 1000) / 10 : null };
-}
-function weeklyHabitsData(r){
-  const keys = weekDayKeys(r);
-  const good = (state.habits || []).filter(h => (h.type || 'good') !== 'bad');
-  const bad = (state.habits || []).filter(h => h.type === 'bad');
-  let done = 0, possible = 0;
-  const perHabit = good.map(h => {
-    let n = 0;
-    keys.forEach(k => { if (!habitActiveOn(h, k)) return; possible++; if (state.logs[k] && state.logs[k].habits && state.logs[k].habits[h.id]){ n++; done++; } });
-    return { label: h.label, days: n, streak: habitStreak(h) };
-  });
-  const banned = bad.map(h => {
-    let n = 0;
-    keys.forEach(k => { if (state.logs[k] && state.logs[k].habits && state.logs[k].habits[h.id]) n++; });
-    return { label: h.label, clean: n, streak: habitStreak(h), target: h.target };
-  });
-  return { good: perHabit, bad: banned, done, possible, rate: possible ? Math.round(done / possible * 100) : 0 };
-}
-function weeklyRecruitingData(r){
-  const rows = [];
-  (state.recruiting || []).forEach(c => (c.interactions || []).forEach(i => {
-    if (inWeekWindow(i.date, r)) rows.push({ coach: c.school || 'School', type: i.type, date: i.date, notes: i.notes || '' });
-  }));
-  return rows.sort((a, b) => String(b.date).localeCompare(String(a.date)));
-}
-function buildWeeklyMarkdown(){
-  const r = weeklyWindow();
-  const gs = gpaSummary();
-  const gc = graduationCredits();
-  const ath = weeklyAthleticsData(r);
-  const hab = weeklyHabitsData(r);
-  const rec = weeklyRecruitingData(r);
-  const L = [];
-  L.push('# 🏀 Phoenix OS — Weekly Summary');
-  L.push('');
-  L.push('**Week of ' + fmtDate(r.startKey, { long: true }) + ' → ' + fmtDate(r.endKey, { long: true }) + '**  ');
-  L.push('_Generated ' + new Date().toLocaleString() + ' · Phoenix OS V2.0_');
-  L.push('');
-
-  /* ---------- Academics ---------- */
-  L.push('## 🎓 Weekly Academics');
-  L.push('');
-  L.push('- **Overall GPA:** ' + (gs.gpa === null ? '—' : gs.gpa.toFixed(2) + ' / 4.0') +
-    (gs.pct === null ? '' : ' (weighted average ' + gs.pct.toFixed(1) + '% · ' + gs.letter + ')'));
-  L.push('- **Earned graduation credits:** ' + fmtNum(gc.total) + ' total · Semester 1 ' + fmtNum(gc.perSem.s1.credits) +
-    ' · Semester 2 ' + fmtNum(gc.perSem.s2.credits) + ' · Extracurricular ' + fmtNum(gc.xcCredits));
-  L.push('- **Volunteer hours:** ' + fmtNum(volunteerTotal()) + (num((state.extracurricular || {}).volunteerGoal) ? ' / ' + fmtNum(num(state.extracurricular.volunteerGoal)) + ' goal' : ''));
-  L.push('');
-  const classes = (state.classCats || []).slice();
-  L.push('**Class grades**');
-  L.push('');
-  if (classes.length){
-    L.push('| Class | Semester | Grade | Letter | Credits |');
-    L.push('| --- | --- | --- | --- | --- |');
-    classes.forEach(c => {
-      const g = classGrade(c);
-      L.push('| ' + (c.label || 'Class') + ' | ' + String(c.semester || 's1').toUpperCase() + ' | ' +
-        (g === null || g === undefined ? '—' : fmtNum(Math.round(g * 10) / 10) + '%') + ' | ' +
-        (g === null || g === undefined ? '—' : gpaFor(g).letter) + ' | ' + fmtNum(classCredits(c)) + ' |');
-    });
-  } else {
-    L.push('_No classes registered yet._');
-  }
-  L.push('');
-  const todayK = todayKey();
-  const dueSoon = (state.school || []).filter(a => !['Completed', 'Handed In'].includes(a.status) && a.dueDate)
-    .filter(a => inWeekWindow(a.dueDate, r) || a.dueDate < todayK)
-    .sort((a, b) => String(a.dueDate).localeCompare(String(b.dueDate)));
-  L.push('**Upcoming / due assignments**');
-  L.push('');
-  if (dueSoon.length){
-    dueSoon.forEach(a => {
-      const overdue = a.dueDate < todayK;
-      L.push('- ' + (overdue ? '🔴 **OVERDUE ' + fmtDate(a.dueDate) + '**' : '🟡 Due ' + fmtDate(a.dueDate)) + ' — ' + (a.assignment || 'Assignment') +
-        ' _(' + (a.course || 'Course') + ' · ' + (a.category || 'Other') + ' · ' + (a.priority || 'Medium') + ' priority · ' + (a.status || 'Not Started') + ')_');
-    });
-  } else {
-    L.push('- ✅ Nothing due or overdue right now.');
-  }
-  L.push('');
-
-  /* ---------- Athletics ---------- */
-  L.push('## 🏀 Weekly Athletics');
-  L.push('');
-  L.push('- **Shot volume:** ' + fmtNum(ath.makes) + ' makes on ' + fmtNum(ath.attempts) + ' attempts' +
-    (ath.pct === null ? '' : ' — **' + ath.pct + '%**'));
-  L.push('- **Live workouts completed:** ' + fmtNum(ath.live));
-  L.push('- **Workout sessions logged:** ' + fmtNum(ath.sessions));
-  L.push('- **Games logged:** ' + fmtNum(ath.games.length));
-  ath.games.forEach(g => {
-    const score = (g.scoreUs !== undefined && g.scoreUs !== '') ? ' — ' + g.scoreUs + '–' + (g.scoreThem || 0) : '';
-    L.push('  - ' + fmtDate(g.date) + ' vs **' + (g.opponent || 'Opponent') + '**' + score +
-      ([g.season, g.club, g.tournament].filter(Boolean).length ? ' _(' + [g.season, g.club, g.tournament].filter(Boolean).join(' · ') + ')_' : ''));
-  });
-  L.push('');
-
-  /* ---------- Habits ---------- */
-  L.push('## ✅ Habit & Banned List Highlights');
-  L.push('');
-  L.push('- **Good habit completion:** ' + hab.rate + '% (' + hab.done + ' of ' + hab.possible + ' check-ins across the week)');
-  if (hab.good.length){
-    L.push('- **Streaks:** ' + hab.good.map(h => h.label + ' 🔥' + h.streak + ' (' + h.days + '/7 this week)').join(' · '));
-  } else {
-    L.push('- _No good habits tracked._');
-  }
-  if (hab.bad.length){
-    hab.bad.forEach(h => L.push('- **Banned list — ' + h.label + ':** ' + h.clean + '/7 days clean · current streak 🔥' + h.streak + (h.target ? ' · monthly target ' + h.target + ' days' : '')));
-  } else {
-    L.push('- _No banned habits tracked._');
-  }
-  L.push('');
-
-  /* ---------- Recruiting ---------- */
-  L.push('## 📞 Recruiting CRM Log');
-  L.push('');
-  if (rec.length){
-    rec.forEach(i => L.push('- ' + fmtDate(i.date) + ' · **' + i.type + '** — ' + i.coach + (i.notes ? ': ' + i.notes : '')));
-  } else {
-    L.push('- _No coach interactions logged this week._');
-  }
-  L.push('');
-  L.push('---');
-  L.push('_Phoenix OS · local-first workspace_');
-  return L.join('\n');
-}
 /* ============================================================
    V1.0 — shared helpers + Daily Routine (TAB 2)
    ============================================================ */
@@ -10428,7 +9731,7 @@ function renderRoutineSchedule(){
   (visible.length ? '' : '<div class="hint" style="margin-top:8px">No classes scheduled for ' + day + ' — free block.</div>');
 }
 /* ============================================================
-   V1.0 — LIFE MAXX CATEGORIZED HABIT TRACKER
+   V3.0 — HABITS & GOALS CATEGORIZED HABIT TRACKER
    Four buckets. Check-ins live in state.logs[key].habits, so the daily boxes
    reset themselves at midnight while every past record — and therefore every
    streak, best streak and rolling rate — is preserved in history.
@@ -10659,7 +9962,7 @@ function openHabitModal(){
 }
 /* Retired entry points kept as forwarders (nothing in V1.0 calls them). */
 function renderRoutineHabits(){ renderHabitBuckets(); }
-function renderRoutineBanned(){ /* Banned List is rendered inside Life Maxx > Habit Tracker. */ }
+function renderRoutineBanned(){ /* Banned List is rendered inside Habits & Goals > Habit Tracker. */ }
 
 /* ============================================================
    V1.0 — Multi-Zone Shot Heatmap (Athletics)
@@ -11499,133 +10802,7 @@ function cyclePlaybookMastery(id){
 }
 
 /* ============================================================
-   V1.0 — BC → NCAA 1-Direction Flow Mind Map
-   ============================================================ */
-const NCAA_REQS = {
-  'NCAA D1': { english: 4, math: 3, science: 2, social: 2, extra: 4 },
-  'NCAA D2': { english: 3, math: 2, science: 2, social: 2, extra: 5 }
-};
-function ncaaState(){
-  if (!state.ncaa || typeof state.ncaa !== 'object') state.ncaa = { paths: [], selectedNode: 'precalc11' };
-  if (!Array.isArray(state.ncaa.paths)) state.ncaa.paths = [];
-  if (!state.ncaa.selectedNode) state.ncaa.selectedNode = 'precalc11';
-  return state.ncaa;
-}
-function ncaaCourse(id){ return NCAA_COURSES.find(c => c.id === id) || null; }
-function ncaaCoreCoverage(target){
-  const req = NCAA_REQS[target] || NCAA_REQS['NCAA D1'];
-  const have = { english: 0, math: 0, science: 0, social: 0, extra: 0 };
-  (state.classCats || []).forEach(c => {
-    const key = String(c.label || '').toLowerCase();
-    const hit = NCAA_COURSES.find(n => n.label.toLowerCase() === key || key.includes(n.label.toLowerCase()));
-    if (hit) have[hit.cat] = (have[hit.cat] || 0) + 1;
-  });
-  return { req, have };
-}
-function renderNcaa(){
-  const flow = document.getElementById('ncaa-flow');
-  if (!flow) return;
-  const st = ncaaState();
-  const kick = document.getElementById('ncaa-kicker');
-  if (kick) kick.textContent = NCAA_COURSES.length + ' BC courses';
-  const grades = ['10', '11', '12'];
-  const cols = grades.map(g =>
-    '<div class="ncaa-col"><div class="ncaa-col-head">GRADE ' + g + '</div>' +
-      NCAA_COURSES.filter(c => c.grade === g).map(c => {
-        const sel = st.selectedNode === c.id ? ' sel' : '';
-        return '<div class="ncaa-node' + sel + '" onclick="selectNcaaNode(\'' + c.id + '\')"><b>' + esc(c.label) + '</b><span class="nn-cat">' + esc(NCAA_CORE[c.cat]) + '</span></div>';
-      }).join('') +
-    '</div>').join('<div class="ncaa-arrow">→</div>');
-  const cov = ncaaCoreCoverage('NCAA D1');
-  const coreCol =
-    '<div class="ncaa-col core"><div class="ncaa-col-head">NCAA 16-CORE (D1)</div>' +
-      Object.keys(NCAA_REQS['NCAA D1']).map(k => {
-        const need = cov.req[k], gv = cov.have[k] || 0;
-        const ok = gv >= need;
-        return '<div class="ncaa-core' + (ok ? ' ok' : '') + '"><b>' + esc(NCAA_CORE[k]) + '</b><span>' + gv + ' / ' + need + ' mapped</span></div>';
-      }).join('') +
-    '</div>';
-  flow.innerHTML = '<div class="ncaa-flow-wrap">' + cols + '<div class="ncaa-arrow">→</div>' + coreCol + '</div>' +
-    '<p class="paste-hint" style="margin-top:10px">Every arrow flows one way — a Grade 10 course feeds a Grade 11 course, which feeds a Grade 12 course and finally an NCAA core slot. Click any node for details; build your own sequential path on the right.</p>';
-  renderNcaaDetail();
-  renderNcaaPaths();
-}
-function selectNcaaNode(id){
-  ncaaState().selectedNode = id;
-  save();
-  renderNcaa();
-}
-function renderNcaaDetail(){
-  const el = document.getElementById('ncaa-detail');
-  if (!el) return;
-  const c = ncaaCourse(ncaaState().selectedNode);
-  if (!c){ el.innerHTML = empty('Select a course node.'); return; }
-  el.innerHTML =
-    '<div class="ncaa-detail">' +
-      '<h4>' + esc(c.label) + '</h4>' +
-      '<div class="nd-tags">' + chip('#45a29e', 'Grade ' + c.grade) + chip('#f0a500', fmtNum(c.credits) + ' credits') + chip('#66a3ff', NCAA_CORE[c.cat]) + '</div>' +
-      '<p>' + esc(c.desc) + '</p>' +
-      '<div class="nd-ncaa"><span class="kicker">NCAA CORE STATUS</span><b>' + esc(NCAA_CORE[c.cat]) + '</b>' +
-        '<span class="hint">' + (c.cat === 'extra' ? 'Counts toward the Additional core block (or as an elective).' : 'Counts directly toward the ' + NCAA_CORE[c.cat] + ' core requirement.') + '</span></div>' +
-    '</div>';
-}
-let ncaaDraft = [];
-function renderNcaaPaths(){
-  const el = document.getElementById('ncaa-paths');
-  if (!el) return;
-  const paths = ncaaState().paths;
-  el.innerHTML = paths.length
-    ? paths.map(p =>
-        '<div class="ncaa-path">' +
-          '<div class="np-head"><b>' + esc(p.name) + '</b>' + chip('#9d4edd', p.target) +
-            '<button class="icon-btn danger" onclick="deleteNcaaPath(\'' + p.id + '\')" title="Delete path">✕</button></div>' +
-          '<div class="np-chain">' + p.nodeIds.map(id => '<span class="np-step">' + esc(ncaaCourse(id) ? ncaaCourse(id).label : id) + '</span>').join('<span class="np-arrow">→</span>') + '</div>' +
-        '</div>').join('')
-    : empty('No custom paths yet — build one with the path builder.');
-}
-function openNcaaPathModal(){
-  ncaaDraft = [];
-  openModal('Custom Sequential Path Builder');
-  renderNcaaPathModal();
-}
-function renderNcaaPathModal(){
-  modalBody.innerHTML =
-    '<div class="field"><label>Path Name</label><input id="np-name" placeholder="e.g. Math Track — NCAA Math core"></div>' +
-    '<div class="compact-row">' +
-      '<div class="field inline-block" style="flex:2 1 150px"><label>Add Course (in sequence)</label><select id="np-course">' + NCAA_COURSES.map(c => '<option value="' + c.id + '">' + esc(c.label) + ' — Gr ' + c.grade + '</option>').join('') + '</select></div>' +
-      '<div class="field inline-block"><label>Target</label><select id="np-target"><option>NCAA D1</option><option>NCAA D2</option></select></div>' +
-    '</div>' +
-    '<button class="btn sm" onclick="ncaaDraftAdd()">+ Add to path</button>' +
-    '<div class="ncaa-draft">' + (ncaaDraft.length
-      ? ncaaDraft.map((id, i) => '<span class="np-step">' + (i + 1) + '. ' + esc(ncaaCourse(id) ? ncaaCourse(id).label : id) + ' <button class="icon-btn danger" onclick="ncaaDraftRemove(' + i + ')" title="Remove">✕</button></span>').join('<span class="np-arrow">→</span>')
-      : '<span class="hint">No courses added yet — e.g. Foundations of Math 10 → Pre-Calculus 11 → Pre-Calculus 12.</span>') + '</div>' +
-    '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px"><button class="btn ghost sm" onclick="closeModal()">Cancel</button><button class="btn" onclick="saveNcaaPath()">Save Path</button></div>';
-}
-function ncaaDraftAdd(){ const id = document.getElementById('np-course').value; if (id){ ncaaDraft.push(id); renderNcaaPathModal(); } }
-function ncaaDraftRemove(i){ ncaaDraft.splice(i, 1); renderNcaaPathModal(); }
-function saveNcaaPath(){
-  const name = (document.getElementById('np-name').value || '').trim();
-  if (!name){ toast('Name the path', 'error'); return; }
-  if (!ncaaDraft.length){ toast('Add at least one course', 'error'); return; }
-  snapshot();
-  ncaaState().paths.push({ id: uid(), name, target: document.getElementById('np-target').value || 'NCAA D1', nodeIds: ncaaDraft.slice() });
-  save();
-  closeModal();
-  renderNcaa();
-  toast('✓ Path saved');
-}
-function deleteNcaaPath(id){
-  snapshot();
-  const st = ncaaState();
-  const p = (st.paths || []).find(x => x.id === id);
-  if (p) trashItem('ncaaPath', (p.name || 'NCAA path'), (p.target || ''), { path: JSON.parse(JSON.stringify(p)), index: idxOf(st.paths, id) });
-  st.paths = st.paths.filter(p => p.id !== id);
-  save();
-  renderNcaa();
-}
-
-/* ============================================================
-   V1.0 — Life Maxx (TAB 7)
+   V3.0 — Habits & Goals (TAB 7)
    ============================================================ */
 function lifeState(){
   if (!state.life || typeof state.life !== 'object') state.life = { sprints: [], debriefs: [], contacts: [], levelXp: {} };
@@ -11638,7 +10815,7 @@ function lifeState(){
   return l;
 }
 function renderLife(){ renderHabits(); renderCombine(); }
-/* ---------- Physical Combine (Life Maxx > Stats) ---------- */
+/* ---------- Physical Combine (Habits & Goals > Stats) ---------- */
 function combineState(){
   const l = lifeState();
   if (!l.combine || typeof l.combine !== 'object') l.combine = {};
@@ -11746,38 +10923,6 @@ function deleteSprint(id){
   save();
   renderSprints();
 }
-function openNotionExport(){
-  const md = buildWeeklyMarkdown();
-  const r = weeklyWindow();
-  openModal('Export to Notion — Weekly Summary');
-  const body = document.getElementById('modal-body');
-  if (!body) return;
-  body.innerHTML =
-    '<p class="paste-hint" style="margin-bottom:10px">Pre-formatted Markdown for the week of <b>' + esc(fmtDate(r.startKey, { long: true })) + '</b> → <b>' + esc(fmtDate(r.endKey)) + '</b>. Copy it, then paste into any Notion page — headings, bullets and tables convert automatically.</p>' +
-    '<textarea class="notion-md" id="notion-md" readonly spellcheck="false">' + esc(md) + '</textarea>' +
-    '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">' +
-      '<button class="btn sm ghost" onclick="closeModal()">Close</button>' +
-      '<button class="btn" onclick="copyNotionExport()">⧉ Copy to Clipboard</button>' +
-    '</div>';
-}
-function copyNotionExport(){
-  const ta = document.getElementById('notion-md');
-  const md = ta ? ta.value : '';
-  if (!md){ toast('Nothing to copy', 'error'); return; }
-  const fallback = () => {
-    if (!ta) return;
-    try { ta.removeAttribute('readonly'); ta.focus(); ta.select(); } catch (e){}
-    toast('Select the text and copy manually (Ctrl+C)', 'error');
-  };
-  try {
-    if (navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(md).then(() => toast('✓ Markdown copied — paste into Notion')).catch(fallback);
-      return;
-    }
-  } catch (e){ /* fall through to manual copy */ }
-  fallback();
-}
-
 /* ============================================================
    PHOENIX OS V1.0 — PRODUCTION MODULE LAYER (part 1)
    Habit buckets · midnight reset · dashboard focus · lunch templates
@@ -12107,10 +11252,11 @@ function applyTrashRestore(t){
     return reinsertAt(m.playbook, p, d.index);
   }
   if (t.kind === 'ncaaPath'){
+    /* The BC→NCAA map was retired in V3.0; keep the record restorable in the save. */
     const p = d.path; if (!p) return false;
-    const st = ncaaState();
-    st.paths = st.paths || [];
-    return reinsertAt(st.paths, p, d.index);
+    state.ncaa = state.ncaa || { paths: [], selectedNode: '' };
+    state.ncaa.paths = state.ncaa.paths || [];
+    return reinsertAt(state.ncaa.paths, p, d.index);
   }
   if (t.kind === 'sprint'){
     const s = d.sprint; if (!s) return false;
@@ -12169,7 +11315,7 @@ function renderSettingsTrash(){
     '</div>';
 }
 function setSettingsView(v){
-  if (!['prefs', 'backup', 'archive', 'trash'].includes(v)) v = 'prefs';
+  if (!['prefs', 'backup', 'mobile', 'archive', 'trash'].includes(v)) v = 'prefs';
   state.settings.settingsView = v;
   save();
   applySettingsView();
@@ -12179,7 +11325,7 @@ function applySettingsView(){
   $$('#settings-subtabs .sub-tab').forEach(b => b.classList.toggle('active', b.dataset.sv === v));
   const tb = document.querySelector('#settings-subtabs .sub-tab[data-sv="trash"]');
   if (tb) tb.textContent = '🗑 Recently Deleted' + (trashCount() ? ' (' + trashCount() + ')' : '');
-  const map = { prefs: 'sview-prefs', backup: 'sview-backup', archive: 'sview-archive', trash: 'sview-trash' };
+  const map = { prefs: 'sview-prefs', backup: 'sview-backup', mobile: 'sview-mobile', archive: 'sview-archive', trash: 'sview-trash' };
   Object.entries(map).forEach(([k, id]) => {
     const el = document.getElementById(id);
     if (el) el.classList.toggle('active', k === v);
@@ -12202,14 +11348,6 @@ function setPref(key, value){
   renderDashboard();
   toast('Preference saved');
 }
-function setPrefNum(key, value){
-  snapshot();
-  state.settings[key] = Math.max(1, parseInt(value, 10) || CONTACT_STALE_DAYS);
-  save();
-  renderRecruiting();
-  renderSettings();
-  toast('Preference saved');
-}
 function renderSettingsPrefs(){
   const el = document.getElementById('settings-prefs');
   if (!el) return;
@@ -12224,8 +11362,6 @@ function renderSettingsPrefs(){
         '<label class="pref"><span>Default workout type</span><select data-pref="pmType">' +
           ['basketball', 'lift', 'strength'].map(x => '<option value="' + x + '"' + (s.pmType === x ? ' selected' : '') + '>' + x.charAt(0).toUpperCase() + x.slice(1) + '</option>').join('') +
         '</select></label>' +
-        '<label class="pref"><span>Recruiting follow-up threshold (days)</span>' +
-          '<input type="number" min="1" max="120" data-pref-num="staleDays" value="' + esc(String(contactStaleDays())) + '"></label>' +
         '<label class="pref"><span>Default Workouts discipline</span><select data-pref="workoutEnv">' +
           WORKOUT_ENVS.map(x => '<option value="' + x + '"' + (s.workoutEnv === x ? ' selected' : '') + '>' + WORKOUT_ENV_META[x].icon + ' ' + WORKOUT_ENV_META[x].label + '</option>').join('') +
         '</select></label>' +
@@ -12238,10 +11374,10 @@ function renderSettingsPrefs(){
     '</div>' +
     '<div class="card" style="margin-top:16px"><div class="card-head"><h3>🚀 Launch Roadmap</h3><span class="kicker">Testing phase</span></div>' +
       '<div class="roadmap">' +
-        '<div class="rm-step on"><b>October 2026</b><i>Active testing phase — dual-running Phoenix OS V1.0 alongside Notion to stress-test the real workflow.</i></div>' +
-        '<div class="rm-step"><b>November 2026</b><i>Official launch — complete retirement of Notion; 100% migration to Phoenix OS.</i></div>' +
+        '<div class="rm-step on"><b>November 2026</b><i>V3.0 — focused command center: Habits &amp; Goals, academic-year school tracking and System Settings.</i></div>' +
+        '<div class="rm-step"><b>Next</b><i>Continued tuning from daily use — no new modules until the current ones are second nature.</i></div>' +
       '</div>' +
-      '<div class="paste-hint">Build V2.0 · Workout Renaming, Individual Lift Sets, Category Weights, Court Spots, Play Builder &amp; Mobile Sync.</div>' +
+      '<div class="paste-hint">Build V3.0 · Habits &amp; Goals, academic-year school tracking, and Mobile Sync inside System Settings.</div>' +
     '</div>';
 }
 function renderSettingsBackup(){
@@ -12255,7 +11391,6 @@ function renderSettingsBackup(){
       ['Assignments', (state.school || []).length],
       ['Goals', (state.goals || []).length],
       ['Habits', (state.habits || []).length],
-      ['Recruiting targets', (state.recruiting || []).length],
       ['Saved plays', (((state.film || {}).plays) || []).length]
     ];
     el.innerHTML =
@@ -12388,6 +11523,7 @@ if (state.settings.landingTab && state.settings.landingTab !== 'last') state.set
 bindEvents();
 bindGlobalActions();
 populateLiftSplits();
+resetSchoolYearField();
 applyTab();
 renderAll();
 startClock();
