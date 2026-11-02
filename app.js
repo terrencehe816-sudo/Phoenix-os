@@ -437,7 +437,7 @@ const SEED_CLASSES = [
 const SEED_ASSIGNMENTS = [
   { course: 'Pre-Calculus 11', assignment: 'Ch. 1.1 Quiz', dueDate: '2026-09-17',
     category: 'Quiz', priority: 'Medium', status: 'Completed',
-    semester: 's1', weight: 1, score: 100 }
+    semester: 's1', weight: 1, score: 100, year: 'g10' }
 ];
 const SEED_PRESETS = {
   basketball: [{
@@ -749,7 +749,7 @@ function mergeState(p){
      current grade so they stay visible in the year filter instead of vanishing. */
   const legacyYear = SCHOOL_YEARS.some(y => y.key === (p.finance && p.finance.grade)) ? p.finance.grade : 'g10';
   const merged = {
-    version: 2,
+    version: APP_SCHEMA_VERSION,
     seedVersion: Number(p.seedVersion) || 0,
     habits:   Array.isArray(p.habits)   && p.habits.length   ? p.habits.map(h => ({ ...h, type: h.type || 'good', desc: h.desc || '', target: h.target ?? '', bucket: (h && typeof h.bucket === 'string' && h.bucket) ? h.bucket : habitBucketOf(h), createdAt: (h && typeof h.createdAt === 'string') ? h.createdAt : '' })) : d.habits,
     habitBuckets: Array.isArray(p.habitBuckets) && p.habitBuckets.length ? normalizeHabitBuckets(p.habitBuckets) : d.habitBuckets,
@@ -1036,6 +1036,412 @@ function updateUndoRedoButtons(){
    DATA MANAGEMENT — JSON backup + Supabase cloud sync (V2.0)
    ============================================================ */
 
+/* ============================================================
+   V3.0 IMPORT PIPELINE — legacy backups migrate instead of failing
+   A V2.x backup can still carry Recruiting CRM contacts, shooting
+   badges and the lifetime badge vault, lift tank tiers, shooting
+   records, the BC -> NCAA track map and Export-to-Notion settings.
+   Every imported file is read through migrateImportedPayload(),
+   which strips those retired sections without blocking, maps school
+   rows onto the new academic years, folds Mobile Sync and Life Maxx
+   into their V3.0 homes, and returns a report shown to the user
+   once the import has landed.
+   ============================================================ */
+const APP_SCHEMA_VERSION = 3;
+
+const IMPORT_ARRAY_KEYS = ['habits', 'habitBuckets', 'school', 'classCats', 'goals', 'trash'];
+const IMPORT_OBJECT_KEYS = ['workouts', 'logs', 'todos', 'records', 'film', 'finance', 'life', 'mental', 'live', 'routine', 'shotMap', 'settings', 'presets', 'extracurricular', 'recovery', 'ncaa'];
+const IMPORT_SECTION_LABELS = {
+  habits: 'Habits', habitBuckets: 'Habit categories', school: 'Assignments',
+  classCats: 'Classes', goals: 'Goals', trash: 'Recently deleted',
+  recruiting: 'Recruiting CRM', workouts: 'Workout sessions', logs: 'Daily logs',
+  todos: 'To-do matrix', records: 'Gym PRs & records', film: 'Film & playbook',
+  finance: 'Finance', life: 'Habits & Goals', mental: 'Journal & study',
+  live: 'Live session', routine: 'Daily routine', shotMap: 'Shot chart',
+  settings: 'Settings', presets: 'Workout presets', extracurricular: 'Volunteer hours',
+  recovery: 'Recovery scores', ncaa: 'BC -> NCAA track map'
+};
+
+/* Sections V3.0 retired: discarded without an error, then listed in the report. */
+const IMPORT_REMOVED_KEYS = [
+  ['recruiting', 'Recruiting CRM'],
+  ['recruitingContacts', 'Recruiting CRM'],
+  ['recruitLog', 'Recruiting CRM'],
+  ['badges', 'Shooting badges'],
+  ['shootingBadges', 'Shooting badges'],
+  ['badgeVault', 'Lifetime badge vault'],
+  ['lifetimeBadges', 'Lifetime badge vault'],
+  ['shotRecords', 'Shooting records'],
+  ['shotRecord', 'Shooting records'],
+  ['ncaa', 'BC -> NCAA track map'],
+  ['ncaaMap', 'BC -> NCAA track map'],
+  ['ncaaPaths', 'BC -> NCAA track map'],
+  ['notion', 'Export to Notion settings'],
+  ['notionExport', 'Export to Notion settings'],
+  ['notionSettings', 'Export to Notion settings'],
+  ['exportSettings', 'Export to Notion settings']
+];
+const IMPORT_REMOVED_SETTINGS = [
+  ['notionExport', 'Export to Notion settings'],
+  ['notionEnabled', 'Export to Notion settings'],
+  ['notionDatabase', 'Export to Notion settings'],
+  ['notionToken', 'Export to Notion settings'],
+  ['notionPageId', 'Export to Notion settings'],
+  ['recruitFilter', 'Recruiting CRM'],
+  ['recruitDivFilter', 'Recruiting CRM'],
+  ['recruitWishOnly', 'Recruiting CRM'],
+  ['recruitStatus', 'Recruiting CRM'],
+  ['staleDays', 'Recruiting CRM'],
+  ['badgeVaultView', 'Lifetime badge vault'],
+  ['rankTierView', 'Lift tank tiers'],
+  ['shotRecordView', 'Shooting records']
+];
+
+function isPlainObject(v){ return !!v && typeof v === 'object' && !Array.isArray(v); }
+function importUnits(n, one, many){ return n + ' ' + (n === 1 ? one : (many || one + 's')); }
+function importCount(v){
+  if (Array.isArray(v)) return v.length;
+  if (isPlainObject(v)) return Object.keys(v).length;
+  return (v === undefined || v === null || v === false || v === '') ? 0 : 1;
+}
+/* Non-throwing deep copy. Nulls, functions and NaN never reach mergeState. */
+function importSafe(value, depth){
+  if (depth > 12) return null;
+  if (Array.isArray(value)){
+    return value.map(v => importSafe(v, depth + 1)).filter(v => v !== null && v !== undefined);
+  }
+  if (isPlainObject(value)){
+    const out = {};
+    Object.entries(value).forEach(([k, v]) => {
+      const safe = importSafe(v, depth + 1);
+      if (safe !== undefined) out[k] = safe;
+    });
+    return out;
+  }
+  if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
+  if (typeof value === 'string' || typeof value === 'boolean') return value;
+  return null;
+}
+/* Legacy year spellings -> g10 | g11 | g12 (V3.0 academic-year keys). */
+function importYearKey(v){
+  if (v === undefined || v === null) return '';
+  const raw = String(v).trim().toLowerCase();
+  if (!raw) return '';
+  if (['g10', 'g11', 'g12'].includes(raw)) return raw;
+  const m = raw.match(/^(?:grade\s*|gr\s*)?(9|10|11|12)$/);
+  if (m) return 'g' + Math.max(10, parseInt(m[1], 10));
+  if (/^freshman$/.test(raw)) return 'g10';
+  if (/^sophomore$|^soph$/.test(raw)) return 'g10';
+  if (/^junior$|^jr$/.test(raw)) return 'g11';
+  if (/^senior$|^sr$/.test(raw)) return 'g12';
+  return '';
+}
+function importTabLabel(tab){
+  const labels = {
+    dashboard: 'Dashboard', routine: 'Daily Routine', log: 'Workouts',
+    school: 'School', film: 'Film', finance: 'Finance',
+    life: 'Habits & Goals', settings: 'System Settings'
+  };
+  return labels[tab] || tab;
+}
+
+/* Pulls the state + preset blobs out of any export shape Phoenix OS wrote. */
+function extractImportSource(raw){
+  if (!isPlainObject(raw)) throw new Error('That file is not a Phoenix OS backup.');
+  const markers = ['workouts', 'logs', 'school', 'goals', 'habits', 'settings', 'classCats', 'film', 'finance', 'presets', 'todos', 'routine', 'life'];
+  let candidate = null;
+  let presets = null;
+  [raw.keys, raw.data].forEach(box => {
+    if (!isPlainObject(box)) return;
+    if (!candidate && isPlainObject(box[LS_KEY])) candidate = box[LS_KEY];
+    if (!presets && isPlainObject(box[WORKOUT_PRESETS_KEY])) presets = box[WORKOUT_PRESETS_KEY];
+  });
+  if (!candidate && isPlainObject(raw.state)) candidate = raw.state;
+  if (!candidate && isPlainObject(raw.data) && markers.some(k => k in raw.data)) candidate = raw.data;
+  if (!candidate && markers.some(k => k in raw)) candidate = raw;
+  if (!candidate) throw new Error('No Phoenix OS data found in that file.');
+  if (!markers.some(k => k in candidate)) throw new Error('Backup structure is incomplete — open a file exported by Phoenix OS.');
+  const version = String(
+    raw.schemaVersion || raw.version ||
+    (raw.app && raw.app.version) || candidate.version || ''
+  ).trim();
+  return { candidate, presets, version };
+}
+
+/* The whole pipeline: strip, re-home, sanitize, merge, describe. Never throws
+   for a legacy key; only a file with no Phoenix OS data at all is refused. */
+function migrateImportedPayload(raw){
+  const report = {
+    fileVersion: '',
+    target: 'V3.0',
+    sections: [],
+    migrated: [],
+    stripped: [],
+    warnings: []
+  };
+  const src = extractImportSource(raw);
+  report.fileVersion = src.version || '';
+  const candidate = importSafe(src.candidate, 0);
+  if (!isPlainObject(candidate)) throw new Error('No Phoenix OS data found in that file.');
+  const p = {};
+  const addStripped = (label, count) => {
+    const row = report.stripped.find(r => r.label === label);
+    if (row) row.count += count || 0;
+    else report.stripped.push({ label, count: count || 0 });
+  };
+
+  /* --- type-safe section copy --- */
+  IMPORT_ARRAY_KEYS.forEach(k => {
+    if (!(k in candidate)) return;
+    if (Array.isArray(candidate[k])) p[k] = candidate[k].filter(isPlainObject);
+    else report.warnings.push((IMPORT_SECTION_LABELS[k] || k) + ' could not be read — that section was skipped.');
+  });
+  IMPORT_OBJECT_KEYS.forEach(k => {
+    if (!(k in candidate)) return;
+    if (isPlainObject(candidate[k])) p[k] = candidate[k];
+    else report.warnings.push((IMPORT_SECTION_LABELS[k] || k) + ' could not be read — that section was skipped.');
+  });
+  if (Number.isFinite(candidate.seedVersion)) p.seedVersion = candidate.seedVersion;
+
+  /* Legacy grade spellings ('senior', 12, 'Grade 11') repair the Finance year
+     that also supplies the fallback academic year for school rows. */
+  if (isPlainObject(p.finance) && p.finance.grade !== undefined){
+    p.finance = { ...p.finance, grade: importYearKey(p.finance.grade) || 'g10' };
+  }
+
+  /* --- Life Maxx -> Habits & Goals (before unknown-key accounting) --- */
+  let lifeAliasCount = 0;
+  ['lifeMaxx', 'life_maxx', 'lifemaxx', 'lifeMaxxData'].forEach(k => {
+    const box = candidate[k];
+    if (!isPlainObject(box)) return;
+    if (!isPlainObject(p.life)) p.life = {};
+    Object.entries(box).forEach(([sub, value]) => {
+      if (p.life[sub] === undefined) p.life[sub] = importSafe(value, 0);
+      lifeAliasCount++;
+    });
+  });
+
+  /* --- removed features (silent) --- */
+  IMPORT_REMOVED_KEYS.forEach(([key, label]) => {
+    if (!(key in candidate)) return;
+    addStripped(label, importCount(candidate[key]));
+    delete p[key];
+    delete candidate[key];
+  });
+  let mobileFolded = false;
+  ['mobile', 'mobileSync', 'mobileData', 'mobileSyncData'].forEach(k => {
+    if (!(k in candidate)) return;
+    mobileFolded = true;
+  });
+  if (isPlainObject(p.records)){
+    if (Array.isArray(p.records.shooting)){
+      addStripped('Shooting records', p.records.shooting.length);
+    } else if (p.records.shooting !== undefined){
+      report.warnings.push('Shooting records could not be read and were skipped.');
+    }
+    delete p.records.shooting;
+    if (Array.isArray(p.records.rankTiers)){
+      addStripped('Lift tank tiers', p.records.rankTiers.length);
+    } else if (p.records.rankTiers !== undefined){
+      report.warnings.push('Lift tank tiers could not be read and were skipped.');
+    }
+    delete p.records.rankTiers;
+    ['badges', 'badgeVault', 'lifetimeBadges', 'shootingBadges', 'shotRecords'].forEach(k => {
+      if (!(k in p.records)) return;
+      addStripped('Shooting badges', importCount(p.records[k]));
+      delete p.records[k];
+    });
+  }
+  if (isPlainObject(p.settings)){
+    IMPORT_REMOVED_SETTINGS.forEach(([key, label]) => {
+      if (!(key in p.settings)) return;
+      addStripped(label, 0);
+      delete p.settings[key];
+    });
+  }
+
+  /* --- school rows -> academic years --- */
+  if (Array.isArray(p.school)){
+    const gradeYear = importYearKey((p.finance && p.finance.grade) || candidate.grade);
+    const fallback = gradeYear || 'g10';
+    let recovered = 0;
+    let inherited = 0;
+    p.school = p.school.map(a => {
+      const explicit = importYearKey(a.year);
+      const legacy = explicit || importYearKey(a.grade) ||
+        importYearKey(a.academicYear) || importYearKey(a.schoolYear) || importYearKey(a.yearLevel);
+      const year = legacy || fallback;
+      if (!explicit && legacy) recovered++;
+      if (!explicit && !legacy) inherited++;
+      const row = {
+        ...a,
+        course: a.course || a.class || a.subject || '',
+        assignment: a.assignment || a.name || a.title || '',
+        year
+      };
+      delete row.grade;
+      delete row.academicYear;
+      delete row.schoolYear;
+      delete row.yearLevel;
+      delete row.class;
+      delete row.subject;
+      return row;
+    });
+    if (recovered){
+      report.migrated.push({
+        label: 'School years',
+        text: importUnits(recovered, 'assignment', 'assignments') + ' recovered a year from earlier fields'
+      });
+    }
+    if (inherited){
+      report.migrated.push({
+        label: 'School years',
+        text: importUnits(inherited, 'assignment', 'assignments') + ' had no year and inherited ' + schoolYearLabel(fallback)
+      });
+    }
+  }
+
+  /* --- settings + navigation --- */
+  const settings = isPlainObject(p.settings) ? p.settings : (p.settings = {});
+  let legacyTab = typeof settings.activeTab === 'string' ? settings.activeTab : '';
+  if (!legacyTab && typeof settings.tab === 'string') legacyTab = settings.tab;
+  delete settings.tab;
+  if (legacyTab === 'mobile'){
+    settings.activeTab = 'settings';
+    settings.settingsView = 'mobile';
+    mobileFolded = true;
+  } else if (legacyTab && !NAV_SECTIONS.includes(legacyTab)){
+    const mapped = LEGACY_TAB_MAP[legacyTab];
+    if (mapped){
+      settings.activeTab = mapped;
+      if (legacyTab === 'goals') settings.lifeView = 'goals';
+      report.migrated.push({
+        label: 'Navigation',
+        text: 'Opened on "' + legacyTab + '", now ' + importTabLabel(mapped)
+      });
+    } else {
+      settings.activeTab = 'dashboard';
+      report.warnings.push('Unknown start tab "' + legacyTab + '" — opening the Dashboard instead.');
+    }
+  }
+  let msyncPrefs = 0;
+  ['msyncMode', 'msyncScope', 'mobileSyncMode', 'mobileSyncScope', 'mobileTab', 'mobileView'].forEach(k => {
+    if (!(k in settings)) return;
+    delete settings[k];
+    msyncPrefs++;
+  });
+  if (mobileFolded || msyncPrefs){
+    report.migrated.push({
+      label: 'Mobile Sync',
+      text: 'Moved under System Settings → Mobile Sync'
+    });
+  }
+
+  /* --- Life Maxx naming on to-dos --- */
+  let lifeTodos = 0;
+  if (isPlainObject(p.todos)){
+    Object.keys(p.todos).forEach(key => {
+      if (!Array.isArray(p.todos[key])){ delete p.todos[key]; return; }
+      p.todos[key] = p.todos[key].filter(isPlainObject).map(t => {
+        if (t.category === 'Life Maxx'){ lifeTodos++; return { ...t, category: 'Habits & Goals' }; }
+        return t;
+      });
+    });
+  }
+  if (lifeTodos){
+    report.migrated.push({
+      label: 'Life Maxx',
+      text: importUnits(lifeTodos, 'to-do', 'to-dos') + ' moved to Habits & Goals'
+    });
+  }
+  if (lifeAliasCount){
+    report.migrated.push({
+      label: 'Life Maxx',
+      text: 'Legacy data merged into Habits & Goals'
+    });
+  }
+
+  /* --- unknown fields --- */
+  const known = new Set([...IMPORT_ARRAY_KEYS, ...IMPORT_OBJECT_KEYS, ...IMPORT_REMOVED_KEYS.map(pair => pair[0]), 'version', 'seedVersion', 'schemaVersion',
+    'lifeMaxx', 'life_maxx', 'lifemaxx', 'lifeMaxxData', 'mobile', 'mobileSync', 'mobileData', 'mobileSyncData']);
+  const unknown = Object.keys(candidate).filter(k => !known.has(k));
+  if (unknown.length){
+    report.warnings.push(
+      importUnits(unknown.length, 'unrecognised field was', 'unrecognised fields were') +
+      ' left out (' + unknown.slice(0, 4).join(', ') + (unknown.length > 4 ? '…' : '') + ').'
+    );
+  }
+
+  /* --- merge through the single sanitizer every load already trusts --- */
+  if (src.presets && !p.presets) p.presets = importSafe(src.presets, 0);
+  let next;
+  try {
+    next = mergeState(p);
+  } catch (err){
+    console.warn('Import merge failed, retrying with a clean base', err);
+    report.warnings.push('Part of this backup could not be read, so those sections were reset to defaults.');
+    try { next = mergeState({ version: APP_SCHEMA_VERSION }); }
+    catch (err2){ next = defaultState(); }
+  }
+  if (src.presets){
+    try { next.presets = mergePresetCollections(next.presets, importSafe(src.presets, 0)); } catch (e){}
+  }
+
+  /* --- what survived --- */
+  const counts = {
+    'Workout sessions': backupSessionCount(next),
+    'Assignments': (next.school || []).length,
+    'Classes': (next.classCats || []).length,
+    'Goals': (next.goals || []).length,
+    'Habits': (next.habits || []).length,
+    'To-do items': Object.values(next.todos || {}).reduce((n, rows) => n + (Array.isArray(rows) ? rows.length : 0), 0),
+    'Finance entries': (next.finance && ((next.finance.transactions || []).length + (next.finance.savings || []).length + (next.finance.investments || []).length)) || 0,
+    'Film & playbook': (next.film && ((next.film.games || []).length + (next.film.plays || []).length)) || 0,
+    'Daily logs': Object.keys(next.logs || {}).length,
+    'Workout presets': Object.values(next.presets || {}).reduce((n, rows) => n + (Array.isArray(rows) ? rows.length : 0), 0)
+  };
+  report.sections = Object.entries(counts)
+    .filter(([, n]) => n > 0)
+    .map(([label, count]) => ({ label, count }));
+
+  return {
+    state: next,
+    exportedAt: typeof raw.exportedAt === 'string' ? raw.exportedAt : '',
+    report
+  };
+}
+
+/* Friendly post-import summary (System Settings → Data & Sync). */
+function showImportReport(report){
+  openModal('Import report');
+  const body = document.getElementById('modal-body');
+  if (!body || !report) return;
+  const row = (label, value) => '<div class="import-row"><span>' + esc(label) + '</span><b>' + esc(value) + '</b></div>';
+  const fromLabel = report.fileVersion ? 'V' + String(report.fileVersion).replace(/^v/i, '') : 'an older build';
+  let html = '<div class="import-report">';
+  html += '<p class="page-sub">Read <b>' + esc(report.fileName || 'your backup') + '</b> from ' + esc(fromLabel) +
+    ' and upgraded it to <b>V3.0</b>. Nothing was rejected — everything below has already been applied.</p>';
+  html += '<div class="import-block"><h4>Brought over</h4>';
+  html += report.sections.length
+    ? report.sections.map(s => row(s.label, s.count)).join('')
+    : '<p class="import-note">No tracked records were found in this file.</p>';
+  html += '</div>';
+  if (report.migrated.length){
+    html += '<div class="import-block"><h4>Updated for V3.0</h4>' +
+      report.migrated.map(m => row(m.label, m.text)).join('') + '</div>';
+  }
+  html += '<div class="import-block"><h4>Removed for V3.0</h4>';
+  html += report.stripped.length
+    ? report.stripped.map(s => row(s.label, s.count ? importUnits(s.count, 'entry', 'entries') + ' removed' : 'removed')).join('')
+    : '<p class="import-note">Nothing needed removing — this backup was already V3.0 clean.</p>';
+  html += '</div>';
+  if (report.warnings.length){
+    html += '<div class="import-block"><h4>Notices</h4>' +
+      report.warnings.map(w => '<p class="import-note">• ' + esc(w) + '</p>').join('') + '</div>';
+  }
+  html += '<button class="btn" onclick="closeModal()">Done</button></div>';
+  body.innerHTML = html;
+}
 /* ---------- Export (JSON file) ---------- */
 function backupEnvelope(){
   flushSave();
@@ -1045,7 +1451,8 @@ function backupEnvelope(){
   try { presets = JSON.parse(localStorage.getItem(WORKOUT_PRESETS_KEY) || 'null') || presets; } catch (e){}
   return {
     app: 'PHOENIX OS',
-    version: '2.0',
+    version: '3.0',
+    schemaVersion: APP_SCHEMA_VERSION,
     exportedAt: new Date().toISOString(),
     keys: {
       [LS_KEY]: primary,
@@ -1087,26 +1494,11 @@ function backupSessionCount(data){
   }, 0);
 }
 /* Accepts the V2.0 envelope, the Mobile Sync JSON shape, and raw V1/V2 saves. */
+/* Accepts the V2.0 envelope, the Mobile Sync JSON shape, and raw V1/V2 saves.
+   Every shape goes through migrateImportedPayload() so retired sections are
+   stripped, school years are restored and the user gets a report. */
 function backupStateFromPayload(raw){
-  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) throw new Error('That file is not a Phoenix OS backup.');
-  let candidate = null;
-  let presets = null;
-  [raw.keys, raw.data].forEach(box => {
-    if (!box || typeof box !== 'object' || Array.isArray(box)) return;
-    if (box[LS_KEY] && typeof box[LS_KEY] === 'object' && !Array.isArray(box[LS_KEY])) candidate = box[LS_KEY];
-    if (box[WORKOUT_PRESETS_KEY]) presets = box[WORKOUT_PRESETS_KEY];
-  });
-  if (!candidate && raw.state && typeof raw.state === 'object' && !Array.isArray(raw.state)) candidate = raw.state;
-  const markers = ['workouts', 'logs', 'school', 'goals', 'habits', 'settings', 'classCats', 'film', 'finance'];
-  if (!candidate && markers.some(k => k in raw)) candidate = raw;
-  if (!candidate) throw new Error('No Phoenix OS data found in that file.');
-  if (markers.filter(k => k in candidate).length < 2) throw new Error('Backup structure is incomplete — open a file exported by Phoenix OS.');
-  if (candidate.workouts !== undefined && (typeof candidate.workouts !== 'object' || Array.isArray(candidate.workouts))) throw new Error('Backup workouts are malformed.');
-  if (candidate.logs !== undefined && (typeof candidate.logs !== 'object' || Array.isArray(candidate.logs))) throw new Error('Backup logs are malformed.');
-  if (candidate.settings !== undefined && (typeof candidate.settings !== 'object' || Array.isArray(candidate.settings))) throw new Error('Backup settings are malformed.');
-  const next = mergeState(candidate);
-  if (presets) next.presets = mergePresetCollections(next.presets, presets);
-  return { state: next, exportedAt: typeof raw.exportedAt === 'string' ? raw.exportedAt : '' };
+  return migrateImportedPayload(raw);
 }
 function importData(event){
   const input = event && event.target;
@@ -1123,10 +1515,16 @@ function importBackupFile(file, done){
     try {
       const parsed = JSON.parse(String(reader.result || ''));
       const incoming = backupStateFromPayload(parsed);
+      const report = incoming.report;
+      report.fileName = file.name;
       const sessions = backupSessionCount(incoming.state);
       const assignments = (incoming.state.school || []).length;
       const summary = sessions + ' workout session' + (sessions === 1 ? '' : 's') + ' · ' + assignments + ' assignment' + (assignments === 1 ? '' : 's');
-      if (!window.confirm('Replace this device\u2019s data with "' + file.name + '"?\n\nContains ' + summary + '\n\nUndo (Ctrl+Z) puts the current data back.')){
+      const legacyNote = report.stripped.length
+        ? '\n\n' + report.stripped.length + ' retired V2 section' + (report.stripped.length === 1 ? '' : 's') +
+          ' will be migrated out: ' + report.stripped.map(r => r.label).join(', ') + '.'
+        : '';
+      if (!window.confirm('Replace this device\u2019s data with "' + file.name + '"?\n\nContains ' + summary + legacyNote + '\n\nUndo (Ctrl+Z) puts the current data back.')){
         toast('Import cancelled');
         return;
       }
@@ -1134,8 +1532,10 @@ function importBackupFile(file, done){
       state = incoming.state;
       flushSave();
       renderAll();
-      closeModal();
-      toast('✓ Data imported — ' + summary);
+      showImportReport(report);
+      toast(report.stripped.length || report.migrated.length
+        ? '✓ Imported — upgraded to V3.0'
+        : '✓ Data imported — ' + summary);
     } catch (err){
       const msg = err instanceof SyntaxError
         ? 'That file is not valid JSON.'
@@ -1147,7 +1547,6 @@ function importBackupFile(file, done){
   };
   reader.readAsText(file);
 }
-
 /* ---------- Cloud connection (Supabase) ---------- */
 let syncBusy = false;
 function readSyncConfig(){
