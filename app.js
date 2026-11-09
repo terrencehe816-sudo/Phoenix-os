@@ -666,10 +666,13 @@ function defaultState(){
       scouting: { videoUrl: '', title: '', notes: [], matchups: [] },
       playbook: []       // { id, cat, name, url, notes, mastery }
     },
-    live: {              // LIVE WORKOUT MODE (in-progress session buffer)
-      active: false, dateKey: '', location: 'DT', note: '', drill: '',
-      startedAt: 0, pausedAt: 0, drillStartAt: 0, restEndsAt: 0,
-      restPreset: 30, category: '3-PT', mentalDismissed: false, timerOn: true, chunks: []
+    /* LIVE WORKOUT MODE — one independent buffer per discipline. A lifting
+       session and a basketball shooting session never share counters, drills or
+       clocks; state.live.env says which buffer the overlay is currently on. */
+    live: {
+      env: 'basketball',
+      basketball: { active: false, dateKey: '', location: 'DT', note: '', drill: '', startedAt: 0, pausedAt: 0, drillStartAt: 0, restEndsAt: 0, restPreset: 30, category: '3-PT', mentalDismissed: false, timerOn: true, chunks: [], plan: null },
+      lift: { active: false, dateKey: '', location: '', note: '', startedAt: 0, pausedAt: 0, restEndsAt: 0, restPreset: 90, timerOn: true, mode: 'gym', exercise: '', weight: '', reps: '', rpe: '', entries: [], plan: null }
     },
     recovery: {},        // dateKey -> 1-10 CNS / sleep recovery score
     presets: { basketball: [], lift: [], strength: [] },
@@ -738,7 +741,9 @@ function defaultState(){
       savedRangeFrom: '',     // custom saved-window start ('' = default 7 days back)
       savedRangeTo: '',       // custom saved-window end ('' = today)
       workoutDates: { lift: '', basketball: '', strength: '' },  // per-discipline log dates ('' = follow logDate)
-      habitSeed: 0            // bucket-seed marker (see seedHabitBuckets)
+      habitSeed: 0,           // bucket-seed marker (see seedHabitBuckets)
+      liveMode: 'gym',        // Live Workout location: gym | home (equipment defaults)
+      liveModeByTemplate: {}  // workout template name -> last Live Workout location
     }
   };
 }
@@ -775,31 +780,7 @@ function mergeState(p){
           .filter(([k, v]) => /^\d{4}-\d{2}-\d{2}$/.test(k) && Number.isFinite(parseFloat(v)))
           .map(([k, v]) => [k, clamp(Math.round(parseFloat(v)), 1, 10)]))
       : {},
-    live: p.live && typeof p.live === 'object'
-      ? {
-          active: !!p.live.active,
-          timerOn: p.live.timerOn === undefined ? true : !!p.live.timerOn,
-          dateKey: p.live.dateKey || '',
-          location: p.live.location || 'DT',
-          note: p.live.note || '',
-          drill: p.live.drill || '',
-          startedAt: Number(p.live.startedAt) || 0,
-          pausedAt: Number(p.live.pausedAt) || 0,
-          drillStartAt: Number(p.live.drillStartAt) || 0,
-          restEndsAt: Number(p.live.restEndsAt) || 0,
-          restPreset: REST_PRESETS.includes(p.live.restPreset) ? p.live.restPreset : 30,
-          category: LIVE_CATEGORIES.includes(p.live.category) ? p.live.category : '3-PT',
-          mentalDismissed: !!p.live.mentalDismissed,
-          chunks: Array.isArray(p.live.chunks)
-            ? p.live.chunks.map(c => ({
-                name: c.name || '',
-                category: LIVE_CATEGORIES.includes(c.category) ? c.category : 'Other',
-                setType: c.setType || 'Shooting',
-                attempts: num(c.attempts), makes: num(c.makes), reps: num(c.reps)
-              }))
-            : []
-        }
-      : d.live,
+    live: normalizeLiveState(p.live),
     mental: p.mental && typeof p.mental === 'object'
       ? {
           weekly: (p.mental.weekly && typeof p.mental.weekly === 'object') ? p.mental.weekly : {},
@@ -2688,7 +2669,7 @@ function wsEnvEmptyHtml(env){
     '<div class="ws-actions">' +
       '<button class="btn" style="background:' + meta.color + ';border-color:' + meta.color + ';color:#0b0c10" onclick="openPresetChooser(\'' + env + '\')">' + meta.icon + ' Load ' + esc(meta.label) + ' Preset</button>' +
       '<button class="btn ghost" onclick="openPresetManager(\'' + env + '\')">⚙ Manage Presets</button>' +
-      (env === 'basketball' ? '<button class="btn live-start" onclick="startLiveWorkout()">🔴 Start Live Workout</button>' : '') +
+      (env === 'basketball' || env === 'lift' ? '<button class="btn live-start" onclick="startLiveWorkout(\'' + env + '\')">🔴 Start Live Workout</button>' : '') +
     '</div>' +
   '</div>';
 }
@@ -2739,7 +2720,7 @@ function wsSavedListHtml(env, key, entries){
         '</span>' +
       '</span>' +
       '<button class="btn sm" style="background:' + meta.color + ';border-color:' + meta.color + ';color:#0b0c10" onclick="openPresetChooser(\'' + env + '\')">+ New ' + esc(meta.label) + ' Session</button>' +
-      (env === 'basketball' ? '<button class="btn sm" onclick="startLiveWorkout()">🔴 Live</button>' : '') +
+      (env === 'basketball' ? '<button class="btn sm" onclick="startLiveWorkout(\'basketball\')">🔴 Live</button>' : '') +
     '</div>' +
     (rows || wsEnvEmptyHtml(env)) +
   '</div>';
@@ -2769,7 +2750,7 @@ function wsEditorHtml(s, env, key){
       '<button class="btn sm ghost" onclick="changeWsPreset()">⚡ Change</button>' +
       '<button class="btn sm ghost" onclick="renameDraftSession()" title="Rename this workout">🏷 Rename</button>' +
       '<button class="btn sm ghost" onclick="createPresetFromWorkout()">＋ Create Preset</button>' +
-      (s.type === 'basketball' ? '<button class="btn sm" style="border-color:rgba(255,77,94,.6);color:#ff4d5e" onclick="startLiveWorkout()">🔴 Live Mode</button>' : '') +
+      (s.type === 'basketball' ? '<button class="btn sm" style="border-color:rgba(255,77,94,.6);color:#ff4d5e" onclick="startLiveWorkout(\'basketball\')">🔴 Live Mode</button>' : '') +
     '</div>' +
     '<div class="ws-body">' + body + '</div>' +
     addBtn +
@@ -9764,34 +9745,190 @@ const LIVE_CAT_META = {
   'Other': { label: 'Other / Form', setType: 'Shooting',    spot: '',           color: '#45a29e' }
 };
 const REST_PRESETS = [30, 60, 90];
+/* ---------- Live session location (Normal Gym vs Home Gym) ----------
+   The launch flow asks where the session is happening before the tracking
+   screen opens, because the equipment defaults differ: a commercial gym means a
+   standard 45 lb bar with conventional jumps, while a home setup runs a
+   fractional plate calculator off its own bar/handle base weight. The choice is
+   remembered per workout template so "Morning Lift" reopens where it last ran. */
+const LIVE_MODE_KEYS = ['gym', 'home'];
+const LIVE_MODES = {
+  gym: {
+    key: 'gym', label: 'Normal Gym', icon: '🏋️',
+    blurb: 'Standard machines, fixed dumbbells, standard 45 lb Olympic barbells, direct weight inputs.',
+    bar: 45, collar: 0, minJump: 5, fractional: false,
+    plates: [45, 35, 25, 10, 5, 2.5]
+  },
+  home: {
+    key: 'home', label: 'Home Gym', icon: '🏠',
+    blurb: 'Fractional plate calculator (5.5 lb, 3.5 lb, etc.), custom bar/handle base weights, symmetrical load balancing.',
+    bar: 45, collar: 0, minJump: 2.5, fractional: true,
+    plates: [45, 35, 25, 10, 5.5, 3.5, 2.5, 1.25]
+  }
+};
+function liveModeKey(v){ return LIVE_MODE_KEYS.includes(v) ? v : 'gym'; }
+function liveModeMeta(v){ return LIVE_MODES[liveModeKey(v)]; }
+function liveModeLabel(v){ return liveModeMeta(v).label; }
+function liveSavedModes(){
+  const m = state.settings && state.settings.liveModeByTemplate;
+  return (m && typeof m === 'object' && !Array.isArray(m)) ? m : {};
+}
+/* The template on screen right now — an unsaved draft first, then the latest
+   saved session for the active discipline. */
+function liveTemplateName(){
+  const draft = (typeof activeDraft === 'function') ? activeDraft() : null;
+  if (draft && String(draft.presetName || '').trim()) return String(draft.presetName).trim();
+  const key = (typeof activeWorkoutDate === 'function' && activeWorkoutDate()) || (typeof todayKey === 'function' ? todayKey() : '');
+  const s = (key && typeof latestSessionFor === 'function') ? latestSessionFor(key, (typeof activeEnv === 'function' ? activeEnv() : 'lift')) : null;
+  return String((s && s.presetName) || '').trim();
+}
+/* Pre-select order: the last location used for THIS template, then a template
+   hint (home/garage lifting), then the last location used anywhere. */
+function liveDefaultMode(template){
+  const name = String(template || liveTemplateName()).trim().toLowerCase();
+  const saved = liveSavedModes();
+  if (name && LIVE_MODE_KEYS.includes(saved[name])) return saved[name];
+  if (/\b(home|garage|basement|apartment|backyard)\b/.test(name)) return 'home';
+  /* Lifting templates (e.g. "Morning Lift") run on the home setup by default,
+     while shooting / skills templates assume the full gym. */
+  if (/\b(lift|lifting|weights?|barbell|squat|deadlift|bench)\b/.test(name)) return 'home';
+  if (/\b(shoot|shooting|hoops|skills|basketball|drills?|conditioning)\b/.test(name)) return 'gym';
+  const last = state.settings && state.settings.liveMode;
+  if (LIVE_MODE_KEYS.includes(last)) return last;
+  return 'gym';
+}
+function rememberLiveMode(mode, template){
+  const k = liveModeKey(mode);
+  if (!state.settings) state.settings = {};
+  state.settings.liveMode = k;
+  const name = String(template || '').trim().toLowerCase();
+  if (name){
+    const map = { ...liveSavedModes() };
+    map[name] = k;
+    state.settings.liveModeByTemplate = map;
+  }
+  return k;
+}
 const MENTAL_MIN_ATTEMPTS = 15;
 const MENTAL_PCT_THRESHOLD = 40;
 const MENTAL_MESSAGE = 'Stay calm, reset your base, focus on your follow-through — one rep at a time.';
 let liveTicker = null;
 let liveAudio = null;
 
-function liveState(){
+const LIVE_ENVS = ['basketball', 'lift'];
+function liveEnv(){
+  const e = state.live && state.live.env;
+  return LIVE_ENVS.includes(e) ? e : 'basketball';
+}
+function liveBuffer(env){
+  const key = LIVE_ENVS.includes(env) ? env : 'basketball';
   if (!state.live || typeof state.live !== 'object') state.live = {};
-  const l = state.live;
+  if (!state.live[key] || typeof state.live[key] !== 'object' || Array.isArray(state.live[key])) state.live[key] = {};
+  return state.live[key];
+}
+function liveSetEnv(env){
+  if (!LIVE_ENVS.includes(env)) return;
+  if (!state.live || typeof state.live !== 'object') state.live = {};
+  state.live.env = env;
+}
+/* Whichever discipline currently has a running buffer — used on boot so the
+   overlay reopens on the session that was actually in progress. */
+function liveActiveEnv(){
+  const hits = LIVE_ENVS.filter(e => !!liveBuffer(e).active);
+  if (!hits.length) return null;
+  hits.sort((a, b) => num(liveBuffer(b).startedAt) - num(liveBuffer(a).startedAt));
+  return hits[0];
+}
+function normalizeLiveBuffer(raw, env){
+  const src = (raw && typeof raw === 'object' && !Array.isArray(raw)) ? raw : {};
+  const base = {
+    active: !!src.active,
+    timerOn: src.timerOn === undefined ? true : !!src.timerOn,
+    dateKey: typeof src.dateKey === 'string' ? src.dateKey : '',
+    location: typeof src.location === 'string' ? src.location : (env === 'lift' ? '' : 'DT'),
+    note: typeof src.note === 'string' ? src.note : '',
+    startedAt: num(src.startedAt),
+    pausedAt: num(src.pausedAt),
+    restEndsAt: num(src.restEndsAt),
+    restPreset: REST_PRESETS.includes(src.restPreset) ? src.restPreset : (env === 'lift' ? 90 : 30),
+    mode: LIVE_MODE_KEYS.includes(src.mode) ? src.mode : 'gym',
+    plan: normalizeLivePlan(src.plan, env)
+  };
+  if (env === 'lift'){
+    return { ...base,
+      exercise: typeof src.exercise === 'string' ? src.exercise : '',
+      weight: src.weight === undefined || src.weight === null ? '' : src.weight,
+      reps: src.reps === undefined || src.reps === null ? '' : src.reps,
+      rpe: src.rpe === undefined || src.rpe === null ? '' : src.rpe,
+      entries: Array.isArray(src.entries)
+        ? src.entries.map(e => ({
+            exercise: String((e && e.exercise) || '').trim(),
+            weight: e && e.weight !== undefined ? e.weight : '',
+            reps: e && e.reps !== undefined ? e.reps : '',
+            rpe: e && e.rpe !== undefined ? e.rpe : ''
+          })).filter(e => e.exercise)
+        : []
+    };
+  }
+  return { ...base,
+    drill: typeof src.drill === 'string' ? src.drill : '',
+    drillStartAt: num(src.drillStartAt),
+    category: LIVE_CATEGORIES.includes(src.category) ? src.category : '3-PT',
+    mentalDismissed: !!src.mentalDismissed,
+    chunks: Array.isArray(src.chunks)
+      ? src.chunks.map(c => ({
+          name: (c && c.name) || '',
+          category: LIVE_CATEGORIES.includes(c && c.category) ? c.category : 'Other',
+          setType: (c && c.setType) || 'Shooting',
+          attempts: num(c && c.attempts), makes: num(c && c.makes), reps: num(c && c.reps)
+        }))
+      : []
+  };
+}
+/* Saves written before the split kept ONE flat buffer — that was the basketball
+   tracker, so it migrates straight into the basketball buffer with no data loss. */
+function normalizeLiveState(raw){
+  const src = (raw && typeof raw === 'object') ? raw : {};
+  const hasBuffers = LIVE_ENVS.some(e => src[e] && typeof src[e] === 'object');
+  const legacy = hasBuffers ? null : src;
+  return {
+    env: LIVE_ENVS.includes(src.env) ? src.env : 'basketball',
+    basketball: normalizeLiveBuffer(hasBuffers ? src.basketball : legacy, 'basketball'),
+    lift: normalizeLiveBuffer(hasBuffers ? src.lift : {}, 'lift')
+  };
+}
+function liveState(){
+  const l = liveBuffer(liveEnv());
+  const env = liveEnv();
   l.active = !!l.active;
-  if (!l.dateKey) l.dateKey = activeWorkoutDate() || todayKey();
-  if (typeof l.location !== 'string') l.location = 'DT';
+  if (!l.dateKey) l.dateKey = env === 'lift' ? (workoutDateFor('lift') || todayKey()) : (activeWorkoutDate() || todayKey());
+  if (typeof l.location !== 'string') l.location = env === 'lift' ? '' : 'DT';
   if (typeof l.note !== 'string') l.note = '';
-  if (typeof l.drill !== 'string') l.drill = '';
+  if (!LIVE_MODE_KEYS.includes(l.mode)) l.mode = liveModeKey(state.settings && state.settings.liveMode);
   if (!Number.isFinite(l.startedAt)) l.startedAt = 0;
   if (!Number.isFinite(l.pausedAt)) l.pausedAt = 0;
-  if (!Number.isFinite(l.drillStartAt) || !l.drillStartAt) l.drillStartAt = Date.now();
   if (!Number.isFinite(l.restEndsAt)) l.restEndsAt = 0;
-  if (!REST_PRESETS.includes(l.restPreset)) l.restPreset = 30;
+  if (!REST_PRESETS.includes(l.restPreset)) l.restPreset = env === 'lift' ? 90 : 30;
+  if (typeof l.timerOn !== 'boolean') l.timerOn = true;   // stopwatch is OPTIONAL — log reps with it off
+  if (!l.plan || typeof l.plan !== 'object' || !Array.isArray(l.plan.items)) l.plan = null;
+  if (env === 'lift'){
+    if (typeof l.exercise !== 'string') l.exercise = '';
+    if (l.weight === undefined || l.weight === null) l.weight = '';
+    if (l.reps === undefined || l.reps === null) l.reps = '';
+    if (l.rpe === undefined || l.rpe === null) l.rpe = '';
+    if (!Array.isArray(l.entries)) l.entries = [];
+    return l;
+  }
+  if (typeof l.drill !== 'string') l.drill = '';
+  if (!Number.isFinite(l.drillStartAt) || !l.drillStartAt) l.drillStartAt = Date.now();
   if (!LIVE_CATEGORIES.includes(l.category)) l.category = '3-PT';
   if (typeof l.mentalDismissed !== 'boolean') l.mentalDismissed = false;
-  if (typeof l.timerOn !== 'boolean') l.timerOn = true;   // stopwatch is OPTIONAL — log reps with it off
   if (!Array.isArray(l.chunks)) l.chunks = [];
   return l;
 }
 function liveRunning(){ const l = liveState(); return l.active && !l.pausedAt; }
 function liveSessionMs(){ const l = liveState(); if (!l.startedAt) return 0; return Math.max(0, (l.pausedAt || Date.now()) - l.startedAt); }
-function liveDrillMs(){ const l = liveState(); if (!l.active) return 0; return Math.max(0, (l.pausedAt || Date.now()) - l.drillStartAt); }
+function liveDrillMs(){ const l = liveState(); if (!l.active || liveEnv() === 'lift' || !Number.isFinite(l.drillStartAt)) return 0; return Math.max(0, (l.pausedAt || Date.now()) - l.drillStartAt); }
 function fmtClock(ms){ const t = Math.max(0, Math.round((ms || 0) / 1000)); return pad(Math.floor(t / 60)) + ':' + pad(t % 60); }
 function liveTotals(){
   const l = liveState();
@@ -9844,8 +9981,6 @@ function livePingRest(){
   liveInitAudio();
   liveBeep(880, 0.16, 0);
   liveBeep(1180, 0.22, 0.2);
-  const box = document.getElementById('live-rest-box');
-  if (box){ box.classList.remove('done'); void box.offsetWidth; box.classList.add('done'); }
 }
 function liveFlashStats(){
   const el = document.getElementById('live-stats');
@@ -9854,21 +9989,87 @@ function liveFlashStats(){
 }
 
 /* ---------- start / pause / rest / finish ---------- */
-function startLiveWorkout(){
-  snapshot();
+/* Basketball live mode lives in the Basketball section and starts straight away.
+   The Lifting section has its own, separate live session that asks where it is
+   happening first (the wrong equipment profile makes every plate loading wrong). */
+function startLiveWorkout(env){
+  const e = env === 'lift' ? 'lift' : 'basketball';
+  liveSetEnv(e);
   const l = liveState();
+  if (l.active){
+    openLiveOverlay();
+    startLiveTicker();
+    return;
+  }
+  if (e === 'lift'){ openLiveModeChooser(false); return; }
+  beginLiveWorkout();
+}
+/* switching=true is the mid-session gear in the live header: it never restarts
+   the clocks or drops counters, only the equipment profile changes. */
+function openLiveModeChooser(switching){
+  const l = liveState();
+  const mid = !!switching && l.active;
+  const template = liveTemplateName();
+  const recommended = mid ? liveModeKey(l.mode) : liveDefaultMode(template);
+  const card = m => {
+    const on = mid && liveModeKey(l.mode) === m.key;
+    return '<button type="button" class="live-mode-opt' + (on ? ' on' : '') + (recommended === m.key ? ' rec' : '') + '"' +
+        ' onclick="chooseLiveMode(\'' + m.key + '\', ' + (mid ? 'true' : 'false') + ')">' +
+      '<span class="lmo-icon">' + m.icon + '</span>' +
+      '<span class="lmo-main"><b>' + esc(m.label) + '</b>' +
+        '<i>' + esc(m.blurb) + '</i>' +
+        '<span class="lmo-eq">Bar ' + fmtNum(m.bar) + ' lb · plates ' + m.plates.join(' / ') + ' lb · ' +
+          (m.fractional ? 'fractional jumps' : 'standard jumps') + '</span></span>' +
+      '<span class="lmo-tag">' + (on ? 'CURRENT' : (recommended === m.key ? 'SUGGESTED' : 'SELECT')) + '</span>' +
+    '</button>';
+  };
+  openModal(mid ? 'Switch Workout Location' : 'Select Workout Location');
+  const body = document.getElementById('modal-body');
+  if (!body) return;
+  body.innerHTML =
+    '<p class="paste-hint" style="margin-bottom:12px">' + (mid
+      ? 'Switching mid-session keeps every set you have already logged — only the plate calculator and equipment defaults change.'
+      : 'Choose your setup for this lifting session to load the correct plate calculator &amp; equipment defaults.') + '</p>' +
+    '<div class="live-mode-grid">' + LIVE_MODE_KEYS.map(k => card(LIVE_MODES[k])).join('') + '</div>' +
+    (template ? '<p class="paste-hint" style="margin-top:10px">Workout: <b>' + esc(template) + '</b> — the last location used for this template is pre-selected.' : '') +
+    '<div style="display:flex;justify-content:flex-end;margin-top:14px">' +
+      '<button class="btn ghost" onclick="closeModal()">Cancel</button>' +
+    '</div>';
+}
+function chooseLiveMode(mode, switching){
+  const k = liveModeKey(mode);
+  const l = liveState();
+  snapshot();
+  rememberLiveMode(k, liveTemplateName());
+  l.mode = k;
+  save();
+  if (switching && l.active){
+    closeModal();
+    renderLive();
+    toast('⚙ Equipment profile: ' + liveModeMeta(k).label);
+    return;
+  }
+  closeModal();
+  beginLiveWorkout();
+}
+function beginLiveWorkout(){
+  const l = liveState();
+  const env = liveEnv();
+  if (env === 'basketball') snapshot();
   l.active = true;
   l.startedAt = Date.now();
   l.pausedAt = 0;
-  l.drillStartAt = Date.now();
+  if (env === 'basketball') l.drillStartAt = Date.now();
   l.restEndsAt = 0;
   l.mentalDismissed = false;
-  l.dateKey = activeWorkoutDate() || todayKey();
+  l.dateKey = env === 'lift' ? (workoutDateFor('lift') || todayKey()) : (activeWorkoutDate() || todayKey());
   liveInitAudio();
   save();
   openLiveOverlay();
   startLiveTicker();
-  toast('🔴 Live workout started — tap as you go');
+  toast(env === 'lift'
+    ? '🔴 Live lift started — ' + liveModeLabel(l.mode) + ' · log each set as you go'
+    : '🔴 Live workout started — tap as you go');
 }
 function openLiveOverlay(){
   renderLive();
@@ -9881,13 +10082,33 @@ function closeLiveOverlay(){
   if (el) el.classList.add('hidden');
   if (document.body && document.body.classList) document.body.classList.remove('live-mode');
 }
+/* The live session remembers which date it belongs to, so a workout finished
+   after midnight (or one logged late) can be filed on the day it happened.
+   It starts on the discipline's log date and can be changed mid-session. */
+function liveDateValue(){
+  const l = liveState();
+  const v = String(l.dateKey || '');
+  if (/^\d{4}-\d{2}-\d{2}$/.test(v)) return v;
+  return liveEnv() === 'lift' ? (workoutDateFor('lift') || todayKey()) : (activeWorkoutDate() || todayKey());
+}
+function setLiveDate(value){
+  const l = liveState();
+  const v = String(value || '');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(v)){ toast('Pick a valid date', 'error'); return; }
+  if (v === l.dateKey) return;
+  snapshotDebounced();
+  l.dateKey = v;
+  save();
+  renderLive();
+  toast('📅 This session will save to ' + fmtDate(v));
+}
 function toggleLivePause(){
   const l = liveState();
   if (!l.active) return;
   if (l.pausedAt){
     const delta = Date.now() - l.pausedAt;
     l.startedAt += delta;
-    l.drillStartAt += delta;
+    if (liveEnv() === 'basketball' && Number.isFinite(l.drillStartAt)) l.drillStartAt += delta;
     if (l.restEndsAt) l.restEndsAt += delta;
     l.pausedAt = 0;
     toast('▶ Session resumed');
@@ -9942,7 +10163,7 @@ function toggleLiveTimer(){
   l.timerOn = !l.timerOn;
   save();
   renderLive();
-  toast(l.timerOn ? '⏱ Timer on — session time will be recorded' : '⏱ Timer off — logging counters only');
+  toast(l.timerOn ? '⏱ Drill clock on' : '⏱ Drill clock off — logging counters only');
 }
 function setLiveField(field, value){
   const l = liveState();
@@ -9968,24 +10189,6 @@ function resetLiveDrillTimer(){
   renderLive();
   toast('Drill timer restarted');
 }
-function startLiveRest(sec){
-  const l = liveState();
-  if (!l.active) return;
-  const s = REST_PRESETS.includes(sec) ? sec : 30;
-  l.restPreset = s;
-  l.restEndsAt = (l.pausedAt || Date.now()) + s * 1000;
-  liveInitAudio();
-  save();
-  renderLive();
-  startLiveTicker();
-  toast('⏱ ' + s + 's rest started');
-}
-function skipLiveRest(){
-  const l = liveState();
-  l.restEndsAt = 0;
-  save();
-  renderLive();
-}
 function dismissMentalBanner(){ liveState().mentalDismissed = true; save(); renderLive(); }
 function removeLiveChunk(name, category){
   const l = liveState();
@@ -10004,6 +10207,8 @@ function cancelLiveWorkout(){
   l.pausedAt = 0;
   l.restEndsAt = 0;
   l.chunks = [];
+  l.entries = [];
+  l.plan = null;
   l.mentalDismissed = false;
   save();
   stopLiveTicker();
@@ -10013,6 +10218,7 @@ function cancelLiveWorkout(){
   toast('Live session discarded');
 }
 function finishLiveWorkout(){
+  if (liveEnv() === 'lift') return finishLiveLift();
   const l = liveState();
   const chunks = l.chunks.filter(c => num(c.attempts) > 0 || num(c.reps) > 0);
   if (!chunks.length){ toast('Log at least one make, miss or rep first', 'error'); return; }
@@ -10054,6 +10260,7 @@ function finishLiveWorkout(){
   l.restEndsAt = 0;
   l.mentalDismissed = false;
   l.chunks = [];
+  l.plan = null;
   save();
   stopLiveTicker();
   renderLive();
@@ -10066,25 +10273,8 @@ function liveTick(){
   const l = liveState();
   if (!l.active){ stopLiveTicker(); return; }
   if (l.timerOn){
-    const sc = document.getElementById('live-session-clock');
-    if (sc) sc.textContent = fmtClock(liveSessionMs());
     const dc = document.getElementById('live-drill-clock');
     if (dc) dc.textContent = fmtClock(liveDrillMs());
-  }
-  const rc = document.getElementById('live-rest-clock');
-  if (l.restEndsAt){
-    const left = l.restEndsAt - (l.pausedAt || Date.now());
-    if (left <= 0 && !l.pausedAt){
-      l.restEndsAt = 0;
-      save();
-      renderLive();
-      livePingRest();
-      toast('⏱ Rest complete — back to work');
-    } else if (rc){
-      rc.textContent = fmtClock(left);
-    }
-  } else if (rc){
-    rc.textContent = '--:--';
   }
 }
 function startLiveTicker(){
@@ -10094,13 +10284,400 @@ function startLiveTicker(){
 function stopLiveTicker(){
   if (liveTicker){ clearInterval(liveTicker); liveTicker = null; }
 }
+function liveLiftTotals(){
+  const l = liveState();
+  let sets = 0, reps = 0, volume = 0, top = 0;
+  const groups = [];
+  (l.entries || []).forEach(e => {
+    const w = num(e.weight), rp = num(e.reps);
+    sets++; reps += rp; volume += w * rp;
+    if (w > top) top = w;
+    const name = String(e.exercise || '').trim();
+    if (name && !groups.some(g => g.toLowerCase() === name.toLowerCase())) groups.push(name);
+  });
+  return { sets, reps, volume, top, groups };
+}
+/* Exercise suggestions come from whatever this lift session is already built
+   from, so live logging matches the template's wording. */
+function liveLiftExerciseOptions(){
+  const names = [];
+  const add = n => {
+    const k = String(n || '').trim();
+    if (k && !names.some(x => x.toLowerCase() === k.toLowerCase())) names.push(k);
+  };
+  const draft = activeDraft();
+  if (draft && draft.type === 'lift') (draft.exercises || []).forEach(r => add(r.name));
+  const saved = latestSessionFor(workoutDateFor('lift'), 'lift');
+  if (saved) (saved.exercises || []).forEach(r => add(r.name));
+  ((state.presets && state.presets.lift) || []).forEach(p => (p.exercises || []).forEach(r => add(r.name)));
+  return names;
+}
+/* ---------- Follow a preset in live ----------
+   The plan is guidance only: it stores the preset's own rows so the overlay can
+   show targets and what has already been logged. Counters/sets stay exactly the
+   same structures they were, which keeps finishing a session untouched. */
+function normalizeLivePlan(raw, env){
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
+  const items = (Array.isArray(raw.items) ? raw.items : []).map(it => {
+    if (!it || typeof it !== 'object') return null;
+    const name = String(it.name || '').trim();
+    if (!name) return null;
+    if (env === 'lift') return {
+      name,
+      targetSets: num(it.targetSets),
+      targetReps: num(it.targetReps),
+      targetWeight: num(it.targetWeight)
+    };
+    const cat = LIVE_CATEGORIES.includes(it.category) ? it.category : 'Other';
+    return {
+      name, category: cat,
+      setType: String(it.setType || LIVE_CAT_META[cat].setType),
+      spot: String(it.spot || ''),
+      targetAttempts: num(it.targetAttempts),
+      targetMakes: num(it.targetMakes)
+    };
+  }).filter(Boolean);
+  if (!items.length) return null;
+  return { id: String(raw.id || ''), name: String(raw.name || 'Preset'), items };
+}
+function liveCategoryForDrill(d){
+  const cat = d && d.category;
+  if (LIVE_CATEGORIES.includes(cat)) return cat;
+  const st = String((d && d.setType) || '').toLowerCase();
+  if (/free|\bft\b/.test(st)) return 'FT';
+  if (/finish|lay|paint/.test(st)) return 'Lay';
+  return 'Other';
+}
+function livePlanForPreset(env, p){
+  if (!p) return null;
+  const items = [];
+  if (env === 'lift'){
+    (p.exercises || []).forEach(r => {
+      const name = String(r.name || '').trim();
+      if (!name) return;
+      const sets = liftSetList(r);
+      const reps = sets.reduce((m, st) => Math.max(m, num(st.reps)), 0);
+      const weight = sets.reduce((m, st) => Math.max(m, num(st.weight)), 0);
+      const counted = sets.filter(st => num(st.reps) || num(st.weight)).length;
+      items.push({ name, targetSets: counted || sets.length, targetReps: reps, targetWeight: weight });
+    });
+  } else {
+    basketAllDrills(p).forEach(d => {
+      const name = String(d.name || '').trim();
+      if (!name) return;
+      const cat = liveCategoryForDrill(d);
+      items.push({
+        name, category: cat, setType: LIVE_CAT_META[cat].setType, spot: d.spot || '',
+        targetAttempts: num(d.attempts), targetMakes: num(d.makes)
+      });
+    });
+  }
+  return items.length ? { id: p.id || '', name: String(p.name || 'Preset'), items } : null;
+}
+/* How much of a plan row is already in the live buffer — derived, never stored. */
+function livePlanLogged(item){
+  const l = liveState();
+  const key = String(item && item.name || '').trim().toLowerCase();
+  if (!key) return 0;
+  if (liveEnv() === 'lift')
+    return (l.entries || []).filter(e => String(e.exercise || '').trim().toLowerCase() === key).length;
+  return (l.chunks || [])
+    .filter(c => String(c.name || '').trim().toLowerCase() === key)
+    .reduce((n, c) => n + num(c.attempts) + num(c.reps), 0);
+}
+function livePlanSelectHtml(){
+  const env = liveEnv();
+  const list = (state.presets && state.presets[env]) || [];
+  const plan = liveState().plan;
+  return '<select class="lp-pick" onchange="setLivePlan(this.value)" title="Follow a saved preset">' +
+    '<option value="">Freeform — no preset</option>' +
+    list.map(p => '<option value="' + p.id + '"' + (plan && plan.id === p.id ? ' selected' : '') + '>' +
+      esc(p.name || 'Preset') + '</option>').join('') +
+    '</select>';
+}
+function livePlanRowHtml(item, i){
+  const env = liveEnv();
+  const logged = livePlanLogged(item);
+  const target = env === 'lift' ? item.targetSets : item.targetAttempts;
+  const complete = target > 0 && logged >= target;
+  const label = env === 'lift' ? item.name : item.name + (item.spot ? ' · ' + item.spot : '');
+  const targetText = env === 'lift'
+    ? (item.targetSets ? item.targetSets + ' × ' + (item.targetReps || '—') : '— set/rep') + (item.targetWeight ? ' @ ' + fmtNum(item.targetWeight) + ' lb' : '')
+    : (item.targetAttempts ? item.targetAttempts + ' att' : 'no target') + (item.targetMakes ? ' · ' + item.targetMakes + ' makes' : '');
+  return '<div class="lp-row' + (complete ? ' done' : '') + '">' +
+    '<span class="lp-mark">' + (complete ? '✓' : (logged ? '◐' : '○')) + '</span>' +
+    '<span class="lp-name">' + esc(label) + '</span>' +
+    '<span class="lp-target">' + esc(targetText) + '</span>' +
+    '<span class="lp-done">' + (target ? logged + '/' + target : logged + ' logged') + '</span>' +
+    (env === 'lift'
+      ? '<button class="chip-btn" onclick="logLivePlanSet(' + i + ')" title="Log one set at this target">+ Set</button>'
+      : '<button class="chip-btn" onclick="focusLivePlanItem(' + i + ')" title="Make this the active drill">Focus</button>') +
+  '</div>';
+}
+function livePlanCardHtml(){
+  const env = liveEnv();
+  const plan = liveState().plan;
+  const list = (state.presets && state.presets[env]) || [];
+  const started = plan ? plan.items.filter(it => livePlanLogged(it) > 0).length : 0;
+  const body = plan
+    ? '<div class="lp-rows">' + plan.items.map((it, i) => livePlanRowHtml(it, i)).join('') + '</div>'
+    : '<p class="paste-hint">' + (list.length
+        ? 'Pick a saved ' + (env === 'lift' ? 'lifting' : 'basketball') + ' preset to see its ' + (env === 'lift' ? 'exercises' : 'drills') + ' here while you log. The live ' + (env === 'lift' ? 'set log stays exactly as it is.' : 'counters stay exactly as they are.')
+        : 'No ' + (env === 'lift' ? 'lifting' : 'basketball') + ' presets saved yet — build one in the Preset Manager, then follow it here.') + '</p>';
+  return '<div class="live-plan card" style="box-shadow:none">' +
+    '<div class="card-head"><h3>Follow a Preset</h3><span class="kicker">' +
+      (plan ? started + '/' + plan.items.length + ' started' : list.length + ' saved') + '</span></div>' +
+    '<div class="lp-head">' + livePlanSelectHtml() +
+      (plan ? '<span class="lp-tag">📋 ' + esc(plan.name) + '</span>' : '') + '</div>' +
+    body +
+  '</div>';
+}
+function setLivePlan(id){
+  const env = liveEnv();
+  const l = liveState();
+  if (!id){ l.plan = null; save(); renderLive(); toast('Freeform live session'); return; }
+  const p = ((state.presets && state.presets[env]) || []).find(x => x.id === id);
+  if (!p){ toast('That preset no longer exists', 'error'); return; }
+  const plan = livePlanForPreset(env, p);
+  if (!plan){ toast('That preset has no rows to follow', 'error'); return; }
+  snapshotDebounced();
+  l.plan = plan;
+  save();
+  renderLive();
+  toast('📋 Following "' + p.name + '" — ' + plan.items.length + ' ' + (env === 'lift' ? 'exercise' : 'drill') + (plan.items.length === 1 ? '' : 's'));
+}
+function focusLivePlanItem(i){
+  const l = liveState();
+  const item = l.plan && Array.isArray(l.plan.items) ? l.plan.items[i] : null;
+  if (!item || liveEnv() !== 'basketball' || !l.active) return;
+  l.drill = item.name;
+  l.category = LIVE_CATEGORIES.includes(item.category) ? item.category : 'Other';
+  l.drillStartAt = Date.now();
+  l.mentalDismissed = false;
+  save();
+  renderLive();
+  toast('🎯 Drill: ' + item.name + ' · ' + LIVE_CAT_META[l.category].label);
+}
+/* ---------- Plate-loading calculator ----------
+   Greedy per-side load from the selected profile's bar and plate inventory.
+   Both sides always get the same plates, so only half the target is solved. */
+function livePlateHtml(weight, mode){
+  const meta = liveModeMeta(mode);
+  const total = num(weight);
+  if (!total) return '<span class="pc-label">PER SIDE</span><span class="pc-out">Type a weight to load the bar.</span>';
+  if (total < meta.bar) return '<span class="pc-label">PER SIDE</span><span class="pc-out bad">Below the ' +
+    fmtNum(meta.bar) + ' lb bar — add weight or switch to dumbbells.</span>';
+  const plates = meta.plates.slice().sort((a, b) => b - a);
+  let left = Math.round((total - meta.bar) / 2 * 100) / 100;
+  const used = [];
+  plates.forEach(p => {
+    while (left >= p - 0.001){ used.push(p); left = Math.round((left - p) * 100) / 100; }
+  });
+  const exact = Math.abs(left) < 0.01;
+  const maxTotal = Math.round((total - left * 2) * 10) / 10;
+  return '<span class="pc-label">PER SIDE</span>' +
+    '<span class="pc-plates">' + (used.length
+      ? used.map(p => '<span class="pc-plate">' + fmtNum(p) + '</span>').join('')
+      : '<i class="pc-none">bar only</i>') + '</span>' +
+    '<span class="pc-frac">' + fmtNum(meta.bar) + ' lb bar' + (used.length ? ' + ' + fmtNum(Math.round(used.reduce((a, b) => a + b, 0) * 100) / 100) + ' per side' : '') + '</span>' +
+    '<span class="pc-out ' + (exact ? 'ok' : 'bad') + '">' + (exact
+      ? '= ' + fmtNum(total) + ' lb ✓'
+      : 'max ' + fmtNum(maxTotal) + ' lb — ' + fmtNum(Math.round(left * 100) / 100) + ' lb short per side') + '</span>' +
+    '<span class="pc-meta">' + (meta.fractional ? 'fractional' : 'standard') + ' jumps · ' + esc(meta.label) + '</span>';
+}
+function renderLivePlateCalc(){
+  const el = document.getElementById('ll-plate');
+  if (!el) return;
+  const l = liveState();
+  el.innerHTML = livePlateHtml(l.weight, l.mode);
+}
+
+function setLiveLiftField(field, value){
+  const l = liveState();
+  if (liveEnv() !== 'lift' || !['exercise', 'weight', 'reps', 'rpe'].includes(field)) return;
+  l[field] = value;
+  snapshotDebounced();
+  save();
+  if (field === 'weight') renderLivePlateCalc();
+}
+function logLiveLiftSet(){
+  const l = liveState();
+  if (liveEnv() !== 'lift' || !l.active) return;
+  if (l.pausedAt) toggleLivePause();          // logging a set resumes a paused session
+  const el = id => document.getElementById(id);
+  const exercise = String((el('ll-exercise') || {}).value !== undefined ? el('ll-exercise').value : l.exercise).trim();
+  const weight = el('ll-weight') ? el('ll-weight').value : l.weight;
+  const reps = el('ll-reps') ? el('ll-reps').value : l.reps;
+  const rpe = el('ll-rpe') ? el('ll-rpe').value : l.rpe;
+  if (!exercise){ toast('Name the exercise first', 'error'); return; }
+  if (!num(reps) && !num(weight)){ toast('Enter a weight or reps for this set', 'error'); return; }
+  pushLiveLiftEntry(exercise, weight, reps, rpe);
+}
+function pushLiveLiftEntry(exercise, weight, reps, rpe){
+  const l = liveState();
+  if (liveEnv() !== 'lift' || !l.active) return false;
+  const name = String(exercise || '').trim();
+  if (!name) return false;
+  snapshotDebounced();
+  l.exercise = name;
+  l.weight = weight;
+  l.reps = reps;
+  l.rpe = rpe;
+  l.entries.push({ exercise: name, weight, reps, rpe });
+  save();
+  renderLive();
+  liveFlashStats();
+  return true;
+}
+function logLivePlanSet(i){
+  const l = liveState();
+  const item = l.plan && Array.isArray(l.plan.items) ? l.plan.items[i] : null;
+  if (!item || liveEnv() !== 'lift' || !l.active) return;
+  if (l.pausedAt) toggleLivePause();
+  const ok = pushLiveLiftEntry(item.name,
+    item.targetWeight ? String(item.targetWeight) : l.weight,
+    item.targetReps ? String(item.targetReps) : l.reps, '');
+  if (!ok) toast('That preset row has no weight or reps to log', 'error');
+}
+function removeLiveLiftEntry(i){
+  const l = liveState();
+  if (!Array.isArray(l.entries) || i < 0 || i >= l.entries.length) return;
+  snapshot();
+  l.entries.splice(i, 1);
+  save();
+  renderLive();
+}
+function renderLiveLift(){
+  const el = document.getElementById('live-overlay');
+  if (!el) return;
+  const l = liveState();
+  if (!l.active){ el.innerHTML = ''; return; }
+  const t = liveLiftTotals();
+  const meta = liveModeMeta(l.mode);
+  const entries = (l.entries || []).length
+    ? l.entries.map((e, i) =>
+        '<div class="live-chunk">' +
+          '<span class="lc-cat" style="color:var(--amber);border-color:rgba(240,165,0,.55)">SET ' + (i + 1) + '</span>' +
+          '<span class="lc-name">' + esc(e.exercise) + '</span>' +
+          '<span>' + fmtNum(e.weight) + ' lb × ' + fmtNum(e.reps) + (num(e.rpe) ? ' · RPE ' + fmtNum(e.rpe) : '') + '</span>' +
+          '<button class="icon-btn danger" onclick="removeLiveLiftEntry(' + i + ')" title="Remove set">✕</button>' +
+        '</div>').join('')
+    : '<div class="empty sm">No sets logged yet — log the first one above.</div>';
+  el.innerHTML =
+    '<div class="live-wrap">' +
+      '<div class="live-head">' +
+        '<span class="live-rec"><span class="dot"></span>LIVE LIFT</span>' +
+        '<label class="live-date"><span>DATE</span><input type="date" id="live-date" value="' + liveDateValue() + '" onchange="setLiveDate(this.value)"></label>' +
+        '<button class="live-mode-btn" onclick="openLiveModeChooser(true)" title="Switch workout location / equipment">Mode: ' + esc(meta.label) + ' ⚙️</button>' +
+        '<span class="live-spacer"></span>' +
+        '<button class="btn sm ghost" onclick="toggleLivePause()">' + (l.pausedAt ? '▶ Resume' : '⏸ Pause') + '</button>' +
+        '<button class="btn sm ghost" onclick="closeLiveOverlay()">Minimize</button>' +
+      '</div>' +
+
+      '<div class="live-stats" id="live-stats">' +
+        '<div class="live-stat-row">' +
+          '<div class="live-stat"><div class="ls-label">Sets Logged</div><div class="ls-val">' + fmtNum(t.sets) + '</div></div>' +
+          '<div class="live-stat"><div class="ls-label">Reps</div><div class="ls-val small">' + fmtNum(t.reps) + '</div></div>' +
+          '<div class="live-stat"><div class="ls-label">Volume</div><div class="ls-val small">' + fmtNum(t.volume) + ' lb</div></div>' +
+          '<div class="live-stat"><div class="ls-label">Top Set</div><div class="ls-val small">' + (t.top ? fmtNum(t.top) + ' lb' : '—') + '</div></div>' +
+          '<div class="live-stat"><div class="ls-label">Exercises</div><div class="ls-val small" style="font-size:14px">' + esc(t.groups.length ? t.groups.join(' · ') : '—') + '</div></div>' +
+        '</div>' +
+      '</div>' +
+
+      livePlanCardHtml() +
+
+      '<div class="live-sec card" style="box-shadow:none">' +
+        '<div class="card-head"><h3>Log a Set</h3><span class="kicker">' + meta.icon + ' ' + esc(meta.label) + ' · bar ' + fmtNum(meta.bar) + ' lb base</span></div>' +
+        '<div class="live-lift-form">' +
+          '<label><span>Exercise</span><input id="ll-exercise" list="live-lift-exercises" value="' + esc(l.exercise || '') + '" placeholder="e.g. Back Squat" oninput="setLiveLiftField(\'exercise\',this.value)"></label>' +
+          '<label><span>Weight (lb)</span><input id="ll-weight" type="number" min="0" step="2.5" inputmode="decimal" value="' + esc(l.weight) + '" placeholder="lbs" oninput="setLiveLiftField(\'weight\',this.value)"></label>' +
+          '<label><span>Reps</span><input id="ll-reps" type="number" min="0" step="1" inputmode="numeric" value="' + esc(l.reps) + '" placeholder="reps" oninput="setLiveLiftField(\'reps\',this.value)"></label>' +
+          '<label><span>RPE</span><input id="ll-rpe" type="number" min="1" max="10" step="1" value="' + esc(l.rpe) + '" placeholder="—" oninput="setLiveLiftField(\'rpe\',this.value)"></label>' +
+          '<button class="live-btn make" style="padding:15px 18px;font-size:14px" onclick="logLiveLiftSet()">+ Log Set</button>' +
+        '</div>' +
+        '<div class="plate-calc" id="ll-plate">' + livePlateHtml(l.weight, l.mode) + '</div>' +
+        '<datalist id="live-lift-exercises">' + liveLiftExerciseOptions().map(n => '<option value="' + esc(n) + '"></option>').join('') + '</datalist>' +
+        '<p class="paste-hint" style="margin-top:8px">Weight and reps carry over between sets — change only what moved, then tap <b>+ Log Set</b>.</p>' +
+      '</div>' +
+
+      '<div class="live-sec card" style="box-shadow:none">' +
+        '<div class="card-head"><h3>Logged This Session</h3><span class="kicker">' + t.sets + ' set' + (t.sets === 1 ? '' : 's') + '</span></div>' +
+        entries +
+        '<div class="field" style="margin-top:10px"><label>Session Notes</label><textarea rows="2" id="live-note" placeholder="How did the sets feel?" oninput="setLiveField(\'note\',this.value)">' + esc(l.note || '') + '</textarea></div>' +
+      '</div>' +
+
+      '<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end">' +
+        '<button class="btn ghost" onclick="cancelLiveWorkout()">Discard Session</button>' +
+        '<button class="btn" onclick="finishLiveWorkout()">✓ Finish &amp; Save Lift</button>' +
+      '</div>' +
+    '</div>';
+}
+function finishLiveLift(){
+  const l = liveState();
+  if (!Array.isArray(l.entries) || !l.entries.length){ toast('Log at least one set first', 'error'); return; }
+  const key = l.dateKey || workoutDateFor('lift') || todayKey();
+  const rows = [];
+  l.entries.forEach(e => {
+    const name = String(e.exercise || '').trim();
+    if (!name) return;
+    if (!num(e.weight) && !num(e.reps)) return;
+    let row = rows.find(r => r.name.toLowerCase() === name.toLowerCase());
+    if (!row){
+      row = { id: uid(), name, rpe: '', pr: false, sets: [] };
+      rows.push(row);
+    }
+    row.sets.push({ setNum: row.sets.length + 1, weight: e.weight === undefined ? '' : e.weight, reps: e.reps === undefined ? '' : e.reps });
+    if (num(e.rpe)) row.rpe = e.rpe;
+  });
+  if (!rows.length){ toast('Log at least one set first', 'error'); return; }
+  snapshot();
+  /* Time is optional: with the stopwatch off nothing is added to the duration. */
+  const mins = l.timerOn ? Math.max(1, Math.round(liveSessionMs() / 60000)) : 0;
+  let s = latestSessionFor(key, 'lift');
+  if (s){
+    s.exercises = Array.isArray(s.exercises) ? s.exercises : [];
+    rows.forEach(row => {
+      const hit = s.exercises.find(r => String(r.name || '').toLowerCase() === row.name.toLowerCase());
+      if (hit){
+        const list = liftSetList(hit);
+        row.sets.forEach(st => list.push(st));
+        hit.sets = list;
+        renumberLiftSets(hit);
+        if (!num(hit.rpe) && num(row.rpe)) hit.rpe = row.rpe;
+      } else {
+        s.exercises.push(row);
+      }
+    });
+    if (mins) s.time = String(num(s.time) + mins);
+    if (l.note) s.notes = (s.notes ? s.notes + ' — ' : '') + l.note;
+  } else {
+    s = { id: uid(), type: 'lift', presetId: null, presetName: 'Live Session', day: 'Mon',
+          exercises: rows, time: mins ? String(mins) : '', notes: l.note || '' };
+    addSessionFor(key, 'lift', s);
+  }
+  syncSessionToLog(key);
+  const t = liveLiftTotals();
+  l.active = false;
+  l.startedAt = 0;
+  l.pausedAt = 0;
+  l.restEndsAt = 0;
+  l.entries = [];
+  l.plan = null;
+  save();
+  stopLiveTicker();
+  renderLive();
+  closeLiveOverlay();
+  renderAll();
+  livePingRest();
+  toast('✓ Live lift saved — ' + t.sets + ' set' + (t.sets === 1 ? '' : 's') + ' · ' + fmtNum(t.volume) + ' lbs' + (mins ? ' · ' + mins + ' min' : ' · timer off'));
+}
 function renderLive(){
+  if (liveEnv() === 'lift') return renderLiveLift();
   const el = document.getElementById('live-overlay');
   if (!el) return;
   const l = liveState();
   if (!l.active){ el.innerHTML = ''; return; }
   const t = liveTotals();
-  const restLeft = l.restEndsAt ? l.restEndsAt - (l.pausedAt || Date.now()) : 0;
   const catMeta = LIVE_CAT_META[l.category];
   const mental = liveMentalActive() && !l.mentalDismissed;
   const chunks = l.chunks.length
@@ -10116,12 +10693,12 @@ function renderLive(){
     '<div class="live-wrap">' +
       '<div class="live-head">' +
         '<span class="live-rec"><span class="dot"></span>LIVE SESSION</span>' +
+        '<label class="live-date"><span>DATE</span><input type="date" id="live-date" value="' + liveDateValue() + '" onchange="setLiveDate(this.value)"></label>' +
         (l.timerOn
-          ? '<div class="live-clock" id="live-session-clock">' + fmtClock(liveSessionMs()) + '<small>SESSION</small></div>' +
-            '<div class="live-clock" id="live-drill-clock">' + fmtClock(liveDrillMs()) + '<small>ACTIVE DRILL</small></div>'
-          : '<span class="live-timer-off">⏱ STOPWATCH OFF — counters only</span>') +
+          ? '<div class="live-clock" id="live-drill-clock">' + fmtClock(liveDrillMs()) + '<small>ACTIVE DRILL</small></div>'
+          : '<span class="live-timer-off">⏱ Drill clock off — counters only</span>') +
         '<span class="live-spacer"></span>' +
-        '<button class="btn sm ghost" onclick="toggleLiveTimer()">' + (l.timerOn ? '⏱ Timer: On' : '⏱ Timer: Off') + '</button>' +
+        '<button class="btn sm ghost" onclick="toggleLiveTimer()">' + (l.timerOn ? '⏱ Drill Clock: On' : '⏱ Drill Clock: Off') + '</button>' +
         (l.timerOn ? '<button class="btn sm ghost" onclick="resetLiveDrillTimer()">↻ Reset drill timer</button>' : '') +
         '<button class="btn sm ghost" onclick="toggleLivePause()">' + (l.pausedAt ? '▶ Resume' : '⏸ Pause') + '</button>' +
         '<button class="btn sm ghost" onclick="closeLiveOverlay()">Minimize</button>' +
@@ -10137,6 +10714,8 @@ function renderLive(){
         '</div>' +
       '</div>' +
 
+      livePlanCardHtml() +
+
       (mental
         ? '<div class="live-mental"><span style="font-size:20px">🧠</span><p><b>Mental reset:</b> ' + esc(MENTAL_MESSAGE) + '</p>' +
           '<button class="chip-btn" onclick="dismissMentalBanner()">Got it</button></div>'
@@ -10151,14 +10730,6 @@ function renderLive(){
         '<button class="live-fix" onclick="liveUndo(\'make\')" title="Undo an accidental make">−1 Make</button>' +
         '<button class="live-fix" onclick="liveUndo(\'miss\')" title="Undo an accidental miss">−1 Miss</button>' +
         '<button class="live-fix" onclick="liveUndo(\'rep\')" title="Undo an accidental rep">−1 Rep</button>' +
-      '</div>' +
-
-      '<div class="live-rest' + (restLeft > 0 ? ' on' : '') + '" id="live-rest-box">' +
-        '<span class="kicker">REST COUNTDOWN</span>' +
-        '<span class="live-rest-clock" id="live-rest-clock">' + (restLeft > 0 ? fmtClock(restLeft) : '--:--') + '</span>' +
-        REST_PRESETS.map(s => '<button class="chip-btn' + (l.restPreset === s ? ' active' : '') + '" onclick="startLiveRest(' + s + ')">' + s + 's</button>').join('') +
-        '<button class="chip-btn" onclick="skipLiveRest()">Skip rest</button>' +
-        '<span class="paste-hint">Pings audibly + flashes when the countdown finishes.</span>' +
       '</div>' +
 
       '<div class="live-sec card" style="box-shadow:none">' +
@@ -12084,4 +12655,5 @@ applyTab();
 renderAll();
 startClock();
 startAutoSync();
-if (liveState().active){ openLiveOverlay(); startLiveTicker(); }
+const liveRestoreEnv = liveActiveEnv();
+if (liveRestoreEnv){ liveSetEnv(liveRestoreEnv); openLiveOverlay(); startLiveTicker(); }
